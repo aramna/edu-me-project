@@ -3,6 +3,8 @@ import { Authentication } from 'components'
 import { connect } from 'react-redux'
 import { registerRequest } from "../actions/authentication"
 import { browserHistory } from 'react-router'
+import 'antd/dist/antd.css';
+import { message } from 'antd'
 
 class Register extends React.Component {
 
@@ -15,7 +17,7 @@ class Register extends React.Component {
         return this.props.registerRequest(username, email, pw).then(
             () => {
                 if(this.props.status === "SUCCESS") {
-                    window.alert('회원가입을 성공했습니다. 로그인 하세요.')
+                    message.success('회원가입을 성공했습니다. 로그인 하세요.')
                     browserHistory.push('/login')
                     return true
                 } else {
@@ -25,7 +27,7 @@ class Register extends React.Component {
                         '비밀번호가 넘짧자나',
                         '이메일이 이미 존재해유'
                     ];
-                    window.alert(errorMessage[this.props.errorCode - 1])
+                    message.warning(errorMessage[this.props.errorCode - 1])
                     return false
                 }
             }

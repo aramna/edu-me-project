@@ -79,7 +79,7 @@ class Header extends React.Component {
         )
 
         return (
-            <div>
+            <div >
                 <Navbar color="faded" light expand="md">
                     <NavbarBrand tag={Link} to="/">EduMe</NavbarBrand>
                     <NavbarToggler onClick={this.toggle}/>

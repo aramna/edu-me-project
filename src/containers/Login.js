@@ -1,5 +1,7 @@
 import React from 'react';
 import {Authentication} from 'components'
+import 'antd/dist/antd.css';
+import { message } from 'antd'
 
 // Login 컴포넌트를 Redux에 연결
 import {connect} from 'react-redux'
@@ -26,11 +28,12 @@ class Login extends React.Component {
                     // cookie 설정
                     document.cookie = 'key=' + btoa(JSON.stringify(loginData))
 
-                    window.alert('성공적으로 로그인 되었습니다.')
+
                     browserHistory.push('/')    //로그인이 성공하면 홈으로 넘어감
+                    message.success("로그인을 성공했습니다.")
                     return true
                 } else {
-                    window.alert('실패했습니다.')
+                    message.error("로그인을 실패했습니다.")
                     return false
                 }
             }

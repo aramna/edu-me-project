@@ -8,7 +8,7 @@ const router = express.Router();
 router.post('/adduser', (req, res) => {
     console.log('회원가입 라우팅 응답');
     // username의 형식 체크(영어 기준 -> 한글 기준으로 바꿀 것)
-    let usernameRegex = /^[가-힣]+$/
+    let usernameRegex = /^[a-zA-Z가-힣]+$/
 
     if (!usernameRegex.test(req.body.username)) {
         return res.status(400).json({

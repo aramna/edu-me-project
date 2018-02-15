@@ -2,6 +2,8 @@ import React, {Component} from 'react';
 import {Header} from 'components'
 import {connect} from 'react-redux'
 import {getStatusRequest, logoutRequest} from "../actions/authentication";
+import 'antd/dist/antd.css';
+import { message } from 'antd'
 
 class App extends Component {
 
@@ -15,7 +17,7 @@ class App extends Component {
     handleLogout() {
         this.props.logoutRequest().then(
             () => {
-                window.alert('빠이')
+                message.success("로그아웃이 완료되었습니다.")
 
                 // EMPTIES THE SESSION
                 let loginData = {

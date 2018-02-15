@@ -56,17 +56,6 @@ class Authentication extends React.Component {
         );
     }
 
-    // 비밀번호를 치고 엔터를 눌렀을 때 로그인/회원가입 실행
-    handleKeyPress(e) {
-        if(e.key === 'Enter') {
-            if(this.props.mode) {
-                this.handleLogin()
-            } else {
-                this.handleRegister()
-            }
-        }
-    }
-
     render() {
 
         const loginView = (
@@ -92,7 +81,6 @@ class Authentication extends React.Component {
                                    type="password"
                                    onChange={this.handleChange}
                                    value={this.state.password}
-                                   onKeyPress={this.handleKeyPress}
                                    placeholder='비밀번호'
                                    style={{borderRadius: 30}}/>
                         </Form.Field>
@@ -142,7 +130,6 @@ class Authentication extends React.Component {
                                    type="password"
                                    onChange={this.handleChange}
                                    value={this.state.password}
-                                   onKeyPress={this.handleKeyPress}
                                    placeholder='비밀번호'
                                    style={{borderRadius: 30}}/>
                         </Form.Field>
