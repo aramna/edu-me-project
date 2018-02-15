@@ -12,7 +12,7 @@ import database from './database/database'
 
 import webpack from 'webpack';
 import WebpackDevServer from 'webpack-dev-server';
-const config = require('../../../Downloads/Start3/server/config/config');
+const config = require('./config/config');
 const webConfig = require('../webpack.dev.config');
 const path = require('path');
 const http = require('http');
