@@ -29,13 +29,13 @@ class App extends Component {
     }
 
     componentDidMount() {
-        function getCookie(email) {
+        function getCookie(name) {
             var value = "; " + document.cookie
             var parts = value.split("; " + name + "=")
             if (parts.length == 2) return parts.pop().split(";").shift()
         }
 
-        // get loginData from cookie
+        // 쿠키로부터 로그인 데이터를 얻음
         let loginData = getCookie('key');
 
         // if loginData is undefined, do nothing

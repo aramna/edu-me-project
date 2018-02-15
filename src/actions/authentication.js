@@ -14,14 +14,14 @@ import axios from 'axios';
 
 /* ====== AUTH ====== */
 
-/* LOGIN */
+/* 로그인 */
 export function loginRequest(email, password) {
     return (dispatch) => {
         dispatch(login());
 
         return axios.post('/api/user/login', { email, password })
             .then((response) => {
-                dispatch(loginSuccess(email));
+                dispatch(loginSuccess(response.data.info.username));
             }).catch((error) => {
                 dispatch(loginFailure());
             });
@@ -48,7 +48,7 @@ export function loginFailure() {
     };
 }
 
-/* REGISTER */
+/* 회원가입 */
 export function registerRequest(username, email, password) {
     return (dispatch) => {
         // inform register API is starting
@@ -82,14 +82,14 @@ export function registerFailure(error) {
     };
 }
 
-/* GET STATUS */
+/* 로그인 세션 확인 */
 
 export function getStatusRequest() {
     return (dispatch) => {
         dispatch(getStatus());
         return axios.get('/api/user/getinfo')
             .then((response) => {
-                dispatch(getStatusSuccess(response.data.info.email));
+                dispatch(getStatusSuccess(response.data.info.username));
             }).catch((error) => {
                 dispatch(getStatusFailure());
             });
@@ -116,7 +116,7 @@ export function getStatusFailure() {
 }
 
 
-/* LOGOUT */
+/* 로그아웃 */
 export function logoutRequest() {
     return (dispatch) => {
         return axios.post('/api/user/logout')

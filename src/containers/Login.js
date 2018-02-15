@@ -27,7 +27,7 @@ class Login extends React.Component {
                     document.cookie = 'key=' + btoa(JSON.stringify(loginData))
 
                     window.alert('성공적으로 로그인 되었습니다.')
-                    browserHistory.push('/chat')    //로그인이 성공하면 홈으로 넘어감
+                    browserHistory.push('/')    //로그인이 성공하면 홈으로 넘어감
                     return true
                 } else {
                     window.alert('실패했습니다.')

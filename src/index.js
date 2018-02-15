@@ -23,7 +23,6 @@ ReactDOM.render(
                 <IndexRoute component={Home}/>
                 <Route path="login" component={Login}/>
                 <Route path="register" component={Register}/>
-                <Route path="chat" component={Chat}/>
             </Route>
         </Router>
     </Provider>,

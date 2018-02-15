@@ -1,5 +1,6 @@
 import express from 'express'
 import database from '../database/database'
+
 const router = express.Router();
 
 
@@ -7,7 +8,7 @@ const router = express.Router();
 router.post('/adduser', (req, res) => {
     console.log('회원가입 라우팅 응답');
     // username의 형식 체크(영어 기준 -> 한글 기준으로 바꿀 것)
-    let usernameRegex = /^[a-z0-9]+$/
+    let usernameRegex = /^[가-힣]+$/
 
     if (!usernameRegex.test(req.body.username)) {
         return res.status(400).json({
@@ -39,7 +40,7 @@ router.post('/adduser', (req, res) => {
         if (err) throw err
         if (exists) {
             return res.status(409).json({
-                error: "이미 이메일이 존재해요시벌아",
+                error: "이미 이메일이 존재해요",
                 code: 4
             })
         }
@@ -65,18 +66,18 @@ router.post('/adduser', (req, res) => {
 router.route('/login').post(function (req, res) {
     console.log('로그인 라우트 응답 받음')
 
-    if(typeof req.body.password !== "string") {
+    if (typeof req.body.password !== "string") {
         return res.status(401).json({
             error: "로그인 실패",
             code: 1
         })
     }
 
-    database.UserModel.findOne({ email: req.body.email }, (err, user) => {
-        if(err) throw err
+    database.UserModel.findOne({email: req.body.email}, (err, user) => {
+        if (err) throw err
 
         // 계정 존재 유무 확인
-        if(!user) {
+        if (!user) {
             console.log('계정이 존재하지 않습니다.')
             return res.status(401).json({
                 error: "이메일이 존재하지 않아",
@@ -85,7 +86,7 @@ router.route('/login').post(function (req, res) {
         }
 
         //비밀번호 확인
-        if(!user.validateHash(req.body.password)) {
+        if (!user.validateHash(req.body.password)) {
             console.log('비밀번호가 일치하지 않습니다.')
             return res.status(401).json({
                 error: "비밀번호 불일치",
@@ -97,31 +98,34 @@ router.route('/login').post(function (req, res) {
         let session = req.session
         session.loginInfo = {
             _id: user._id,
-            username: user.username
+            username: user.username,
+            email: user.email
         }
         console.log('로그인 성공!');
-        // success 반환
-        return res.json({
-            success: true
-        })
+
+        // success와 저장된 로그인정보 반환
+        var data = {}
+        return res.json({info: req.session.loginInfo})
     })
 })
 
 router.post('/logout', (req, res) => {
     console.log('로그아웃 라우트 요청받음');
-    req.session.destroy(err => { if(err) throw err; });
-    return res.json({ sucess: true });
+    req.session.destroy(err => {
+        if (err) throw err;
+    });
+    return res.json({success: true});
 });
 
 // 세션확인 구현
 router.get('/getinfo', (req, res) => {
-    if(typeof req.session.loginInfo === "undefined"){
+    if (typeof req.session.loginInfo === "undefined") {
         return res.status(401).json({
             error: 1
         })
     }
 
-    res.json({ info: req.session.loginInfo })
+    res.json({info: req.session.loginInfo})
 })
 
 export default router

@@ -1,16 +1,19 @@
 import React from 'react';
-import { Jumbotron, Button } from 'reactstrap';
+import {Jumbotron, Button} from 'reactstrap';
+import {connect} from 'react-redux'
+import {Chat} from 'containers'
 
 
-class Home extends React.Component{
-    sayHey(){
+class Home extends React.Component {
+    sayHey() {
         alert("hey")
     }
 
     render() {
-        return (
-            <div>
 
+        const chatView = (<Chat/>)
+        const homeView = (
+            <div>
                 <Jumbotron>
                     <h1 className="display-3">에듀미다</h1>
                     <p className="lead">에듀미는 </p>
@@ -20,10 +23,21 @@ class Home extends React.Component{
                         <Button onClick={this.sayHey} color="primary">가즈아!</Button>
                     </p>
                 </Jumbotron>
+            </div>
+        )
 
+        return (
+            <div>
+                {this.props.isLoggedIn ? chatView : homeView}
             </div>
         );
     }
 }
 
-export default Home;
+const mapStateToProps = (state) => {
+    return {
+        isLoggedIn: state.authentication.status.isLoggedIn
+    }
+}
+
+export default connect(mapStateToProps)(Home);

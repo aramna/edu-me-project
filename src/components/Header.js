@@ -15,8 +15,9 @@ import {
 } from 'reactstrap';
 import {Dropdown, Icon} from 'semantic-ui-react'
 import {Link} from 'react-router'
+import {connect} from 'react-redux'
 
-export default class Header extends React.Component {
+class Header extends React.Component {
     constructor(props) {
         super(props);
 
@@ -37,14 +38,14 @@ export default class Header extends React.Component {
 
         const trigger = (
             <span>
-            <Icon name='user'/> Hello, {this.props.username}
+            <Icon name='user'/> {this.props.currentUser}
              </span>
         )
 
         const options = [
             {
                 key: 'user',
-                text: <span><strong>{this.props.username}</strong>님</span>,
+                text: <span><strong>{this.props.currentUser}</strong>님</span>,
                 disabled: true,
             },
             {key: 'profile', text: '나의 프로필'},
@@ -121,15 +122,24 @@ export default class Header extends React.Component {
 }
 
 
-// props의 type과 기본값 설정하는 부분
-Header.propTypes = {
-    isLoggedIn: React.PropTypes.bool,   // 현재 로그인 상태인지 아닌지 여부를 알려주는 값
-    onLogout: React.PropTypes.func      // 함수형 props로 로그아웃 담당
-}
+// // props의 type과 기본값 설정하는 부분
+// Header.propTypes = {
+//     isLoggedIn: React.PropTypes.bool,   // 현재 로그인 상태인지 아닌지 여부를 알려주는 값
+//     onLogout: React.PropTypes.func      // 함수형 props로 로그아웃 담당
+// }
+//
+// Header.defaultProps = {
+//     isLoggedIn: false,
+//     onLogout: () => {
+//         console.error("로그아웃 기능이 정의되지 않았습니다.")
+//     }
+// }
 
-Header.defaultProps = {
-    isLoggedIn: false,
-    onLogout: () => {
-        console.error("로그아웃 기능이 정의되지 않았습니다.")
+const mapStateToProps = (state) => {
+    return {
+        isLoggedIn: state.authentication.status.isLoggedIn,
+        currentUser: state.authentication.status.currentUser
     }
 }
+
+export default connect(mapStateToProps)(Header)

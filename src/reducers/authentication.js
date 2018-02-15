@@ -10,7 +10,7 @@ const initialState = {
         error: -1
     },
     status: {
-        valid: false,
+        valid: false,       // 페이지가 새로고침되었을 때, 세션이 유효한지 체크
         isLoggedIn: false,
         currentUser: ''
     }
