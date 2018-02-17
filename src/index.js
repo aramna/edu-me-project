@@ -11,6 +11,7 @@ import thunk from 'redux-thunk'
 
 import 'semantic-ui-css/semantic.min.css'
 import 'bootstrap/dist/css/bootstrap.css';
+import 'antd/dist/antd.css';
 
 const store = createStore(reducers, applyMiddleware(thunk))
 
@@ -24,6 +25,7 @@ ReactDOM.render(
                 <Route path="login" component={Login}/>
                 <Route path="register" component={Register}/>
             </Route>
+            <Route path="chat" component={Chat}/>
         </Router>
     </Provider>,
     rootElement

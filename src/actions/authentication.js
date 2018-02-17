@@ -35,10 +35,10 @@ export function login() {
     };
 }
 
-export function loginSuccess(email) {
+export function loginSuccess(userData) {
     return {
         type: AUTH_LOGIN_SUCCESS,
-        email
+        userData
     };
 }
 
@@ -55,7 +55,7 @@ export function registerRequest(username, email, password) {
         dispatch(register());
 
         return axios.post('/api/user/adduser', { username, email, password })
-            .then((reponse) => {
+            .then((response) => {
                 dispatch(registerSuccess());
             }).catch((error) => {
                 dispatch(registerFailure(error.response.data.code));
@@ -102,10 +102,10 @@ export function getStatus() {
     };
 }
 
-export function getStatusSuccess(email) {
+export function getStatusSuccess(userData) {
     return {
         type: AUTH_GET_STATUS_SUCCESS,
-        email
+        userData
     };
 }
 

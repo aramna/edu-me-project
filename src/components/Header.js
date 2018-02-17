@@ -1,23 +1,38 @@
 import React from 'react';
 import {
-    Collapse,
-    Navbar,
-    NavbarToggler,
-    NavbarBrand,
-    Nav,
-    NavItem,
-    NavLink,
-    UncontrolledDropdown,
-    DropdownToggle,
-    DropdownMenu,
-    DropdownItem,
-    Button
-} from 'reactstrap';
-import {Dropdown, Icon} from 'semantic-ui-react'
+    Dropdown,
+    Button,
+    Container,
+    Divider,
+    Grid,
+    Icon,
+    Image,
+    List,
+    Menu,
+    Responsive,
+    Segment,
+    Sidebar,
+    Visibility,
+} from 'semantic-ui-react'
+import whitelogoImage from '../images/logo.png'
+import blacklogoImage from '../images/logo2.png'
+// import {
+//     Collapse,
+//     Navbar,
+//     NavbarToggler,
+//     NavbarBrand,
+//     Nav,
+//     NavItem,
+//     NavLink,
+//     UncontrolledDropdown,
+//     DropdownToggle,
+//     DropdownMenu,
+//     DropdownItem,
+// } from 'reactstrap';
 import {Link} from 'react-router'
 import {connect} from 'react-redux'
 
-class Header extends React.Component {
+class FixedHeader extends React.Component {
     constructor(props) {
         super(props);
 
@@ -32,6 +47,13 @@ class Header extends React.Component {
             isOpen: !this.state.isOpen
         });
     }
+
+    // hideFixedMenu() {
+    //     this.setState({fixed: false})
+    // }
+    // showFixedMenu() {
+    //     this.setState({ fixed: true })
+    // }
 
 
     render() {
@@ -60,62 +82,92 @@ class Header extends React.Component {
 
 
         const loginButton = (
-            <NavItem>
-                <Button
-                    tag={Link}
+            <Grid>
+                <Menu.Item
+                    as={Link}
                     to="/register"
-                    outline color="secondary"
-                    style={{marginRight: 10}}
-                >회원가입</Button>
+                    inverted
+                >Sign up</Menu.Item>
 
-                <Button tag={Link} to="/login" outline color="secondary">로그인</Button>
-            </NavItem>
+                <Menu.Item as={Link}
+                           to="/login"
+                           inverted
+                           style={{marginLeft: '0.5em'}}
+                >Sign in</Menu.Item>
+            </Grid>
         )
 
         const logoutButton = (
-            <NavItem>
+            <div>
                 <DropdownTrigger/>
-            </NavItem>
+            </div>
         )
 
-        return (
-            <div >
-                <Navbar color="faded" light expand="md">
-                    <NavbarBrand tag={Link} to="/">EduMe</NavbarBrand>
-                    <NavbarToggler onClick={this.toggle}/>
-                    <Collapse isOpen={this.state.isOpen} navbar>
-                        <Nav className="ml-auto" navbar>
-                            <NavItem>
-                                <NavLink href="/components/">소개</NavLink>
-                            </NavItem>
-                            <NavItem>
-                                <NavLink>사용법</NavLink>
-                            </NavItem>
-                            <UncontrolledDropdown nav inNavbar
-                                                  style={{marginRight: 30}}>
-                                <DropdownToggle nav caret>
-                                    메뉴
-                                </DropdownToggle>
-                                <DropdownMenu>
-                                    <DropdownItem>
-                                        Option 1
-                                    </DropdownItem>
-                                    <DropdownItem>
-                                        Option 2
-                                    </DropdownItem>
-                                    <DropdownItem divider/>
-                                    <DropdownItem>
-                                        Reset
-                                    </DropdownItem>
-                                </DropdownMenu>
-                            </UncontrolledDropdown>
+        const loggedHeader = (
+            <Menu
+                fixed='top'
+                secondary
+                inverted
+                style={{marginTop: 8}}
+            >
+                <Container>
+                    <Menu.Item style={{marginBottom: 0}}>
+                        <Image
+                            size='small'
+                            src={whitelogoImage}
+                        />
+                    </Menu.Item>
+                    <Menu.Item as='a' style={{marginBottom: 0}}>Introduction</Menu.Item>
+                    <Menu.Item as='a' style={{marginBottom: 0}}>Using</Menu.Item>
+                    <Menu.Item as='a' style={{marginBottom: 0}}>Careers</Menu.Item>
+                    <Menu.Item position='right'>
+                        {this.props.isLoggedIn ? logoutButton : loginButton}
+                    </Menu.Item>
+                </Container>
+            </Menu>
+        )
 
-                            <NavItem>
-                                {this.props.isLoggedIn ? logoutButton : loginButton}
-                            </NavItem>
-                        </Nav>
-                    </Collapse>
-                </Navbar>
+        const logoutedHeader = (
+            <Segment inverted color='brown' style={{textAlign: 'center', minHeight: 55, padding: 0, borderRadius: 0}}>
+                <Menu
+                    fixed='top'
+                    secondary
+                    inverted
+                    style={{marginTop: 0, width: '100%'}}
+
+                >
+                    <Container
+                        style={{width: '100%'}}>
+                        <Menu.Item as='a' style={{marginTop: 0}}>
+                            <Image
+                                size='tiny'
+                                src={whitelogoImage}
+                            />
+                        </Menu.Item>
+
+                        <Menu.Item position='right'>
+                            <Menu.Item style={{marginBottom: 0}}>
+                                <Icon name="alarm outline"/>
+                            </Menu.Item>
+                            <Menu.Item style={{marginBottom: 0}}>
+                                <Icon name="add user"/>
+                            </Menu.Item>
+                            <Menu.Item style={{marginBottom: 0}}>
+                                <Icon name="users"/>
+                            </Menu.Item>
+                            <Menu.Item style={{marginLeft: 20, marginRight: 0}}>
+                            {this.props.isLoggedIn ? logoutButton : loginButton}
+                            </Menu.Item>
+                        </Menu.Item>
+                    </Container>
+                </Menu>
+            </Segment>
+        )
+
+
+        return (
+            <div>
+                {this.props.isLoggedIn ? logoutedHeader : loggedHeader}
             </div>
         );
     }
@@ -142,4 +194,4 @@ const mapStateToProps = (state) => {
     }
 }
 
-export default connect(mapStateToProps)(Header)
+export default connect(mapStateToProps)(FixedHeader)

@@ -1,5 +1,5 @@
-import Header from './Header';
+import FixedHeader from './Header';
 import Authentication from './Authentication'
 
 
-export { Header, Authentication };
+export { FixedHeader, Authentication };

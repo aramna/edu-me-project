@@ -24,6 +24,10 @@ module.exports = {
         proxy: {
             "*": "http://localhost:3000"
         },
+        overlay: {
+            errors: true,
+            warnings: true
+        },
         stats: {
             // Config for minimal console.log mess.
             assets: false,
@@ -46,7 +50,7 @@ module.exports = {
         loaders: [
             {
                 test: /\.js$/,
-                loaders: ['babel?' + JSON.stringify({
+                loaders: ['react-hot', 'babel?' + JSON.stringify({
                     cacheDirectory: true,
                     presets: ['es2015', 'react']
                 })],

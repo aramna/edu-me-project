@@ -6,7 +6,6 @@ import { message } from 'antd'
 // Login 컴포넌트를 Redux에 연결
 import {connect} from 'react-redux'
 import {loginRequest} from "../actions/authentication"
-
 import {browserHistory} from 'react-router'
 
 class Login extends React.Component {
@@ -17,6 +16,7 @@ class Login extends React.Component {
     }
 
     handleLogin(email, pw) {
+        // 밑에 매핑한 loginRequest 함수 실행
         return this.props.loginRequest(email, pw).then(    //.then()은 AJAX요청이 끝난후에 할 작업
             () => {
                 if (this.props.status === "SUCCESS") {
@@ -51,12 +51,13 @@ class Login extends React.Component {
     }
 }
 
-
+// store 안의 state 값을 props로 연결
 const mapStateToProps = (state) => {
     return {
-        status: state.authentication.login.status
+        status: state.authentication.login.status   // status를 authentication 컴포넌트에 매핑
     }
 }
+
 
 const mapDispatchToProps = (dispatch) => {
     return {
@@ -66,4 +67,5 @@ const mapDispatchToProps = (dispatch) => {
     }
 }
 
+// react-redux를 통해 Login 컴포넌트를 Redux에 연결
 export default connect(mapStateToProps, mapDispatchToProps)(Login)

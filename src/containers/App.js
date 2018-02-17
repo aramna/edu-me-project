@@ -1,9 +1,22 @@
 import React, {Component} from 'react';
-import {Header} from 'components'
+import {FixedHeader} from 'components'
 import {connect} from 'react-redux'
 import {getStatusRequest, logoutRequest} from "../actions/authentication";
 import 'antd/dist/antd.css';
 import { message } from 'antd'
+import {Dropdown,
+    Button,
+    Container,
+    Divider,
+    Grid,
+    Icon,
+    Image,
+    List,
+    Menu,
+    Responsive,
+    Segment,
+    Sidebar,
+    Visibility,} from 'semantic-ui-react'
 
 class App extends Component {
 
@@ -77,7 +90,7 @@ class App extends Component {
 
         return (
             <div>
-                {isAuth ? undefined : <Header isLoggedIn={this.props.status.isLoggedIn}
+                {isAuth ? undefined : <FixedHeader isLoggedIn={this.props.status.isLoggedIn}
                                               onLogout={this.handleLogout}/>}
                 {this.props.children}
             </div>

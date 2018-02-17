@@ -1,29 +1,64 @@
 import React from 'react';
-import {Jumbotron, Button} from 'reactstrap';
+// import {Jumbotron, Button} from 'reactstrap';
 import {connect} from 'react-redux'
-import {Chat} from 'containers'
-
+import {Chat, CreateTeam} from 'containers'
+import {
+    Button,
+    Container,
+    Divider,
+    Grid,
+    Header,
+    Icon,
+    Image,
+    List,
+    Menu,
+    Responsive,
+    Segment,
+    Sidebar,
+    Visibility,
+} from 'semantic-ui-react'
+import backgroundImage from '../images/blueback.jpg'
 
 class Home extends React.Component {
-    sayHey() {
-        alert("hey")
-    }
+
 
     render() {
 
-        const chatView = (<Chat/>)
+
+        const chatView = (<CreateTeam/>)
         const homeView = (
-            <div>
-                <Jumbotron>
-                    <h1 className="display-3">에듀미다</h1>
-                    <p className="lead">에듀미는 </p>
-                    <hr className="my-2"/>
-                    <p>ㅋㅋㅋㅋ</p>
-                    <p className="lead">
-                        <Button onClick={this.sayHey} color="primary">가즈아!</Button>
-                    </p>
-                </Jumbotron>
-            </div>
+            <Segment textAlign='center'
+                     style={{ minHeight: 700,
+                         padding: '1em 0em',
+                     // backgroundImage: "url(" + 'http://globalmedicalco.com/photos/globalmedicalco/9/44188.jpg' + ")",
+                     backgroundImage: "url(" + backgroundImage + ")",
+                     backgroundSize: 'cover'}}
+                     vertical>
+            <Container text>
+                <Header
+                    as='h1'
+                    content='Edu-Me'
+                    inverted
+                    style={{
+                        fontSize: '4em',
+                        fontWeight: 'normal',
+                        marginBottom: 0,
+                        marginTop: '4em',
+                    }}
+                />
+                <Header
+                    as='h2'
+                    content='에듀미에 오신걸 환영합니다.'
+                    inverted
+                    style={{
+                        fontSize: '1.7em',
+                        fontWeight: 'normal',
+                        marginTop: '1.5em',
+                    }}
+                />
+
+            </Container>
+            </Segment>
         )
 
         return (

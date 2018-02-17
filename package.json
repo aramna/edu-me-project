@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "antd": "^3.2.1",
     "axios": "^0.17.1",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.18.2",
@@ -49,7 +50,6 @@
     "webpack-dev-server": "^1.14.1",
     "webpack-hot-middleware": "^2.21.0"
   },
-
   "scripts": {
     "clean": "rm -rf build public/bundle.js",
     "build": "babel server --out-dir build --presets=es2015 && webpack",

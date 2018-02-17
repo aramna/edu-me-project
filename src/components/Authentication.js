@@ -14,7 +14,6 @@ class Authentication extends React.Component {
         this.handleChange = this.handleChange.bind(this)
         this.handleLogin = this.handleLogin.bind(this)
         this.handleRegister = this.handleRegister.bind(this)
-        this.handleKeyPress = this.handleKeyPress.bind(this)
     }
 
     handleChange(e) {
@@ -56,16 +55,6 @@ class Authentication extends React.Component {
         );
     }
 
-    // 비밀번호를 치고 엔터를 눌렀을 때 로그인/회원가입 실행
-    handleKeyPress(e) {
-        if(e.key === 'Enter') {
-            if(this.props.mode) {
-                this.handleLogin()
-            } else {
-                this.handleRegister()
-            }
-        }
-    }
 
     render() {
 
