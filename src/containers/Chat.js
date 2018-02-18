@@ -20,46 +20,55 @@ import {Link} from "react-router";
 import {connect} from "react-redux";
 
 
-class Chat extends React.Component{
+class Chat extends React.Component {
 
 
     render() {
 
+        const chatHeader = (
+            <Menu
+                fixed='top'
+                secondary
+                style={{marginTop: 0, width: '100%'}}
+            >
+                <Menu.Item>
+                    <Image
+                        size='tiny'
+                        src={blacklogoImage}
+                    />
+                </Menu.Item>
+                <Menu.Item position='right'>
+                    <Menu.Item style={{marginBottom: 0}}>
+                        <Icon name="alarm outline"/>
+                    </Menu.Item>
+                    <Menu.Item style={{marginBottom: 0}}>
+                        <Icon name="add user"/>
+                    </Menu.Item>
+                    <Menu.Item style={{marginBottom: 0}}>
+                        <Icon name="users"/>
+                    </Menu.Item>
+                </Menu.Item>
+            </Menu>
+        )
+
+        const sidebar = (
+            <Container style={{width: '300px', backgroundColor: 'blue'}}>
+                사이드바
+            </Container>
+        )
+
         return (
-            <Segment style={{textAlign: 'center', minHeight: 55, padding: 0}}>
-                <Menu
-                    fixed='top'
-                    secondary
-                    style={{marginTop: 0, width: '100%'}}
-
-                >
-                    <Container
-                        style={{width: '100%'}}>
-                        <Menu.Item as='a' style={{marginTop: 0}}>
-                            <Image
-                                size='tiny'
-                                src={blacklogoImage}
-                            />
-                        </Menu.Item>
-
-                        <Menu.Item position='right'>
-                            <Menu.Item style={{marginBottom: 0}}>
-                                <Icon name="alarm outline"/>
-                            </Menu.Item>
-                            <Menu.Item style={{marginBottom: 0}}>
-                                <Icon name="add user"/>
-                            </Menu.Item>
-                            <Menu.Item style={{marginBottom: 0}}>
-                                <Icon name="users"/>
-                            </Menu.Item>
-                        </Menu.Item>
-                    </Container>
-                </Menu>
-            </Segment>
+            <Grid celled>
+                <Grid.Row style={{height: '100px'}}>
+                    {chatHeader}
+                </Grid.Row>
+                <Grid.Row>
+                    {sidebar}
+                </Grid.Row>
+            </Grid>
         );
 
     }
 }
-
 
 export default Chat
