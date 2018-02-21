@@ -52,10 +52,22 @@ app.use(function(err, req, res, next) {
 
 // app.use('/', router);//라우터 객체 등록
 
-app.listen(config.server_port, () => {
+var server = app.listen(config.server_port, () => {
     console.log('서버 실행 완료:', `http://localhost:` + config.server_port)
     database.init(app,config);
 })
+
+// socket.io
+const socketio = require('socket.io')
+const io = socketio.listen(server)
+io.on('connection', (socket) => {
+    console.log('사용자 접속:', socket.client.id)
+    socket.on('chat-msg', (msg) => {
+        console.log('message:', msg)
+        io.emit('chat-msg', msg)
+    })
+})
+
 
 if(process.env.NODE_ENV == 'development') {
     console.log('Server is running on development mode');

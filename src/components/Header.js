@@ -57,7 +57,6 @@ class FixedHeader extends React.Component {
 
 
     render() {
-
         const trigger = (
             <span>
             <Icon name='user'/> {this.props.currentUser}
@@ -128,7 +127,8 @@ class FixedHeader extends React.Component {
         )
 
         const logoutedHeader = (
-            <Segment inverted color='brown' style={{textAlign: 'center', minHeight: 55, padding: 0, borderRadius: 0}}>
+
+            <Segment inverted style={{textAlign: 'center', minHeight: 55, padding: 0, borderRadius: 0}}>
                 <Menu
                     fixed='top'
                     secondary

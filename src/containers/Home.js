@@ -61,6 +61,7 @@ class Home extends React.Component {
             </Segment>
         )
 
+
         return (
             <div>
                 {this.props.isLoggedIn ? chatView : homeView}

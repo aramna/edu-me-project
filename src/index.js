@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import {Router, Route, IndexRoute, browserHistory} from 'react-router';
-import {App, Home, Login, Register, Chat} from 'containers'
+import {App, Home, Login, Register, ChatContainer} from 'containers'
 
 // Redux
 import {Provider} from 'react-redux'
@@ -21,11 +21,12 @@ ReactDOM.render(
     <Provider store={store}>
         <Router history={browserHistory}>
             <Route path="/" component={App}>
-                <IndexRoute component={Home}/>
+                <IndexRoute title="home" component={Home}/>
                 <Route path="login" component={Login}/>
                 <Route path="register" component={Register}/>
+                <Route path="chat" title="chat" component={ChatContainer}/>
             </Route>
-            <Route path="chat" component={Chat}/>
+
         </Router>
     </Provider>,
     rootElement
