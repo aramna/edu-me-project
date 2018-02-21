@@ -1,6 +1,5 @@
 import React from 'react';
 import socketio from 'socket.io-client'
-import styles from './styles.js'
 import {connect} from 'react-redux'
 import {
     Button,
@@ -30,6 +29,7 @@ class ChatContainer extends React.Component {
         this.state = {
             logs: [], message: ''
         }
+        this.messageChanged = this.messageChanged.bind(this)
     }
 
     messageChanged(e) {
@@ -57,6 +57,7 @@ class ChatContainer extends React.Component {
     }
 
     render() {
+
         const messages = this.state.logs.map(e => (
             <Comment key={e.key}>
                 <Comment.Author>{e.name}</Comment.Author>
@@ -64,35 +65,40 @@ class ChatContainer extends React.Component {
                     {
                         background: '#fff',
                         border: '3px',
-                    borderRadius: '5px',
-                    borderTopLeftRadius: 0,
+                        borderRadius: '5px',
+                        borderTopLeftRadius: 0,
                         boxSizing: 'border-box',
-                    color: '#b3b2ca',
-                    height: '100%',
-                    padding: '10px 15px',
-                    position: 'relative',
+                        color: '#b3b2ca',
+                        height: '100%',
+                        padding: '10px 15px',
+                        position: 'relative',
                     }
                 }> {e.message}</div>
                 <p style={{clear: 'both'}}/>
             </Comment>
         ))
         return (
-            <div>
+            <Grid celled style={{marginTop: 0}}>
+                <Grid.Row >
+                    <Grid.Column width={3}>
+                    </Grid.Column>
+                    <Grid.Column width={13}>
 
-                <div style={styles.form}>
-                    이름: {this.props.currentUser}<br/>
-                    메시지:<br/>
-                    <Segment style={{width: '100%', height: '300px'}}>{messages}</Segment>
-                    <Input
-                        placeholder=''
-                        defaultValue='52.03'
-                        value={this.state.message}
-                        onChange={e => this.messageChanged(e)}
-                        style={{width: '89%'}}
-                    />
-                    <Button primary onClick={e => this.send()} style={{width: '10%'}}>전송</Button>
-                </div>
-            </div>
+                            이름: {this.props.currentUser}<br/>
+                            메시지:<br/>
+                            <Segment style={{width: '100%', height: '800px'}}>{messages}</Segment>
+                            <Input
+                                placeholder=''
+                                defaultValue='52.03'
+                                value={this.state.message}
+                                onChange={e => this.messageChanged(e)}
+                                style={{width: '89%'}}
+                            />
+                            <Button primary onClick={e => this.send()} style={{width: '10%'}}>전송</Button>
+
+                    </Grid.Column>
+                </Grid.Row>
+            </Grid>
         )
     }
 }
