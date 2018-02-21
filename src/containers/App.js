@@ -17,6 +17,7 @@ import {Dropdown,
     Segment,
     Sidebar,
     Visibility,} from 'semantic-ui-react'
+import {browserHistory} from "react-router";
 
 class App extends Component {
 
@@ -30,6 +31,7 @@ class App extends Component {
     handleLogout() {
     this.props.logoutRequest().then(
         () => {
+            browserHistory.push('/')
             message.success("로그아웃이 완료되었습니다.")
 
             // EMPTIES THE SESSION
@@ -39,6 +41,7 @@ class App extends Component {
             };
 
             document.cookie = 'key=' + btoa(JSON.stringify(loginData));
+
         }
     );
 }

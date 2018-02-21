@@ -1,7 +1,7 @@
 import React from 'react';
 // import {Jumbotron, Button} from 'reactstrap';
 import {connect} from 'react-redux'
-import {Chat, CreateTeam} from 'containers'
+import {ChatContainer, CreateTeam} from 'containers'
 import {
     Button,
     Container,
@@ -17,7 +17,7 @@ import {
     Sidebar,
     Visibility,
 } from 'semantic-ui-react'
-import backgroundImage from '../images/blueback.jpg'
+import backgroundImage from '../images/Scooter.jpg'
 
 class Home extends React.Component {
 

@@ -50,14 +50,20 @@ app.use(function(err, req, res, next) {
     res.status(500).send('Something broke!');
 });
 
+
+
+
+
+
 // app.use('/', router);//라우터 객체 등록
 
-var server = app.listen(config.server_port, () => {
+const server = app.listen(config.server_port, () => {
     console.log('서버 실행 완료:', `http://localhost:` + config.server_port)
     database.init(app,config);
 })
 
 // socket.io
+
 const socketio = require('socket.io')
 const io = socketio.listen(server)
 io.on('connection', (socket) => {
@@ -67,7 +73,6 @@ io.on('connection', (socket) => {
         io.emit('chat-msg', msg)
     })
 })
-
 
 if(process.env.NODE_ENV == 'development') {
     console.log('Server is running on development mode');

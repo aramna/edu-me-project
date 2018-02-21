@@ -21,7 +21,8 @@ export function loginRequest(email, password) {
 
         return axios.post('/api/user/login', { email, password })
             .then((response) => {
-                dispatch(loginSuccess(response.data.info.username));
+                let userInfo = [response.data.info.username, response.data.info.email]
+                dispatch(loginSuccess(userInfo));
             }).catch((error) => {
                 dispatch(loginFailure());
             });
@@ -89,7 +90,8 @@ export function getStatusRequest() {
         dispatch(getStatus());
         return axios.get('/api/user/getinfo')
             .then((response) => {
-                dispatch(getStatusSuccess(response.data.info.username));
+                let userInfo = [response.data.info.username, response.data.info.email]
+                dispatch(getStatusSuccess(userInfo));
             }).catch((error) => {
                 dispatch(getStatusFailure());
             });

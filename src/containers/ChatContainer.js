@@ -2,6 +2,24 @@ import React from 'react';
 import socketio from 'socket.io-client'
 import styles from './styles.js'
 import {connect} from 'react-redux'
+import {
+    Button,
+    Container,
+    Divider,
+    Grid,
+    Header,
+    Icon,
+    Input,
+    Image,
+    List,
+    Menu,
+    Responsive,
+    Segment,
+    Sidebar,
+    Visibility,
+    Comment,
+    Message
+} from 'semantic-ui-react'
 
 const socket = socketio.connect('http://localhost:3000')
 
@@ -19,10 +37,11 @@ class ChatContainer extends React.Component {
     }
 
     send() {
-        socket.emit('chat-msg', {
+        var output = {
             name: this.props.currentUser,
             message: this.state.message
-        })
+        }
+        socket.emit('chat-msg', output)
         this.setState({message: ''})
     }
 
@@ -39,23 +58,40 @@ class ChatContainer extends React.Component {
 
     render() {
         const messages = this.state.logs.map(e => (
-            <div key={e.key}>
-                <span style={styles.name}>{e.name}</span>
-                <span style={styles.msg}>: {e.message}</span>
+            <Comment key={e.key}>
+                <Comment.Author>{e.name}</Comment.Author>
+                <div style={
+                    {
+                        background: '#fff',
+                        border: '3px',
+                    borderRadius: '5px',
+                    borderTopLeftRadius: 0,
+                        boxSizing: 'border-box',
+                    color: '#b3b2ca',
+                    height: '100%',
+                    padding: '10px 15px',
+                    position: 'relative',
+                    }
+                }> {e.message}</div>
                 <p style={{clear: 'both'}}/>
-            </div>
+            </Comment>
         ))
         return (
             <div>
+
                 <div style={styles.form}>
-                    <h1>채팅기본</h1>
                     이름: {this.props.currentUser}<br/>
                     메시지:<br/>
-                    <input value={this.state.message}
-                           onChange={e => this.messageChanged(e)}/><br/>
-                    <button onClick={e => this.send()}>전송</button>
+                    <Segment style={{width: '100%', height: '300px'}}>{messages}</Segment>
+                    <Input
+                        placeholder=''
+                        defaultValue='52.03'
+                        value={this.state.message}
+                        onChange={e => this.messageChanged(e)}
+                        style={{width: '89%'}}
+                    />
+                    <Button primary onClick={e => this.send()} style={{width: '10%'}}>전송</Button>
                 </div>
-                <div>{messages}</div>
             </div>
         )
     }
@@ -64,8 +100,8 @@ class ChatContainer extends React.Component {
 const mapStateToProps = (state) => {
 
     return {
-        currentUser:
-        state.authentication.status.currentUser
+        currentUser: state.authentication.status.currentUser,
+        currentEmail: state.authentication.status.currentEmail
     }
 
 }
