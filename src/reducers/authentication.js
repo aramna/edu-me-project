@@ -12,7 +12,8 @@ const initialState = {
     status: {
         valid: false,       // 페이지가 새로고침되었을 때, 세션이 유효한지 체크
         isLoggedIn: false,
-        currentUser: ''
+        currentUser: '',
+        currentEmail: ''
     }
 };
 
@@ -38,7 +39,8 @@ export default function authentication(state, action) {
                 },
                 status: {
                     isLoggedIn: { $set: true },
-                    currentUser: { $set: action.userData }
+                    currentUser: { $set: action.userData[0] },
+                    currentEmail: { $set: action.userData[1] }
                 }
             });
         case types.AUTH_LOGIN_FAILURE:
@@ -81,7 +83,8 @@ export default function authentication(state, action) {
             return update(state, {
                 status: {
                     valid: { $set: true },
-                    currentUser: { $set: action.userData }
+                    currentUser: { $set: action.userData[0] },
+                    currentEmail: { $set: action.userData[1] }
                 }
             });
         case types.AUTH_GET_STATUS_FAILURE:
@@ -97,7 +100,8 @@ export default function authentication(state, action) {
             return update(state, {
                 status: {
                     isLoggedIn: { $set: false },
-                    currentUser: { $set: '' }
+                    currentUser: { $set: '' },
+                    currentEmail: { $set: '' }
                 }
             });
         default:

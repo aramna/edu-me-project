@@ -12,12 +12,15 @@ import database from './database/database'
 
 import webpack from 'webpack';
 import WebpackDevServer from 'webpack-dev-server';
-const config = require('./config/config');
-const webConfig = require('../webpack.dev.config');
-const path = require('path');
-const http = require('http');
+import config from './config/config';
+import webConfig from '../webpack.dev.config';
+import path from 'path';
+import http from 'http';
 
-var cookieParser = require('cookie-parser');
+import socketio from 'socket.io';
+import socketManager from './socket/socketManager'
+
+import cookieParser from 'cookie-parser';
 // 서버 실행
 const app = express()
 /////////////////////////////////////////////////////////////
@@ -52,7 +55,7 @@ app.use(function(err, req, res, next) {
 
 // app.use('/', router);//라우터 객체 등록
 
-app.listen(config.server_port, () => {
+var server = app.listen(config.server_port, () => {
     console.log('서버 실행 완료:', `http://localhost:` + config.server_port)
     database.init(app,config);
 })
@@ -67,3 +70,7 @@ if(process.env.NODE_ENV == 'development') {
         }
     );
 }
+
+var io = module.exports.io = socketio.listen(server);
+
+io.sockets.on('connection', socketManager);
