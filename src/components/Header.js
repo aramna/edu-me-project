@@ -31,6 +31,7 @@ import blacklogoImage from '../images/logo2.png'
 // } from 'reactstrap';
 import {Link} from 'react-router'
 import {connect} from 'react-redux'
+import backgroundImage from '../images/Scooter.jpg'
 
 class FixedHeader extends React.Component {
     constructor(props) {
@@ -57,7 +58,6 @@ class FixedHeader extends React.Component {
 
 
     render() {
-
         const trigger = (
             <span>
             <Icon name='user'/> {this.props.currentUser}
@@ -128,7 +128,7 @@ class FixedHeader extends React.Component {
         )
 
         const logoutedHeader = (
-            <Segment inverted color='brown' style={{textAlign: 'center', minHeight: 55, padding: 0, borderRadius: 0}}>
+            <Segment style={{textAlign: 'center', minHeight: 55, padding: 0, borderRadius: 0, backgroundImage: "url(" + backgroundImage + ")"}}>
                 <Menu
                     fixed='top'
                     secondary

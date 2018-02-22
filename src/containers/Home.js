@@ -1,7 +1,7 @@
 import React from 'react';
 // import {Jumbotron, Button} from 'reactstrap';
 import {connect} from 'react-redux'
-import {Chat, CreateTeam} from 'containers'
+import {ChatContainer, CreateTeam} from 'containers'
 import {
     Button,
     Container,
@@ -17,7 +17,7 @@ import {
     Sidebar,
     Visibility,
 } from 'semantic-ui-react'
-import backgroundImage from '../images/blueback.jpg'
+import backgroundImage from '../images/Scooter.jpg'
 
 class Home extends React.Component {
 
@@ -40,26 +40,17 @@ class Home extends React.Component {
                     content='Edu-Me'
                     inverted
                     style={{
-                        fontSize: '4em',
+                        fontSize: '6em',
                         fontWeight: 'normal',
                         marginBottom: 0,
-                        marginTop: '4em',
-                    }}
-                />
-                <Header
-                    as='h2'
-                    content='에듀미에 오신걸 환영합니다.'
-                    inverted
-                    style={{
-                        fontSize: '1.7em',
-                        fontWeight: 'normal',
-                        marginTop: '1.5em',
+                        marginTop: '3em',
                     }}
                 />
 
             </Container>
             </Segment>
         )
+
 
         return (
             <div>
