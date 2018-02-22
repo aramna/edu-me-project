@@ -20,8 +20,6 @@ import {
     Message
 } from 'semantic-ui-react'
 
-// const socket = socketio.connect('http://localhost:3000')
-
 const socket = socketio.connect('http://localhost:3000')
 
 class ChatContainer extends React.Component {
@@ -43,13 +41,13 @@ class ChatContainer extends React.Component {
             message: this.state.message
 
         }
-        socket.emit('chat-msg', output)
+        socket.emit('message', output)
         this.setState({message: ''})
     }
 
     componentDidMount() {
         // 실시간으로 로그를 받게 설정
-        socket.on('chat-msg', (obj) => {
+        socket.on('message', (obj) => {
             const logs2 = this.state.logs
             obj.key = 'key_' + (this.state.logs.length + 1)
             console.log(obj)

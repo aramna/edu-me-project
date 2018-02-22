@@ -38,14 +38,14 @@ module.exports = function(socket){
 
         // session
         console.log('===== 세션 확인 =====');
-        console.log(socket.request.session);
+
         let chat = new database.ChatModel({
             name: message.name,
             message: message.message
         })
 
         // 데이터베이스에 저장
-        user.save(err => {
+        chat.save(err => {
             if (err) throw err
         })
 
