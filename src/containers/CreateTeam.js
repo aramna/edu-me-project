@@ -49,6 +49,24 @@ class CreateTeam extends React.Component{
     }
 
     render() {
+        const messagesFromOther = this.state.logs.map(e => (
+            <Comment key={e.key}>
+                <Comment.Author>{e.name}</Comment.Author>
+                <div style={
+                    {
+                        background: '#fff',
+                        borderRadius: '5px',
+                        borderTopLeftRadius: 0,
+                        boxSizing: 'border-box',
+                        color: '#b3b2ca',
+                        height: '100%',
+                        padding: '10px 15px',
+                        position: 'relative',
+                    }
+                }> {e.message}</div>
+                <p style={{clear: 'both'}}/>
+            </Comment>
+        ))
 
         return (
         <Container textAlign='center' style={{width: '100%', height: '100%', marginTop: 100}}>

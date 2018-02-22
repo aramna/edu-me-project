@@ -5,7 +5,7 @@ module.exports = function(socket){
     var io = require('../edume-server').io;
 
     var login_ids = {};
-
+    var saveMsg = [];
     console.log('connection info :', socket.request.connection._peername);
 
     socket.remoteAddress = socket.request.connection._peername.address;
@@ -16,8 +16,18 @@ module.exports = function(socket){
         console.log('login 이벤트를 받았습니다.');
         console.dir(login);
 
-        // 로그인세션은 요청패스를 통해 웹 인증
 
+        // 로그인세션은 요청패스를 통해 웹 인증
+        database.ChatModel.findAll(function(err, results) {
+            if(err) throw err
+
+            if(results) {
+                for (var i = 0; i < results.length; i++) {
+                    saveMsg.push(results[i]._doc);
+                }
+            }
+            console.log(saveMsg);
+        });
         //기존 클라이언트 ID가 없으면 클라이언트 ID를 맵에 추가
         console.log('접속한 소켓의 ID : ' + socket.id);
         login_ids[login.id] = socket.id;
@@ -48,7 +58,7 @@ module.exports = function(socket){
         chat.save(err => {
             if (err) throw err
         })
-
+        console.log(chat);
         io.sockets.emit('message', message);
     });
 }

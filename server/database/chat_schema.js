@@ -10,6 +10,10 @@ Schema.createSchema = function(mongoose){
         created: {type: Date, default: Date.now}
     })
 
+    ChatSchema.static('findAll', function(callback) {
+        return this.find({}, callback);
+    })
+
     return ChatSchema;
 };
 
