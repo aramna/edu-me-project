@@ -16,8 +16,6 @@ module.exports = function(socket){
         console.log('login 이벤트를 받았습니다.');
         console.dir(login);
 
-
-        // 로그인세션은 요청패스를 통해 웹 인증
         database.ChatModel.findAll(function(err, results) {
             if(err) throw err
 
@@ -43,8 +41,6 @@ module.exports = function(socket){
     // 'message' 이벤트를 받았을 때의 처리
     socket.on('message', function(message) {
     	console.log('message 이벤트를 받았습니다.');
-    	console.dir(message);
-
 
         // session
         console.log('===== 세션 확인 =====');
