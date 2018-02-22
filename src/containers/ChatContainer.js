@@ -1,6 +1,5 @@
 import React from 'react';
 import socketio from 'socket.io-client'
-import styles from './styles.js'
 import {connect} from 'react-redux'
 import {
     Button,
@@ -17,12 +16,16 @@ import {
     Segment,
     Sidebar,
     Visibility,
+    Comment,
+    Message
 } from 'semantic-ui-react'
+
+// const socket = socketio.connect('http://localhost:3000')
 
 const socket = socketio.connect('http://localhost:3000')
 
-
 class ChatContainer extends React.Component {
+
     constructor(props) {
         super(props)
         this.state = {
@@ -38,6 +41,7 @@ class ChatContainer extends React.Component {
         var output = {
             name: this.props.currentUser,
             message: this.state.message
+
         }
         socket.emit('chat-msg', output)
         this.setState({message: ''})
@@ -55,30 +59,71 @@ class ChatContainer extends React.Component {
     }
 
     render() {
-        const messages = this.state.logs.map(e => (
-            <div key={e.key}>
-                <span style={styles.name}>{e.name}</span>
-                <span style={styles.msg}>: {e.message}</span>
-                <p style={{clear: 'both'}}/>
-            </div>
-        ))
-        return (
-            <div>
 
-                <div style={styles.form}>
-                    이름: {this.props.currentUser}<br/>
-                    메시지:<br/>
-                    <Segment style={{width: '100%', height: '300px'}}>{messages}</Segment>
-                    <Input
-                        placeholder=''
-                        defaultValue='52.03'
-                        value={this.state.message}
-                        onChange={e => this.messageChanged(e)}
-                        style={{width: '89%'}}
-                    />
-                    <Button primary onClick={e => this.send()} style={{width: '10%'}}>전송</Button>
-                </div>
-            </div>
+        const messagesFromOther = this.state.logs.map(e => (
+            <Comment key={e.key}>
+                <Comment.Author>{e.name}</Comment.Author>
+                <div style={
+                    {
+                        background: '#fff',
+                        borderRadius: '5px',
+                        borderTopLeftRadius: 0,
+                        boxSizing: 'border-box',
+                        color: '#b3b2ca',
+                        height: '100%',
+                        padding: '10px 15px',
+                        position: 'relative',
+                    }
+                }> {e.message}</div>
+                <p style={{clear: 'both'}}/>
+            </Comment>
+        ))
+
+        const messagesFromMe = this.state.logs.map(e => (
+            <Comment key={e.key}>
+                <Comment.Author>{e.name}</Comment.Author>
+                <div style={
+                    {
+                        background: '#fff',
+                        borderRadius: '5px',
+                        borderTopLeftRadius: 0,
+                        boxSizing: 'border-box',
+                        color: 'black',
+                        height: '100%',
+                        padding: '10px 15px',
+                        position: 'relative',
+                        textAlign: 'right'
+                    }
+                }> {e.message}</div>
+                <p style={{clear: 'both'}}/>
+            </Comment>
+        ))
+
+        return (
+            <Grid celled style={{marginTop: 0}}>
+                <Grid.Row>
+                    <Grid.Column width={3}>
+                    </Grid.Column>
+                    <Grid.Column width={13}>
+
+                        이름: {this.props.currentUser}<br/>
+                        메시지:<br/>
+                        <Segment style={{
+                            width: '100%',
+                            height: '700px'
+                        }}>{this.props.currentUser === name ? messagesFromMe : messagesFromOther}</Segment>
+                        <Input
+                            placeholder=''
+                            defaultValue='52.03'
+                            value={this.state.message}
+                            onChange={e => this.messageChanged(e)}
+                            style={{width: '89%'}}
+                        />
+                        <Button primary onClick={e => this.send()} style={{width: '10%'}}>전송</Button>
+
+                    </Grid.Column>
+                </Grid.Row>
+            </Grid>
         )
     }
 }
