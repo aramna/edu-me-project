@@ -21,10 +21,10 @@ ReactDOM.render(
     <Provider store={store}>
         <Router history={browserHistory}>
             <Route path="/" component={App}>
-                <IndexRoute title="home" component={Home}/>
+                <IndexRoute component={Home}/>
                 <Route path="login" component={Login}/>
                 <Route path="register" component={Register}/>
-                <Route path="chat" title="chat" component={ChatContainer}/>
+                <Route path="chat" component={ChatContainer}/>
             </Route>
 
         </Router>

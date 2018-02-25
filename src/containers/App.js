@@ -96,7 +96,6 @@ render() {
             {isAuth ? undefined : <FixedHeader isLoggedIn={this.props.status.isLoggedIn}
                                                onLogout={this.handleLogout}/>}
             {this.props.children}
-
         </div>
     );
 }
