@@ -58,7 +58,7 @@ class ChatContainer extends React.Component {
 
     render() {
 
-        const messagesFromOther = this.state.logs.map(e => (
+        const messages = this.state.logs.map(e => (
             <Comment key={e.key}>
                 <Comment.Author>{e.name}</Comment.Author>
                 <div style={
@@ -77,25 +77,7 @@ class ChatContainer extends React.Component {
             </Comment>
         ))
 
-        const messagesFromMe = this.state.logs.map(e => (
-            <Comment key={e.key}>
-                <Comment.Author>{e.name}</Comment.Author>
-                <div style={
-                    {
-                        background: '#fff',
-                        borderRadius: '5px',
-                        borderTopLeftRadius: 0,
-                        boxSizing: 'border-box',
-                        color: 'black',
-                        height: '100%',
-                        padding: '10px 15px',
-                        position: 'relative',
-                        textAlign: 'right'
-                    }
-                }> {e.message}</div>
-                <p style={{clear: 'both'}}/>
-            </Comment>
-        ))
+
 
         return (
             <Grid celled style={{marginTop: 0}}>
@@ -109,7 +91,7 @@ class ChatContainer extends React.Component {
                         <Segment style={{
                             width: '100%',
                             height: '700px'
-                        }}>{this.props.currentUser === name ? messagesFromMe : messagesFromOther}</Segment>
+                        }}>{messages}</Segment>
                         <Input
                             placeholder=''
                             defaultValue='52.03'

@@ -33,11 +33,13 @@ app.use(bodyParser.json());
 ///////////////////////////////////////////
 app.use(cookieParser());//쿠키설정
 
-app.use(session({//세션설정
+var sessionMiddleware = session({//세션설정
     secret:'edu_key',
     resave:true,
     saveUninitialized:true
-}));
+});
+
+app.use(sessionMiddleware);
 
 app.use('/', express.static(path.join(__dirname, './../public')));
 
@@ -72,5 +74,9 @@ if(process.env.NODE_ENV == 'development') {
 }
 
 var io = module.exports.io = socketio.listen(server);
+
+io.use(function(socket, next) {
+    sessionMiddleware(socket.request, {}, next);
+});
 
 io.sockets.on('connection', socketManager);

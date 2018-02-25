@@ -35,6 +35,7 @@ module.exports = function(socket){
 
         // 응답 메시지 전송
         sendResponse(socket, 'login', '200', '로그인되었습니다.');
+        //io.sockets.emit('message', saveMsg);
     });
 
 
@@ -44,6 +45,13 @@ module.exports = function(socket){
 
         // session
         console.log('===== 세션 확인 =====');
+        console.log(socket.request.session);
+
+        if (socket.request.sessionID) {
+            console.log('로그인되어 있음.');
+        } else {
+            console.log('로그인 안되어 있음');
+        }
 
         let chat = new database.ChatModel({
             name: message.name,
