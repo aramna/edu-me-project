@@ -65,6 +65,23 @@ module.exports = function(socket){
         console.log(chat);
         io.sockets.emit('message', message);
     });
+    socket.on('room', function(room){
+        console.log('room 이벤트를 받았습니다.');
+
+        if(room.command == 'create') {
+
+            if (io.sockets.adapter.rooms[room.roomId]) {
+                console.log('방이 이미 만들어져 있습니다.');
+
+            } else {
+                console.log('방을 새로 만듭니다.');
+
+                socket.join(room.roomId);
+
+
+            }
+        }
+    })
 }
 
 // 응답 메시지 전송 메소드
