@@ -5,6 +5,8 @@ const Schema = {};
 Schema.createSchema = function(mongoose){
 
     var ChatSchema = mongoose.Schema({
+
+        email: String,
         name: String,
         message: String,
         created: {type: Date, default: Date.now}
@@ -17,4 +19,6 @@ Schema.createSchema = function(mongoose){
     return ChatSchema;
 };
 
+
 module.exports = Schema;
+
