@@ -15,17 +15,14 @@ import config from './config/config';
 import webConfig from '../webpack.dev.config';
 import path from 'path';
 
-import socketio from 'socket.io';
+// import socketio from 'socket.io';
+import socketio from 'socket.io'
 import socketManager from './socket/socketManager'
 
 import cookieParser from 'cookie-parser';
 // 서버 실행
 const app = express()
 
-var server = app.listen(config.server_port, () => {
-    console.log('서버 실행 완료:', `http://localhost:` + config.server_port)
-    database.init(app,config);
-})
 
 /* HTTP 요청을 로그하는 미들웨어: morgan */
 app.use(morgan('dev'))
@@ -58,6 +55,10 @@ app.use(function(err, req, res, next) {
 // app.use('/', router);//라우터 객체 등록
 
 
+var server = app.listen(config.server_port, () => {
+    console.log('서버 실행 완료:', `http://localhost:` + config.server_port)
+    database.init(app,config);
+})
 
 if(process.env.NODE_ENV == 'development') {
     console.log('Server is running on development mode');
@@ -69,6 +70,7 @@ if(process.env.NODE_ENV == 'development') {
         }
     );
 }
+
 
 var io = module.exports.io = socketio.listen(server);
 

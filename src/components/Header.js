@@ -16,19 +16,6 @@ import {
 } from 'semantic-ui-react'
 import whitelogoImage from '../images/logo.png'
 import blacklogoImage from '../images/logo2.png'
-// import {
-//     Collapse,
-//     Navbar,
-//     NavbarToggler,
-//     NavbarBrand,
-//     Nav,
-//     NavItem,
-//     NavLink,
-//     UncontrolledDropdown,
-//     DropdownToggle,
-//     DropdownMenu,
-//     DropdownItem,
-// } from 'reactstrap';
 import {Link} from 'react-router'
 import {connect} from 'react-redux'
 import backgroundImage from '../images/Scooter.jpg'

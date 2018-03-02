@@ -26,7 +26,6 @@
     "react": "^15.6.2",
     "react-addons-update": "^15.3.0",
     "react-chat-ui": "^0.3.1",
-    "react-chatview": "^0.2.5",
     "react-dom": "^15.6.2",
     "react-redux": "^4.4.5",
     "react-router": "^2.6.1",
