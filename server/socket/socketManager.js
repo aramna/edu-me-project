@@ -51,7 +51,9 @@ module.exports = function(socket){
         let chat = new database.ChatModel({
             name: message.name,
             message: message.message,
-            email: message.email
+            email: message.email,
+            // 시간 추가
+            time: message.time
         })
 
         // 데이터베이스에 저장

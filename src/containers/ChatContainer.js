@@ -21,9 +21,13 @@ import {
     Comment,
 } from 'semantic-ui-react'
 import {SideBar} from 'components'
-import {Message, MessageText, MessageGroup, MessageList} from '@livechat/ui-kit'
+import {Message, MessageText, MessageGroup, MessageList, Row, Avatar} from '@livechat/ui-kit'
 import {ChatFeed} from 'react-chat-ui'
 import '../index.css'
+
+const getTime = (date) => {
+    return `${date.getHours()}:${("0"+date.getMinutes()).slice(-2)}`
+}
 
 class ChatContainer extends React.Component {
 
@@ -66,7 +70,8 @@ class ChatContainer extends React.Component {
         var output = {
             email: this.props.currentEmail,
             name: this.props.currentUser,
-            message: this.state.message
+            message: this.state.message,
+            time: getTime(new Date(Date.now()))
         }
 
         this.socket.emit('message', output)
@@ -88,22 +93,26 @@ class ChatContainer extends React.Component {
     render() {
         const messages = this.state.logs.map(e => (
 
-            <MessageGroup  onlyFirstWithMeta>
+            <div>
                 {
                     e.name !== this.props.currentUser ?
                         // sender가 상대방일 때
 
-                        <Message authorName={e.name} >
+                        <MessageGroup>
+                        <Message authorName={e.name} date={e.time} >
                             <MessageText>{e.message}</MessageText>
                         </Message>
+                        </MessageGroup>
 
                         :
                         // sender가 본인일 때
-                        <Message isOwn>
+                            <MessageGroup>
+                        <Message isOwn deliveryStatus={e.time} >
                             <MessageText>{e.message}</MessageText>
                         </Message>
+                            </MessageGroup>
                 }
-            </MessageGroup>
+            </div>
         ))
 
         const chatView = (
@@ -122,11 +131,18 @@ class ChatContainer extends React.Component {
                     defaultValue='52.03'
                     value={this.state.message}
                     onChange={e => this.messageChanged(e)}
+                    onKeyPress = {e => {e.key === 'Enter' && this.send()}}
                     style={{width: '89%', height: '100%', marginTop: 10}}
                 />
-                <Button size='mini' primary onClick={e => this.send()} style={{float: 'right, bottom'}}>전송</Button>
+                <Button size='mini'
+                        primary
+                        onClick={e => this.send()}
+                        style={{float: 'right, bottom'}}
+                >전송</Button>
             </div>
         )
+
+
 
         return (
 
