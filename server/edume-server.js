@@ -25,10 +25,6 @@ import cookieParser from 'cookie-parser';
 // 서버 실행
 const app = express()
 
-<<<<<<< HEAD
-=======
-
->>>>>>> e40c47629eeaeb1c7cb188cec2dc43ce34fdc20c
 /* HTTP 요청을 로그하는 미들웨어: morgan */
 app.use(morgan('dev'))
 
@@ -61,10 +57,6 @@ app.use(function(err, req, res, next) {
 
 // app.use('/', router);//라우터 객체 등록
 
-<<<<<<< HEAD
-=======
-
->>>>>>> e40c47629eeaeb1c7cb188cec2dc43ce34fdc20c
 var server = app.listen(config.server_port, () => {
     console.log('서버 실행 완료:', `http://localhost:` + config.server_port)
     database.init(app,config);
