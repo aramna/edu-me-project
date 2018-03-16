@@ -94,8 +94,8 @@ module.exports = function(socket) {
         io.sockets.emit('message', message);
     });
 
-    socket.on('createRoom', function(room) {
-        console.log('createRoom 이벤트를 받았습니다.')
+    socket.on('room', function(room) {
+        console.log('room 이벤트를 받았습니다.')
 
 
 
