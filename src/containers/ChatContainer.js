@@ -25,14 +25,9 @@ import {Message, MessageText, MessageGroup, MessageList, Row, Avatar} from '@liv
 import {ChatFeed} from 'react-chat-ui'
 import '../index.css'
 
-<<<<<<< HEAD
-
-// const socket = socketio.connect('http://localhost:3000')
-=======
 const getTime = (date) => {
     return `${date.getHours()}:${("0"+date.getMinutes()).slice(-2)}`
 }
->>>>>>> e40c47629eeaeb1c7cb188cec2dc43ce34fdc20c
 
 class ChatContainer extends React.Component {
 
@@ -43,40 +38,11 @@ class ChatContainer extends React.Component {
         }
 
         this.socket = socketio.connect()
-<<<<<<< HEAD
-
-
-=======
->>>>>>> e40c47629eeaeb1c7cb188cec2dc43ce34fdc20c
     }
 
     componentWillMount() {
         var output = {
             userEmail: this.props.currentEmail,
-<<<<<<< HEAD
-            roomId: 'main',
-            userName:this.props.currentUser
-    }
-        this.socket.emit('login', output)
-
-
-        // 내가 쓴 대화내용을 채팅창에 들어왔을 때 불러오기
-        /*this.socket.on('preload', data => {
-            for(var i=0; i<data.length; i++) {
-                var output = {
-                    name: data[i].name,
-                    message: data[i].message
-                }
-                this.socket.emit('message', output)
-            }
-            this.setState({message: ''})
-            console.log('데이터다!' + data[0].message)
-        })*/
-    }
-
-
-    messageChanged (e) {
-=======
         }
         this.socket.emit('login', output)
 
@@ -97,7 +63,6 @@ class ChatContainer extends React.Component {
 
 
     messageChanged(e) {
->>>>>>> e40c47629eeaeb1c7cb188cec2dc43ce34fdc20c
         this.setState({message: e.target.value})
     }
 
@@ -117,10 +82,6 @@ class ChatContainer extends React.Component {
 
         this.socket.on('message', (obj) => {
 
-<<<<<<< HEAD
-        this.socket.on('message', (obj) => {
-=======
->>>>>>> e40c47629eeaeb1c7cb188cec2dc43ce34fdc20c
             const logs2 = this.state.logs
             obj.key = 'key_' + (this.state.logs.length + 1)
             console.log(obj)
@@ -130,29 +91,6 @@ class ChatContainer extends React.Component {
     }
 
     render() {
-<<<<<<< HEAD
-            const messages = this.state.logs.map(e => (
-
-                <Comment
-                    className={"message-container ${e.name === this.props.currentUser && 'right'}"}
-                    key={e.key}
-                    >
-                    <Comment.Author>{e.name}</Comment.Author>
-
-                    <div style={
-                        {
-                            background: '#fff',
-                            borderRadius: '5px',
-                            borderTopLeftRadius: 0,
-                            boxSizing: 'border-box',
-                            color: '#b3b2ca',
-                            height: '100%',
-                            padding: '10px 15px',
-                        }
-                    }> {e.message}</div>
-                </Comment>
-            ))
-=======
         const messages = this.state.logs.map(e => (
 
             <div>
@@ -205,7 +143,6 @@ class ChatContainer extends React.Component {
         )
 
 
->>>>>>> e40c47629eeaeb1c7cb188cec2dc43ce34fdc20c
 
         return (
 
