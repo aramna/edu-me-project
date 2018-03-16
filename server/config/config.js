@@ -4,7 +4,8 @@ module.exports = {
     db_url: 'mongodb://localhost/edume',
     db_schemas: [
         {file:'./user_schema', collection:'Users', schemaName:'UserSchema', modelName:'UserModel'},
-        {file:'./chat_schema', collection:'Chats', schemaName:'ChatSchema', modelName:'ChatModel'}
+        {file:'./chat_schema', collection:'Chats', schemaName:'ChatSchema', modelName:'ChatModel'},
+        {file:'./channel_schema', collection:'Channel', schemaName:'ChannelSchema', modelName:'ChannelModel'}
     ],
     route_info: [
     ]

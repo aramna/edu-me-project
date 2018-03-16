@@ -18,12 +18,12 @@ import {
     Visibility,
     Comment,
 } from 'semantic-ui-react'
-
 import ChatView from 'react-chatview'
 import { Message, MessageText, MessageList, Row } from '@livechat/ui-kit'
 import '../index.css'
 
-const socket = socketio.connect('http://localhost:3000')
+
+// const socket = socketio.connect('http://localhost:3000')
 
 class ChatContainer extends React.Component {
 
@@ -32,27 +32,35 @@ class ChatContainer extends React.Component {
         this.state = {
             logs: [] , message: '', userEmail: ''
         }
+
+        this.socket = socketio.connect()
+
+
     }
 
     componentWillMount () {
         var output = {
             userEmail: this.props.currentEmail,
+            roomId: 'main',
+            userName:this.props.currentUser
     }
-        socket.emit('login', output)
+        this.socket.emit('login', output)
+
 
         // 내가 쓴 대화내용을 채팅창에 들어왔을 때 불러오기
-        socket.on('preload', data => {
+        /*this.socket.on('preload', data => {
             for(var i=0; i<data.length; i++) {
                 var output = {
                     name: data[i].name,
                     message: data[i].message
                 }
-                socket.emit('message', output)
+                this.socket.emit('message', output)
             }
             this.setState({message: ''})
             console.log('데이터다!' + data[0].message)
-        })
+        })*/
     }
+
 
     messageChanged (e) {
         this.setState({message: e.target.value})
@@ -65,13 +73,13 @@ class ChatContainer extends React.Component {
             message: this.state.message
         }
 
-        socket.emit('message', output)
+        this.socket.emit('message', output)
         this.setState({message: ''})
     }
 
     componentDidMount () {
 
-        socket.on('message', (obj) => {
+        this.socket.on('message', (obj) => {
             const logs2 = this.state.logs
             obj.key = 'key_' + (this.state.logs.length + 1)
             console.log(obj)
@@ -80,19 +88,19 @@ class ChatContainer extends React.Component {
         })
     }
 
+
     render() {
             const messages = this.state.logs.map(e => (
 
-
                 <Comment
-                    className={`message-container {e.name === this.props.currentUser && 'right'}`}
+                    className={"message-container ${e.name === this.props.currentUser && 'right'}"}
                     key={e.key}
                     >
                     <Comment.Author>{e.name}</Comment.Author>
 
                     <div style={
                         {
-                            ackground: '#fff',
+                            background: '#fff',
                             borderRadius: '5px',
                             borderTopLeftRadius: 0,
                             boxSizing: 'border-box',
@@ -141,7 +149,6 @@ class ChatContainer extends React.Component {
     }
 }
 
-
 const mapStateToProps = (state) => {
 
     return {
@@ -149,6 +156,7 @@ const mapStateToProps = (state) => {
         currentUser: state.authentication.status.currentUser,
         currentEmail: state.authentication.status.currentEmail
     }
+
 }
 
 export default connect(mapStateToProps)(ChatContainer)

@@ -52,7 +52,7 @@ class CreateTeam extends React.Component{
 
 
     render() {
-        // const messagesFromOther = this.state.logs.map(e => (
+//        const messagesFromOther = this.state.logs.map(e => {
         //     <Comment key={e.key}>
         //         <Comment.Author>{e.name}</Comment.Author>
         //         <div style={
@@ -81,7 +81,6 @@ class CreateTeam extends React.Component{
         )
     }
 }
-
 
 
 
