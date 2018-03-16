@@ -7,12 +7,10 @@
 .message-container.left {
     display: flex;
     justify-content: flex-start;
-<<<<<<< HEAD
     min-height: 50px;
     margin: 10px 15px;
     animation: .65s ease-out 0s show
 }
-=======
 
 }
 
