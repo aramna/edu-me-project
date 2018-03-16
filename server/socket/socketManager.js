@@ -22,6 +22,22 @@ module.exports = function(socket) {
         console.log('login 이벤트를 받았습니다.');
         console.dir(login);
 
+<<<<<<< HEAD
+=======
+        // database.ChatModel.findAll(function(err, results) {
+        //     if(err) throw err
+        //
+        //     if(results) {
+        //         for (var i = 0; i < results.length; i++) {
+        //             if(results[i].email === login.userEmail){
+        //                 saveMsg.push(results[i]._doc);
+        //             }
+        //         }
+        //     }
+        //     io.sockets.emit('preload', saveMsg) // saveMsg 내보내기
+        // });
+
+>>>>>>> e40c47629eeaeb1c7cb188cec2dc43ce34fdc20c
         //기존 클라이언트 ID가 없으면 클라이언트 ID를 맵에 추가
         console.log('접속한 소켓의 ID : ' + socket.id);
         login_ids[login.id] = socket.id;
@@ -65,7 +81,14 @@ module.exports = function(socket) {
 
         let chat = new database.ChatModel({
             name: message.name,
+<<<<<<< HEAD
             message: message.message
+=======
+            message: message.message,
+            email: message.email,
+            // 시간 추가
+            time: message.time
+>>>>>>> e40c47629eeaeb1c7cb188cec2dc43ce34fdc20c
         })
         // 데이터베이스에 저장
         chat.save(err => {

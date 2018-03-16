@@ -18,6 +18,7 @@ import {Dropdown,
     Sidebar,
     Visibility,} from 'semantic-ui-react'
 import {browserHistory} from "react-router";
+import { ThemeProvider } from '@livechat/ui-kit'
 
 class App extends Component {
 
@@ -91,12 +92,13 @@ render() {
     let isAuth = re.test(this.props.location.pathname)
 
     return (
-
+        <ThemeProvider>
         <div>
             {isAuth ? undefined : <FixedHeader isLoggedIn={this.props.status.isLoggedIn}
                                                onLogout={this.handleLogout}/>}
             {this.props.children}
         </div>
+        </ThemeProvider>
     );
 }
 }
