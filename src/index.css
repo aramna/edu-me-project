@@ -1,0 +1,40 @@
+.message-container.right {
+    display: flex;
+    text-align: right;
+    justify-content: flex-end
+}
+
+.message-container.left {
+    display: flex;
+    justify-content: flex-start;
+
+}
+
+.message.left {
+    background: #91a7ff;
+    border-radius: 5px;
+    border-top-right-radius: 0;
+    box-sizing: border-box;
+    color: #fff;
+    padding: 10px 15px;
+    position: relative;
+    margin-bottom: 6px;
+    height: 100%;
+
+}
+
+.message.right {
+    background: #e9ecef;
+    border-radius: 5px;
+    border-top-left-radius: 0;
+    box-sizing: border-box;
+    color: #b3b2ca;
+    padding: 10px 15px;
+    position: relative;
+    margin-bottom: 6px;
+    height: 100%;
+}
+
+
+
+
