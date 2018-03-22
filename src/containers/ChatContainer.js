@@ -42,7 +42,8 @@ class ChatContainer extends React.Component {
 
     componentWillMount() {
         var output = {
-            userEmail: this.props.currentEmail,
+            id: this.props.currentUser,
+            roomId: 'main'
         }
         this.socket.emit('login', output)
 

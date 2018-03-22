@@ -1,6 +1,5 @@
 import express from 'express'
 import database from '../database/database'
-
 const router = express.Router();
 
 
@@ -114,6 +113,7 @@ router.post('/logout', (req, res) => {
     req.session.destroy(err => {
         if (err) throw err;
     });
+
     return res.json({success: true});
 });
 
