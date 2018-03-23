@@ -26,7 +26,7 @@ import {ChatFeed} from 'react-chat-ui'
 import '../index.css'
 
 const getTime = (date) => {
-    return `${date.getHours()}:${("0"+date.getMinutes()).slice(-2)}`
+    return `${date.getHours()}:${("0" + date.getMinutes()).slice(-2)}`
 }
 
 class ChatContainer extends React.Component {
@@ -42,8 +42,8 @@ class ChatContainer extends React.Component {
 
     componentWillMount() {
         var output = {
-            id: this.props.currentUser,
-            roomId: 'main'
+            roomId: 'main',
+            userEmail: this.props.currentEmail
         }
         this.socket.emit('login', output)
 
@@ -94,45 +94,47 @@ class ChatContainer extends React.Component {
     render() {
         const messages = this.state.logs.map(e => (
 
-            <div>
+            <div style={{paddingTop: 10}}>
                 {
                     e.name !== this.props.currentUser ?
                         // sender가 상대방일 때
 
-                        <MessageGroup>
-                        <Message authorName={e.name} date={e.time} >
-                            <MessageText>{e.message}</MessageText>
-                        </Message>
-                        </MessageGroup>
+
+                            <Message authorName={e.name} date={e.time}>
+                                <MessageText>{e.message}</MessageText>
+                            </Message>
+
 
                         :
                         // sender가 본인일 때
-                            <MessageGroup>
-                        <Message isOwn deliveryStatus={e.time} >
+
+                        <Message isOwn deliveryStatus={e.time}>
                             <MessageText>{e.message}</MessageText>
                         </Message>
-                            </MessageGroup>
+
                 }
             </div>
         ))
 
         const chatView = (
             <div style={{height: 'calc(100% - 100px)'}}>
-                <MessageList active>
+                <MessageList active style={{backgroundColor: '#D6D6D6'}}>
                     {messages}
                 </MessageList>
             </div>
         )
 
         const inputView = (
-            <div style={{width: '100%', height: 100}}>
+            <div style={{width: '100%', height: 80}}>
 
                 <Input
                     placeholder=''
                     defaultValue='52.03'
                     value={this.state.message}
                     onChange={e => this.messageChanged(e)}
-                    onKeyPress = {e => {e.key === 'Enter' && this.send()}}
+                    onKeyPress={e => {
+                        e.key === 'Enter' && this.send()
+                    }}
                     style={{width: '89%', height: '100%', marginTop: 10}}
                 />
                 <Button size='mini'
@@ -144,15 +146,14 @@ class ChatContainer extends React.Component {
         )
 
 
-
         return (
 
             <Grid celled style={{marginTop: 0, marginBottom: 0, width: '100%', height: 'calc(100vh - 55px)'}}>
-                <Grid.Column style={{width: 200, backgroundColor: '#455A64'}}>
+                <Grid.Column style={{width: 250, backgroundColor: '#455A64', padding: 0}}>
                     <SideBar/>
                 </Grid.Column>
-                <Grid.Column style={{width: 'calc(100% - 260px)'}}>
-                    <div style={{height: '100%'}}>
+                <Grid.Column style={{width: 'calc(100% - 310px)', padding: 0}}>
+                    <div style={{height: '100%', textAlign: 'center'}}>
                         {chatView}
                         {inputView}
                     </div>

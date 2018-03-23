@@ -139,6 +139,8 @@ module.exports = function(socket) {
         if(room.command === 'create') {
             if(io.sockets.adapter.rooms[room.roomId]) {
                 console.log('방이 이미 만들어져 있습니다.');
+                console.log('방에 입장하였습니다.');
+                socket.join(room.roomId);
             } else {
                 console.log('방을 새로 만듭니다.');
 
@@ -154,9 +156,9 @@ module.exports = function(socket) {
 
                 let croom = new database.RoomModel({
                     roomId: curRoom.id,
-                    roomName: curRoom.name,
-                    member: curRoom.member
+                    roomName: curRoom.name
                 })
+                //croom.member.push()
             }
         } else if (room.command === 'join') {
 
@@ -166,7 +168,6 @@ module.exports = function(socket) {
 }
 
 function getRoomList(io) {
-	console.dir(io.sockets.adapter.rooms);
 
     var roomList = [];
 
