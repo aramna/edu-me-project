@@ -5,7 +5,8 @@ module.exports = {
     db_schemas: [
         {file:'./user_schema', collection:'Users', schemaName:'UserSchema', modelName:'UserModel'},
         {file:'./chat_schema', collection:'Chats', schemaName:'ChatSchema', modelName:'ChatModel'},
-        {file:'./room_schema', collection:'Room', schemaName:'RoomSchema', modelName:'RoomModel'}
+        {file:'./room_schema', collection:'Room', schemaName:'RoomSchema', modelName:'RoomModel'},
+        {file:'./user_in_rooms', collection:'User_in_Room', schemaName:'UserRoomSchema', modelName:'UserRoomModel'}
     ],
     route_info: [
     ]

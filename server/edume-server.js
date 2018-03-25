@@ -40,7 +40,6 @@ var sessionMiddleware = session({//세션설정
 });
 
 app.use(sessionMiddleware);
-
 app.use('/', express.static(path.join(__dirname, './../public')));
 
 app.use('/api', api)
@@ -67,7 +66,8 @@ if(process.env.NODE_ENV == 'development') {
     const compiler = webpack(webConfig);
     const devServer = new WebpackDevServer(compiler, webConfig.devServer);
     devServer.listen(
-        webConfig.devServer_port, () => {
+        webConfig.devServer_port
+        () => {
             console.log('webpack-dev-server is listening on port', webConfig.devServer_port);
         }
     );
