@@ -5,6 +5,7 @@ import Store from './Store';
 import {OrderedMap} from 'immutable';
 import _ from 'lodash';
 import {ObjectID} from '../helpers/objectid';
+import SearchUser from '../components/search-user';
 import {
     Button,
     Rail,
@@ -43,11 +44,13 @@ class ChatContainer extends React.Component {
           //  userEmail: '',
             Store: new Store(),
             newMessage: '메시지TEST초기값',
+            searchUser: "",
           //  messages: [], //추가
         };
         this.addTestMessages = this.addTestMessages.bind(this);
         this.handleSend = this.handleSend.bind(this);
         this.renderMessage = this.renderMessage.bind(this);
+        this._onCreateChannel = this._onCreateChannel.bind(this);
         this.socket = socketio.connect();
 
         // this.messages = new OrderedMap();
@@ -56,6 +59,28 @@ class ChatContainer extends React.Component {
         //     name: '듀랑고',
         //     created: new Date(),
         // }
+    }
+
+    _onCreateChannel(){
+
+        const {Store} = this.state;
+
+        const channelId = new ObjectID().toString();
+        const channel = {
+            _id: channelId,
+            title: "New Channel",
+            lastMessage: "Last Message~",
+            members: new OrderedMap({
+                '2':true,
+                '3':true,
+                '1':true,
+            }),
+            messages: new OrderedMap(),
+            created: new Date(),
+            isNew: true,
+        };
+        Store.onCreatedNewChannel(channel);
+        this.forceUpdate();
     }
     renderMessage(message){ //메세지 보안
 
@@ -122,6 +147,7 @@ class ChatContainer extends React.Component {
                     '3':true,
                 }),
                 messages: new OrderedMap(),
+                created: new Date(),
             };
 
             const msgId = `${c}` ;
@@ -135,13 +161,13 @@ class ChatContainer extends React.Component {
      }
 
     componentWillMount() {
+      const {Store} = this.state;
         var output = {
             userEmail: this.props.currentEmail,
         };
         this.socket.emit('login', output);
 
         this.forceUpdate();
-
 
         // // 내가 쓴 대화내용을 채팅창에 들어왔을 때 불러오기
         // this.socket.on('preload', data => {
@@ -295,6 +321,7 @@ class ChatContainer extends React.Component {
         )
 
         const SideBarLeft = (
+
           <Container>
               <Menu.Item>
                   <Menu.Header style={{color: 'white'}}>채널</Menu.Header>
@@ -308,6 +335,18 @@ class ChatContainer extends React.Component {
                       <Menu.Item name='1조스터디' active={activeItem === '1조스터디'} onClick={this.handleItemClick} style={{color: 'white'}}/>
                   </Menu.Menu>
               </Menu.Item>
+              <div onClick={this._onCreateChannel} style={{color: 'red'}}>채널생성</div>
+              {_.get(activeChannel, 'isNew') ? <div>
+                  <lavel>Search:</lavel>
+                  <input onChange={(event) => {
+
+                          const searchUserText = _.get(event, 'target.value');
+                          this.setState({
+                              searchUser: searchUserText
+                          });
+                    }} type="text" value={this.state.searchUser} />
+                  <SearchUser search = {this.state.searchUser} Store={Store} />
+              </div> : <div>채널생성비활성화상태</div> }
               <div>
                   {channels.map((channel, key) => {
                     //const {ChatContainer} = this.state;

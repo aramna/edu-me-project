@@ -23,7 +23,34 @@ export default class Store extends React.Component{
         this.setActiveChannelId = this.setActiveChannelId.bind(this);
     }
 
+    searchUsers(search = ""){
 
+        console.log("서치 네임", search);
+        console.log("서치 네임", search.length);
+        console.log("길이", _.trim(search).legnth);
+        let searchItems = new OrderedMap();
+        if(search.length){
+
+            users.filter((user) => {
+                const name = _.get(user, 'name');
+               const userId = _.get(user, '_id');
+                console.log("name is:", name);
+                if(_.includes(name, search)){
+                      searchItems = searchItems.set(userId, user);
+                }
+            })
+        }
+        console.log("name is2:", name);
+        return searchItems.valueSeq();
+
+    }
+
+    onCreatedNewChannel(channel){
+
+    const channelId = _.get(channel, '_id');
+    this.addChannel(channelId, channel);
+    this.setActiveChannelId(channelId);
+    }
 
     getCurrentUser(){
 
@@ -55,6 +82,9 @@ export default class Store extends React.Component{
 
     }
 
+    componentDidMount(){
+      console.log("디드마운트됌");
+    }
     getMessage(){
 
         return this.messages.valueSeq();
@@ -99,6 +129,10 @@ export default class Store extends React.Component{
 
     }
     getChannels(){
+
+        //return this.channels.valueSeq(); //기존 불러오는방식
+
+        this.channels = this.channels.sort((a,b) => a.created < b.created);
 
         return this.channels.valueSeq();
     }
