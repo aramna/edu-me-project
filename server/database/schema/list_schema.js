@@ -4,17 +4,17 @@ const Schema = {};
 //계정 스키마 정의
 Schema.createSchema = function(mongoose){
 
-    var UserRoomSchema = mongoose.Schema({
+    var ListSchema = mongoose.Schema({
 
-        roomId: String,
-        inRooms: []
+        email: String,
+        roomIds: []
     })
 
-    UserRoomSchema.static('findAll', function(callback) {
+    ListSchema.static('findAll', function(callback) {
         return this.find({}, callback);
     })
 
-    return UserRoomSchema;
+    return ListSchema;
 };
 
 module.exports = Schema;

@@ -1,12 +1,10 @@
 import database from '../database/database'
-const userlist = [];
 
 module.exports = function(socket) {
     var io = require('../edume-server').io;
     const login_ids = {};
 
     var saveMsg = [];
-    //var userlist = [];
     var rooms = [];
 
     console.log('connection info :', socket.request.connection._peername);
@@ -21,58 +19,72 @@ module.exports = function(socket) {
     socket.on('login', function(login){
         console.log('login 이벤트를 받았습니다.');
         console.dir(login);
-//메인방이 데베저장되어야함 만약 데베에 roomId = 'main'이 없다면 생성
 
+        //main방 존재 여부 확인
         database.RoomModel.findOne({roomId : login.roomId}, function(err, room){
 
+            //main방 존재하여 입장
             if (room){
                 console.log(login.roomId + "방에 입장합니다.");
                 socket.join(login.roomId);
+
+                //main방 member list에 사용자 존재 여부 확인 후 없으면 추가
                 if(!room.member.includes(login.id)){
                    console.log("id가 없으므로 id 추가");
                     room.member.push(login.id);
-                    userlist.push(login.id);
                    } else {
                        console.log("id가 존재함");
                    }
+                //main방 상태 저장
                 room.save(err =>{
                     if (err) throw err
                 });
-                console.log(room.member);
+                console.log("1",room.member);
+                //io.sockets.emit('memberlist', room);
+
             } else {
-                console.log("main방을 생성합니다.");
+                console.log(login.roomId + "방을 생성합니다.");
+                //main 방 생성
                 let room = new database.RoomModel({
                     roomId : login.roomId,
                     member : []
                 });
 
                 room.member.push(login.id);
-                userlist.push(login.id);
 
                 room.save(err =>{
                     if (err) throw err
                 });
 
                 console.log(room.member);
+                //main방 생성
+                socket.join(login.roomId);
+                //io.sockets.emit('memberlist', room);
 
-            socket.join(login.roomId);
             }
-        });
+            database.ListModel.findOne({email : login.userEmail}, function(err, list){
+                if (err) throw err;
 
-        console.log(userlist);
-        socket.emit('login', userlist);
-        // database.ChatModel.findAll(function(err, results) {
-        //     if(err) throw err
-        //
-        //     if(results) {
-        //         for (var i = 0; i < results.length; i++) {
-        //             if(results[i].email === login.userEmail){
-        //                 saveMsg.push(results[i]._doc);
-        //             }
-        //         }
-        //     }
-        //     io.sockets.emit('preload', saveMsg) // saveMsg 내보내기
-        // });
+                if (list) {
+
+                    console.log("일치하는 리스트 찾음");
+                    var newArr = list.roomIds.filter(function(data){
+                        return data.text === login.roomId;
+                    })
+                    if(newArr.length>0){
+                        console.log("list의 roomids에" + login.roomId + "가 이미 존재합니다.")
+                    } else {
+                        console.log("list의 roomids에" + login.roomId + "를 추가합니다.")
+                            list.roomIds.push({"text":login.roomId});
+                            list.save(err => {
+                                if (err) throw err
+                            });
+                    }
+                }
+                console.log("list",list);
+                io.sockets.emit('channellist', list);
+            });
+        });
 
         //기존 클라이언트 ID가 없으면 클라이언트 ID를 맵에 추가
         console.log('접속한 소켓의 ID : ' + socket.id);
@@ -81,17 +93,7 @@ module.exports = function(socket) {
         console.log(login_ids)
         console.log('접속한 클라이언트 ID 갯수 : %d', Object.keys(login_ids).length);
 
-       //기본적인 룸에 입장
-
         console.log('login.roomId는 ' + login.roomId)
-
-        //var curRoom = //io.sockets.adapter.rooms[login.roomId];
-        //curRoom.id = login.roomId;
-        //var roomList = getRoomList(io);
-
-        //var output = {command:'list', rooms:roomList};
-
-        //io.sockets.emit('login', output);
     });
 
     socket.on('logout', function() {
@@ -102,68 +104,46 @@ module.exports = function(socket) {
 
     socket.on('room', function(room) {
         console.log('room 이벤트를 받았습니다.')
-        /*var cuRoom = Object.keys(io.sockets.adapter.sids[socket.id]).length-1;
-        var currentRoom = socket.rooms[Object.keys(socket.rooms)[cuRoom]];
-
-        var a = Object.keys(io.sockets.adapter.sids[socket.id])
-        console.log("알고싶은거" + a);
-
-        room.roomId = currentRoom;*/
-
-        console.dir(room);
 
         if(room.command === 'create') {
 
             database.RoomModel.findOne({roomId : room.roomId}, function(err, created_room){
 
             if (created_room){
-                console.log(created_room.roomId + "방에 입장합니다.");
-                socket.join(created_room.roomId);
 
-                if(!created_room.member.includes(room.id)){
-                    console.log("id가 없으므로 id 추가");
-                    created_room.member.push(room.id);
-                } else {
-                    console.log("id가 존재함");
-                }
-                created_room.save(err =>{
-                    if (err) throw err
-                });
-                console.log(created_room.member);
-
-                var curRoom = io.sockets.adapter.rooms[room.roomId];
-                curRoom.id = room.roomId;
-                curRoom.name = room.roomName;
-
-                //현재 방정보 저장
-                /*socket.set('curRoom', function(err, curRoom){
-                    if(err) throw err;
-                    if(curroom){
-
-                        }
-                })*/
+                console.log('이미 방이 존재해요 ' + created_room);
 
             } else {
                 console.log(room.roomId + '방을 새로 만듭니다.');
 
                 socket.join(room.roomId);
 
-                var curRoom = io.sockets.adapter.rooms[room.roomId];
-                curRoom.id = room.roomId;
-                curRoom.name = room.roomName;
-
-                console.dir(curRoom);
-
                 let croom = new database.RoomModel({
-                    roomId: curRoom.id,
+                    roomId: room.roomId
                 })
                 croom.member.push(room.id);
 
                 croom.save(err => {
                     if (err) throw err
                     })
+                database.ListModel.findOne({email : room.userEmail}, function(err, list){
+                    if (list) {
+                            var newArr = list.roomIds.filter(function(data){
+                            return data.text === croom.roomId;
+                        })
+                        if(newArr.length>0){
+                            console.log("list의 roomids에" + croom.roomId + "가 이미 존재합니다.")
+                        } else {
+                            console.log("list의 roomids에" + croom.roomId + "를 추가합니다.")
+                                list.roomIds.push({"text":croom.roomId});
+                                list.save(err => {
+                                    if (err) throw err
+                                });
+                        }
+                    }
+                });
+                console.dir('새로만든 방정보' + croom);
 
-                console.log(croom);
             }
             });
 
@@ -202,13 +182,49 @@ module.exports = function(socket) {
             io.sockets.in(chat.roomId).emit('message', output);
 
         } else if (room.command === 'join') {
-
+            console.log(room.roomId + '에 입장합니다');
             socket.join(room.roomId);
+
+            database.ListModel.findOne({email : room.userEmail}, function(err, list){
+                    if (list) {
+                            var newArr = list.roomIds.filter(function(data){
+                            return data.text === room.roomId;
+                        })
+                        if(newArr.length>0){
+                            console.log("list의 roomids에" + room.roomId + "가 이미 존재합니다.")
+                        } else {
+                            console.log("list의 roomids에" + room.roomId + "를 추가합니다.")
+                                list.roomIds.push({"text":room.roomId});
+                                list.save(err => {
+                                    if (err) throw err
+                                });
+                        }
+                    }
+            });
+
+            database.RoomModel.findOne({roomId : room.roomId}, function(err, created_room){
+                console.dir("내가지금알고싶은거" + created_room)
+                if(!created_room.member.includes(room.id)){
+                    console.log("id가 없으므로 id 추가");
+                    created_room.member.push(room.id);
+                    //io.sockets.in(created_room.roomId).emit('memberlist', created_room);
+                } else {
+                        console.log("id가 존재함");
+                }
+                created_room.save(err =>{
+                    if (err) throw err
+                });
+            console.log(created_room.member);
+            console.log("************멤버리스트 함 볼까요************" + created_room);
+            io.sockets.emit('memberlist', created_room);
+            });
+
         } else if (room.command === 'leave') {
 
         } else if (room.command === 'search'){
 
         }
+        console.dir(room);
     });
 }
 
@@ -242,4 +258,8 @@ function getRoomList(io) {
     console.dir(roomList);
 
     return roomList;
+}
+
+function addMember(room) {
+
 }

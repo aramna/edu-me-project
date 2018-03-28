@@ -67,7 +67,7 @@ if(process.env.NODE_ENV == 'development') {
     const devServer = new WebpackDevServer(compiler, webConfig.devServer);
     devServer.listen(
         webConfig.devServer_port
-        () => {
+        , function() {
             console.log('webpack-dev-server is listening on port', webConfig.devServer_port);
         }
     );
