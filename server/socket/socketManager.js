@@ -60,7 +60,7 @@ module.exports = function(socket) {
                 //main방 생성
                 socket.join(login.roomId);
                 //io.sockets.emit('memberlist', room);
-
+x
             }
             database.ListModel.findOne({email : login.userEmail}, function(err, list){
                 if (err) throw err;
@@ -82,7 +82,7 @@ module.exports = function(socket) {
                     }
                 }
                 console.log("list",list);
-                io.sockets.emit('channellist', list);
+                socket.emit('channellist', list);
             });
         });
 
@@ -113,6 +113,22 @@ module.exports = function(socket) {
 
                 console.log('이미 방이 존재해요 ' + created_room);
 
+                database.ListModel.findOne({email : room.userEmail}, function(err, list){
+                    if (list) {
+                            var newArr = list.roomIds.filter(function(data){
+                            return data.text === created_room.roomId;
+                        })
+                        if(newArr.length>0){
+                            console.log("list의 roomids에" + created_room.roomId + "가 이미 존재합니다.")
+                        } else {
+                            console.log("list의 roomids에" + created_room.roomId + "를 추가합니다.")
+                                list.roomIds.push({"text":created_room.roomId});
+                                list.save(err => {
+                                    if (err) throw err
+                                });
+                        }
+                    }
+                });
             } else {
                 console.log(room.roomId + '방을 새로 만듭니다.');
 
@@ -184,23 +200,6 @@ module.exports = function(socket) {
         } else if (room.command === 'join') {
             console.log(room.roomId + '에 입장합니다');
             socket.join(room.roomId);
-
-            database.ListModel.findOne({email : room.userEmail}, function(err, list){
-                    if (list) {
-                            var newArr = list.roomIds.filter(function(data){
-                            return data.text === room.roomId;
-                        })
-                        if(newArr.length>0){
-                            console.log("list의 roomids에" + room.roomId + "가 이미 존재합니다.")
-                        } else {
-                            console.log("list의 roomids에" + room.roomId + "를 추가합니다.")
-                                list.roomIds.push({"text":room.roomId});
-                                list.save(err => {
-                                    if (err) throw err
-                                });
-                        }
-                    }
-            });
 
             database.RoomModel.findOne({roomId : room.roomId}, function(err, created_room){
                 console.dir("내가지금알고싶은거" + created_room)
