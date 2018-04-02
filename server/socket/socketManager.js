@@ -63,13 +63,13 @@ module.exports = function(socket) {
 
                 io.sockets.in(login.roomId).emit('memberlist', room);
 
+                database.ListModel.findOne({email : login.userEmail}, function(err, list){
+                    console.log("login에서진행해이자식아")
+                    var channellist = addList(list, room);
+                    socket.emit('channellist', channellist);
+                    console.log('login에서보여주는 list' + channellist);
+                });
             }
-            database.ListModel.findOne({email : login.userEmail}, function(err, list){
-                console.log("login에서진행해이자식아")
-                var channellist = addList(list, room);
-                socket.emit('channellist', channellist);
-                console.log('login에서보여주는 list' + channellist);
-            });
         });
 
         //기존 클라이언트 ID가 없으면 클라이언트 ID를 맵에 추가
