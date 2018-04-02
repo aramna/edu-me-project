@@ -55,17 +55,19 @@ class ChatContainer extends React.Component {
             activeChannel: defaultRoom
         })
 
-        this.setState({     //main 채팅방의 정보를 channelList에 추가
-            channelList: this.state.channelList.concat({
-                text: output.roomId
-            })
-        })
+        const channelList = localStorage.channelList
 
-        this.socket.on('channellist', (channellist) => {
-            console.log("채널리스트")
-            console.log(channellist.roomIds)
-            console.log(this.state.channelList)
-        })
+        if(channelList) {
+            this.setState({
+                channelList: JSON.parse(channelList)
+            })
+        }
+    }
+
+    componentDidUpdate(prevProps, prevState) {
+        if(JSON.stringify(prevState.channelList) !== JSON.stringify(this.state.channelList)) {
+            localStorage.channelList = JSON.stringify(this.state.channelList)
+        }
     }
 
 
@@ -199,6 +201,16 @@ class ChatContainer extends React.Component {
             this.setState({logs: logs2})
         })
 
+        this.socket.on('channellist', (channellist) => {
+            console.log("채널리스트")
+            console.log(channellist.roomIds)
+            this.setState({channelList: []})
+            this.setState({
+                channelList: this.state.channelList.concat(channellist.roomIds)
+            })
+            console.log("띄우는거", this.state.channelList)
+        })
+
         this.socket.on('memberlist', (memberlist) => {
             console.log(memberlist.member)
             this.setState({memberList: []})
@@ -213,6 +225,7 @@ class ChatContainer extends React.Component {
                 })
             }
         })
+
     }
 
     render() {
@@ -256,14 +269,14 @@ class ChatContainer extends React.Component {
             ({room, text}) => (
                 room === this.state.activeChannel &&
 
-                    <div className={room}>
-                        <Menu.Menu>
-                            <Menu.Item
-                                name={text}
-                                active={activeChannel === text}
-                            />
-                        </Menu.Menu>
-                    </div>
+                <div className={room}>
+                    <Menu.Menu>
+                        <Menu.Item
+                            name={text}
+                            active={activeChannel === text}
+                        />
+                    </Menu.Menu>
+                </div>
 
             )
         )
@@ -440,7 +453,7 @@ const
         return {
             status: state.authentication.status,
             currentUser: state.authentication.status.currentUser,
-            currentEmail: state.authentication.status.currentEmail
+            currentEmail: state.authentication.status.currentEmail,
         }
 
     }
