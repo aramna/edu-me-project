@@ -18,7 +18,9 @@ import {
 import socketio from "socket.io-client";
 import {connect} from "react-redux";
 
+
 // const socket = socketio.connect('http://localhost:3000')
+
 
 class CreateTeam extends React.Component{
     // constructor(props) {
@@ -48,8 +50,9 @@ class CreateTeam extends React.Component{
     //     })
     // }
 
+
     render() {
-        // const messagesFromOther = this.state.logs.map(e => (
+//        const messagesFromOther = this.state.logs.map(e => {
         //     <Comment key={e.key}>
         //         <Comment.Author>{e.name}</Comment.Author>
         //         <div style={
@@ -68,6 +71,7 @@ class CreateTeam extends React.Component{
         //     </Comment>
         // ))
 
+
         return (
             <Container textAlign='center' style={{width: '100%', height: '100%', marginTop: 100}}>
                 <Button as={Link}
@@ -80,13 +84,18 @@ class CreateTeam extends React.Component{
 
 
 
+
+
 const mapStateToProps = (state) => {
 
+
     return {
-        currentUser: state.authentication.status.currentUser,
-        currentEmail: state.authentication.status.currentEmail
+         currentUser: state.authentication.status.currentUser,
+         currentEmail: state.authentication.status.currentEmail
     }
 
+
 }
+
 
 export default connect(mapStateToProps)(CreateTeam)

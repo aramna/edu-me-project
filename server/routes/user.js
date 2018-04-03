@@ -1,6 +1,5 @@
 import express from 'express'
 import database from '../database/database'
-
 const router = express.Router();
 
 
@@ -57,8 +56,17 @@ router.post('/adduser', (req, res) => {
         // 데이터베이스에 저장
         user.save(err => {
             if (err) throw err
-            return res.json({success: true})
+            return console.log("계정정보가 저장되었습니다.\n" + user);
+        });
+
+        let list = new database.ListModel({
+            email: req.body.email
         })
+
+        list.save(err => {
+            if (err) throw err
+            return console.log("roomlist가 생성되었습니다.\n" + list);
+        });
     })
 })
 
@@ -114,6 +122,7 @@ router.post('/logout', (req, res) => {
     req.session.destroy(err => {
         if (err) throw err;
     });
+
     return res.json({success: true});
 });
 

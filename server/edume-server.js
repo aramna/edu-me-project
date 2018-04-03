@@ -14,6 +14,8 @@ import WebpackDevServer from 'webpack-dev-server';
 import config from './config/config';
 import webConfig from '../webpack.dev.config';
 import path from 'path';
+import http from 'http';
+
 
 // import socketio from 'socket.io';
 import socketio from 'socket.io'
@@ -23,7 +25,6 @@ import cookieParser from 'cookie-parser';
 // 서버 실행
 const app = express()
 
-
 /* HTTP 요청을 로그하는 미들웨어: morgan */
 app.use(morgan('dev'))
 
@@ -32,12 +33,13 @@ app.use(bodyParser.json());
 
 app.use(cookieParser());//쿠키설정
 
-app.use(session({//세션설정
+var sessionMiddleware = session({//세션설정
     secret:'edu_key',
     resave:true,
     saveUninitialized:true
-}));
+});
 
+app.use(sessionMiddleware);
 app.use('/', express.static(path.join(__dirname, './../public')));
 
 app.use('/api', api)
@@ -54,7 +56,6 @@ app.use(function(err, req, res, next) {
 
 // app.use('/', router);//라우터 객체 등록
 
-
 var server = app.listen(config.server_port, () => {
     console.log('서버 실행 완료:', `http://localhost:` + config.server_port)
     database.init(app,config);
@@ -65,7 +66,8 @@ if(process.env.NODE_ENV == 'development') {
     const compiler = webpack(webConfig);
     const devServer = new WebpackDevServer(compiler, webConfig.devServer);
     devServer.listen(
-        webConfig.devServer_port, () => {
+        webConfig.devServer_port
+        , function() {
             console.log('webpack-dev-server is listening on port', webConfig.devServer_port);
         }
     );
@@ -73,5 +75,9 @@ if(process.env.NODE_ENV == 'development') {
 
 
 var io = module.exports.io = socketio.listen(server);
+
+io.use(function(socket, next) {
+    sessionMiddleware(socket.request, {}, next);
+});
 
 io.sockets.on('connection', socketManager);

@@ -5,5 +5,4 @@ import Register from './Register'
 import ChatContainer from './ChatContainer'
 import CreateTeam from './CreateTeam'
 
-
 export { App, Home, Login, Register, ChatContainer, CreateTeam };

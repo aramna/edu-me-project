@@ -115,7 +115,7 @@ class FixedHeader extends React.Component {
         )
 
         const logoutedHeader = (
-            <Segment style={{textAlign: 'center', minHeight: 55, padding: 0, borderRadius: 0, backgroundImage: "url(" + backgroundImage + ")"}}>
+            <Segment style={{textAlign: 'center', minHeight: 55, padding: 0, borderRadius: 0, backgroundColor: '#2196F3'}}>
                 <Menu
                     fixed='top'
                     secondary

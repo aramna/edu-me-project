@@ -16,7 +16,6 @@ import 'antd/dist/antd.css';
 const store = createStore(reducers, applyMiddleware(thunk))
 
 
-
 const rootElement = document.getElementById('root')
 ReactDOM.render(
     <Provider store={store}>
@@ -28,6 +27,7 @@ ReactDOM.render(
                 <Route path="chat" component={ChatContainer}/>
             </Route>
 
+            <Route path="chat" component={ChatContainer}/>
         </Router>
     </Provider>,
     rootElement
