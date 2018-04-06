@@ -39,9 +39,23 @@ class ChatContainer extends React.Component {
         this.handleChannelAdd = this.handleChannelAdd.bind(this)    //sidebar
         this.handleItemClick = this.handleItemClick.bind(this)
         this.handleRoomCreate = this.handleRoomCreate.bind(this)
+        this.handleRefresh = this.handleRefresh.bind(this)
     }
 
     componentWillMount() {
+
+      this.socket.on('premsg', (premsg) => {
+  console.log("premsg마운트됌");
+   console.log("premsg: ",premsg);
+
+const logs2 = premsg;
+console.log("premsg:",premsg);
+console.log("logs2",logs2);
+console.log("this1",this.state.logs);
+this.setState({logs: logs2})
+console.log("this2",this.state.logs);
+  })
+  
         var defaultRoom = 'main'    //채팅방에 입장시 기본 채팅방을 main으로 설정
         var output = {
             userEmail: this.props.currentEmail,
@@ -54,58 +68,39 @@ class ChatContainer extends React.Component {
             activeChannel: defaultRoom
         })
 
-        this.setState({     //main 채팅방의 정보를 channelList에 추가
-            channelList: this.state.channelList.concat({
-                text: output.roomId
-            })
-        })
+        const channelList = localStorage.channelList
 
-        this.socket.on('channellist', (channellist) => {
-            console.log("채널리스트")
-            console.log(channellist)
-            console.log(channellist.roomIds)
-
+        if(channelList) {
             this.setState({
-                channelList: channellist.roomIds
+                channelList: JSON.parse(channelList)
             })
-        })
+        }
+    }
 
-        this.socket.on('memberlist', (memberlist) => {
-            this.setState({
-                memberList: memberlist.member
-            })
-            console.log('?????',this.state.memberList)
-        })
-
-        /////////////////////////////////////////////////////////////
-        // this.setState({
-        //     memberList: this.state.memberList.concat({
-        //         user: output.users
-        //     })
-        // })
-        //
-        // this.socket.on('memberList', (memberlist) => {
-        //   this.setState({
-        //       memberList: memberList.member
-        //   })
-        // })
-/////////////////////////////////////////////////////////////
-        // // 내가 쓴 대화내용을 채팅창에 들어왔을 때 불러오기
-        // this.socket.on('preload', data => {
-        //     for(var i=0; i<data.length; i++) {
-        //         var output = {
-        //             name: data[i].name,
-        //             message: data[i].message
-        //         }
-        //         this.socket.emit('message', output)
-        //     }
-        //     this.setState({message: ''})
-        //     console.log('데이터다!' + data[0].message)
-        // })
+    componentDidUpdate(prevProps, prevState) {
+        if(JSON.stringify(prevState.channelList) !== JSON.stringify(this.state.channelList)) {
+            localStorage.channelList = JSON.stringify(this.state.channelList)
+        }
     }
 
 
-    //Menu의 chaneel을 클릭했을 때 채널리스트가 보여지게 하는 함수
+
+/////////////////////////////////////////////////////////////
+    // // 내가 쓴 대화내용을 채팅창에 들어왔을 때 불러오기
+    // this.socket.on('preload', data => {
+    //     for(var i=0; i<data.length; i++) {
+    //         var output = {
+    //             name: data[i].name,
+    //             message: data[i].message
+    //         }
+    //         this.socket.emit('message', output)
+    //     }
+    //     this.setState({message: ''})
+    //     console.log('데이터다!' + data[0].message)
+    // })
+
+
+//Menu의 chaneel을 클릭했을 때 채널리스트가 보여지게 하는 함수
     handleItemShow() {
         if (this.state.visibleList === false) {
             this.setState({visibleList: true})
@@ -115,12 +110,12 @@ class ChatContainer extends React.Component {
     }   //sidebar
 
 
-    //input에 입력된 value값을 받아와 roomId에 setState하는 함수
+//input에 입력된 value값을 받아와 roomId에 setState하는 함수
     roomChanged(e) {
         this.setState({roomId: e.target.value})
     }
 
-    //input에 채널 이름을 입력했을 때 채널리스트를 추가하는 함수
+//input에 채널 이름을 입력했을 때 채널리스트를 추가하는 함수
     handleChannelAdd() {
         if (this.state.visibleAdd === false) {
             this.setState({visibleAdd: true})
@@ -129,96 +124,83 @@ class ChatContainer extends React.Component {
         }
     }   //sidebar
 
-    //inputView에서 input박스에 입력된 메시지 내용을 받아오는 함수
+//inputView에서 input박스에 입력된 메시지 내용을 받아오는 함수
     messageChanged(e) {
         this.setState({newMessage: e.target.value})
     }
 
 
-    //채팅방을 생성하는 함수
+//채팅방을 생성하는 함수
     handleRoomCreate(e) {
-      var c = 1;
+        var c = 1;
         var output = {
             command: 'create',
-            userEmail:this.props.currentEmail,
-            roomId: this.state.roomId,
+            userEmail: this.props.currentEmail,
+            roomId: e.target.value,
             id: this.props.currentUser,
         }
 
+        for (var i = 0; i < this.state.channelList.length; i++) {
 
-        console.log(this.state.channelList.length);
-        console.log(this.state.channelList);
-        for(var i =0; i <this.state.channelList.length; i++){
-
-            if(this.state.channelList[i].text == this.state.roomId ){
-                c=0;
+            if (this.state.channelList[i].text === e.target.value) {
+                c = 0;
                 i = this.state.channelList.length;
+                this.handleItemClick(e, {name: e.target.value})
+
             }
+
         }
 
-        if(c == 1){
+        if (c === 1) {
             this.socket.emit('room', output)
             this.setState({
                 channelList: this.state.channelList.concat({
-                    text: this.state.roomId
+                    text: e.target.value
                 })
             })
 
-              this.setState({
-              memberList: this.state.memberList.concat({
-                    text: this.props.currentUser
-              })
-              })
+            this.handleItemClick(e, {name: e.target.value})
         }
+        console.log(this.state.channelList.length);
+        console.log(this.state.channelList);
+
     }
 
-    //Menu.Item에서 item을 클릭했을 때 그 채널을 활성화해주는 함수
+//Menu.Item에서 item을 클릭했을 때 그 채널을 활성화해주는 함수
     handleItemClick(e, {name}) {
         console.log(this.state.channelList)
 
         this.setState({activeChannel: name})
 
 
-        this.setState({roomId: name})
-
         var output = {
             command: 'join',
             roomId: name,
             id: this.props.currentUser,
+            userEmail: this.props.currentEmail
         }
 
-        console.log("액티브채널"+ output.roomId)
+        console.log("액티브유저" + this.state.memberList)
         this.socket.emit('room', output)
 
-        // this.socket.on('memberlist', (obj) => {
-        //     this.setState({
-        //         memberList: obj.member
-        //     })
-        // })
-        console.log(this.state.memberList)
-        // this.socket.on('memberlist', (obj) => {
-        //     this.setState({
-        //         memberList: this.state.memberList.concat({
-        //             key: this.state.key++,
-        //             user: obj.member[1]
-        //         })})
-        //     // console.log(obj.member)
-        // })
-        // console.log(this.state.memberList)
     }   //sidebar
 
-    // command를 message로 하여 room 으로 emit
+// command를 message로 하여 room 으로 emit
     handleSend() {
         var output = {
             command: 'message',
             email: this.props.currentEmail,
             name: this.props.currentUser,
             message: this.state.newMessage,
-            roomId: this.state.roomId
+            roomId: this.state.activeChannel
         }
 
         this.socket.emit('room', output)
         this.setState({newMessage: ''})
+    }
+
+    handleRefresh(e) {
+        this.handleItemClick(e, {name: this.state.activeChannel})
     }
 
     componentDidMount() {
@@ -232,6 +214,30 @@ class ChatContainer extends React.Component {
             this.setState({logs: logs2})
         })
 
+        this.socket.on('channellist', (channellist) => {
+            console.log("채널리스트")
+            console.log(channellist.roomIds)
+            this.setState({channelList: []})
+            this.setState({
+                channelList: this.state.channelList.concat(channellist.roomIds)
+            })
+            console.log("띄우는거", this.state.channelList)
+        })
+
+        this.socket.on('memberlist', (memberlist) => {
+            console.log(memberlist.member)
+            this.setState({memberList: []})
+            for (var i = 0; i < memberlist.member.length; i++) {
+
+                this.setState({
+                    memberList: this.state.memberList.concat({
+                            room: memberlist.member[i].channel,
+                            text: memberlist.member[i].text
+                        }
+                    )
+                })
+            }
+        })
 
     }
 
@@ -273,16 +279,19 @@ class ChatContainer extends React.Component {
         )
 
         const userList = this.state.memberList.map(
-            ({text}) => (
-            <div>
-                {this.state.visibleList ?
+            ({room, text}) => (
+                room === this.state.activeChannel &&
+
+                <div className={room}>
                     <Menu.Menu>
                         <Menu.Item
                             name={text}
                             active={activeChannel === text}
                         />
-                    </Menu.Menu> : ""}
-            </div>)
+                    </Menu.Menu>
+                </div>
+
+            )
         )
 
         const chatView = (
@@ -347,11 +356,22 @@ class ChatContainer extends React.Component {
 
         const SideView = (
             <Menu inverted vertical
-                  style={{width: '100%', height: '60%', backgroundColor: '#455A64', marginTop: 30, marginBottom: 0}}>
+                  style={{
+                      width: '100%',
+                      height: '60%',
+                      backgroundColor: '#455A64',
+                      marginTop: 30,
+                      marginBottom: 0
+                  }}>
                 <Menu.Item>
                     <div>
                         <Icon inverted name='user circle outline' size='huge' style={{marginRight: 10}}/>
-                        <label style={{textAlign: 'center', fontWeight: 'bold', fontSize: 17, verticalAlign: 'center'}}>
+                        <label style={{
+                            textAlign: 'center',
+                            fontWeight: 'bold',
+                            fontSize: 17,
+                            verticalAlign: 'center'
+                        }}>
                             {this.props.currentUser}
                             <br/>
                             <label style={{fontWeight: 'normal', fontSize: 13}}>
@@ -407,6 +427,7 @@ class ChatContainer extends React.Component {
                     <Menu.Item>
                         <Menu.Header>
                             <label>UserList</label>
+                            <Icon onClick={this.handleRefresh} name='refresh' style={{float: 'right'}}/>
                         </Menu.Header>
 
                         {userList}
@@ -439,14 +460,19 @@ class ChatContainer extends React.Component {
     }
 }
 
-const mapStateToProps = (state) => {
+const
+    mapStateToProps = (state) => {
 
-    return {
-        status: state.authentication.status,
-        currentUser: state.authentication.status.currentUser,
-        currentEmail: state.authentication.status.currentEmail
+        return {
+            status: state.authentication.status,
+            currentUser: state.authentication.status.currentUser,
+            currentEmail: state.authentication.status.currentEmail,
+        }
+
     }
 
-}
+export default connect(mapStateToProps)
 
-export default connect(mapStateToProps)(ChatContainer)
+(
+    ChatContainer
+)

@@ -7,7 +7,9 @@ Schema.createSchema = function(mongoose){
     var RoomSchema = mongoose.Schema({
 
         roomId: String,
-        member: []
+        member: [],
+        chatCount: {type:Number, default:0},
+        memberJoinNum: []
     })
 
     RoomSchema.static('findAll', function(callback) {
