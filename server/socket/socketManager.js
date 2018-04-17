@@ -43,6 +43,12 @@ module.exports = function(socket) {
 
                 console.log("????????????????" + room);
                 io.sockets.in(login.roomId).emit('memberlist', room);
+                database.ListModel.findOne({email : login.userEmail}, function(err, list){
+                    console.log("login에서진행해이자식아")
+                    var channellist = addList(list, room);
+                    socket.emit('channellist', channellist);
+                    console.log('login에서보여주는 list' + channellist);
+                });
             } else {
                 console.log(login.roomId + "방을 생성합니다.");
                 //main 방 생성
@@ -62,7 +68,6 @@ module.exports = function(socket) {
                 socket.join(login.roomId);
 
                 io.sockets.in(login.roomId).emit('memberlist', room);
-
                 database.ListModel.findOne({email : login.userEmail}, function(err, list){
                     console.log("login에서진행해이자식아")
                     var channellist = addList(list, room);
@@ -70,6 +75,7 @@ module.exports = function(socket) {
                     console.log('login에서보여주는 list' + channellist);
                 });
             }
+
         });
 
         //기존 클라이언트 ID가 없으면 클라이언트 ID를 맵에 추가
@@ -84,10 +90,18 @@ module.exports = function(socket) {
         //메시지 불러오기
         database.ChatModel.find({roomId : login.roomId}, function(err, premsg){
             console.log("%%%%%%%%%%%%" + premsg)
-            if (err) throw err;
             if (premsg) {
-                console.log("프리메시지다 : " + premsg);
-                socket.emit('premsg', premsg);
+                var fn = premsg.length
+                if(fn < 15)
+                {
+                    st = 0
+                } else {
+                    var st = fn - 15
+                }
+                console.log(fn +"fn, st" + st )
+                var premsg_slice = premsg.slice(st, fn)
+                console.log("프리메시지다 : " + premsg_slice);
+                socket.emit('premsg', premsg_slice);
             } else {
                 console.log("아무것도없어");
             }
@@ -167,31 +181,41 @@ module.exports = function(socket) {
                         roomId: room.roomId,
                         chatCount: countNum
                     })
+                    var message_time = `${chat.created.getHours()}:${("0" + chat.created.getMinutes()).slice(-2)}`;
+
+                    chat.time = message_time;
 
                     // 데이터베이스에 저장
                     chat.save(err => {
                         if (err) throw err
                     })
 
-                    var message_time = `${chat.created.getHours()}:${("0" + chat.created.getMinutes()).slice(-2)}`;
-
-                    var output = {
-                        email: chat.email,
-                        name: chat.name,
-                        message: chat.message,
-                        time: message_time,
-                        roomId: chat.roomId,
-                        chatCount: chat.chatCount
-                    }
-
-                    console.log(output);
-                    io.sockets.in(chat.roomId).emit('message', output);
+                    console.log(chat);
+                    io.sockets.in(chat.roomId).emit('message', chat);
                 }
             })
         } else if (room.command === 'join') {
             console.log(room.roomId + '에 입장합니다');
             socket.join(room.roomId);
-
+            database.ChatModel.find({roomId : room.roomId}, function(err, premsg){
+                console.log("%%%%%%%%%%%%" + premsg)
+                if (err) throw err;
+                if (premsg) {
+                    var fn = premsg.length
+                    if(fn < 15)
+                    {
+                        st = 0
+                    } else {
+                        var st = fn - 15
+                    }
+                    console.log(fn +"fn, st" + st )
+                    var premsg_slice = premsg.slice(st, fn)
+                    console.log("프리메시지다 : " + premsg_slice);
+                    socket.emit('premsg', premsg_slice);
+                } else {
+                    console.log("아무것도없어");
+                }
+            });
             database.RoomModel.findOne({roomId : room.roomId}, function(err, created_room){
                 if(created_room) {
                     console.dir("내가지금알고싶은거" + created_room)
@@ -223,18 +247,18 @@ module.exports = function(socket) {
 
         } else if (room.command === 'leave') {
 
-        } /*else if (room.command === 'premessage'){
-            database.ChatModel.find({roomId : room.roomId}, function(err, premsg){
+        } else if (room.command === 'loadmsg'){
+            database.ChatModel.find({roomId : room.roomId}, function(err, loadmsg){
                 if (err) throw err;
-                if (premsg) {
-                    console.log("프리메시지다 : " + premsg);
-                    io.sockets.in(room.roomId).emit('premsg', premsg);
+                if (loadmsg) {
+                    console.log("로드메시지다 : " + loadmsg);
+                    socket.emit('loadmsg', loadmsg);
                 } else {
                     console.log("아무것도없어");
                 }
 
             });
-        }*/
+        }
         console.dir(room);
     });
 }
