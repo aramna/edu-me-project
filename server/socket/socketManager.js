@@ -98,7 +98,7 @@ module.exports = function(socket) {
                 } else {
                     var st = fn - 15
                 }
-                console.log(fn +"fn, st" + st )
+                console.log("fn : " + fn + ", st : " + st)
                 var premsg_slice = premsg.slice(st, fn)
                 console.log("프리메시지다 : " + premsg_slice);
                 socket.emit('premsg', premsg_slice);
@@ -208,7 +208,7 @@ module.exports = function(socket) {
                     } else {
                         var st = fn - 15
                     }
-                    console.log(fn +"fn, st" + st )
+                    console.log("fn : " + fn + ", st : " + st)
                     var premsg_slice = premsg.slice(st, fn)
                     console.log("프리메시지다 : " + premsg_slice);
                     socket.emit('premsg', premsg_slice);
@@ -248,9 +248,26 @@ module.exports = function(socket) {
         } else if (room.command === 'leave') {
 
         } else if (room.command === 'loadmsg'){
+            var loadCount = room.chatSize;
             database.ChatModel.find({roomId : room.roomId}, function(err, loadmsg){
                 if (err) throw err;
                 if (loadmsg) {
+                    var fn = loadmsg.length - loadCount;
+                    if(fn < 0)
+                    {
+                        console.log("저장된 msg길이보다 넘어온 길이가 더 큽니다.")
+                    } else if(fn == 0) {
+                        console.log("끝에 도달했습니다.")
+                    } else if(fn < 15) {
+                        st = 0
+                        console.log("fn : " + fn + ", st : " + st)
+                        var premsg_slice = premsg.slice(st, fn)
+                    } else {
+                        var st = fn - 15
+                        console.log("fn : " + fn + ", st : " + st)
+                        var premsg_slice = premsg.slice(st, fn)
+                    }
+
                     console.log("로드메시지다 : " + loadmsg);
                     socket.emit('loadmsg', loadmsg);
                 } else {

@@ -12,7 +12,19 @@ import {
     Loader
 } from 'semantic-ui-react'
 import {SideBar} from 'components'
-import {Message, MessageText, MessageGroup, MessageList, Row, Avatar} from '@livechat/ui-kit'
+import {
+    Message,
+    MessageText,
+    MessageGroup,
+    MessageList,
+    Row,
+    Avatar,
+    SendButton,
+    TextComposer,
+    TextInput,
+    IconButton,
+    EmojiIcon
+} from '@livechat/ui-kit'
 import '../index.css'
 
 const getTime = (date) => {
@@ -41,6 +53,14 @@ class ChatContainer extends React.Component {
         this.handleItemClick = this.handleItemClick.bind(this)
         this.handleRoomCreate = this.handleRoomCreate.bind(this)
         this.handleRefresh = this.handleRefresh.bind(this)
+        this.scrollDown = this.scrollDown.bind(this)
+    }
+
+    scrollDown() {
+        const { container } = this.refs
+        container.scrollTop = container.scrollHeight
+
+
     }
 
 //Menu의 chaneel을 클릭했을 때 채널리스트가 보여지게 하는 함수
@@ -50,7 +70,7 @@ class ChatContainer extends React.Component {
         } else {
             this.setState({visibleList: false})
         }
-        console.log("로그스",this.state.logs)
+        console.log("로그스", this.state.logs)
     }   //sidebar
 
 
@@ -158,7 +178,7 @@ class ChatContainer extends React.Component {
             roomId: defaultRoom
         }
         // console.log("현재유저:",this.props.currentUser)
-        if(this.props.currentUser !== ''){
+        if (this.props.currentUser !== '') {
             this.socket.emit('login', output)
         }
 
@@ -169,7 +189,7 @@ class ChatContainer extends React.Component {
 
         console.log("액티브채널:", this.state.channelList)
 
-        if(this.state.channelList !== null) {
+        if (this.state.channelList !== null) {
             this.socket.on('channellist', (channellist) => {
                 console.log("채널리스트")
                 console.log(channellist.roomIds)
@@ -197,23 +217,32 @@ class ChatContainer extends React.Component {
 
 
     componentDidMount() {
+        const { container } = this.refs
+        container.addEventListener("scroll", () => {
+            if (container.scrollTop === 0) {
+                console.log('시발')
+            }
+        })
 
+        this.scrollDown()
 
         // this.setState({loaded: true})
     }
 
-    componentDidUpdate(prevProps, prevState){
+    componentDidUpdate(prevProps, prevState) {
         var defaultRoom = 'main'
-        if(this.props.currentUser !== prevProps.currentUser) {
+        if (this.props.currentUser !== prevProps.currentUser) {
             var output = {
                 userEmail: this.props.currentEmail,
                 id: this.props.currentUser,
                 roomId: defaultRoom
             }
-            if(this.props.currentUser !== ''){
+            if (this.props.currentUser !== '') {
                 this.socket.emit('login', output)
             }
         }
+
+        this.scrollDown()
     }
 
 
@@ -236,7 +265,7 @@ class ChatContainer extends React.Component {
         )
 
         const example = []
-        for(var i=0; i<this.state.memberList.length; i++){
+        for (var i = 0; i < this.state.memberList.length; i++) {
             example.push(
                 <Menu.Item
                     name={this.state.memberList[i]}
@@ -257,7 +286,7 @@ class ChatContainer extends React.Component {
 
             <div style={{height: 'calc(100% - 100px)'}}>
 
-                <MessageList active style={{backgroundColor: '#D6D6D6'}}>
+                <div ref='container' style={{height: '100%', overflow: 'auto', backgroundColor: '#D6D6D6'}}>
 
                     <Divider horizontal style={{color: '#455A64', fontSize: 10}}>{this.state.activeChannel}방에
                         입장하셨습니다.</Divider>
@@ -283,7 +312,7 @@ class ChatContainer extends React.Component {
                             ''
                     ))}
 
-                </MessageList>
+                </div>
 
             </div>
 
@@ -317,7 +346,6 @@ class ChatContainer extends React.Component {
                 >전송</Button>
             </div>
         )
-
 
         const SideView = (
             <Menu inverted vertical
