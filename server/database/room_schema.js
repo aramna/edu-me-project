@@ -20,5 +20,5 @@ Schema.createSchema = function(mongoose){
 };
 
 
-module.exports = Schema;
 
+module.exports = Schema;

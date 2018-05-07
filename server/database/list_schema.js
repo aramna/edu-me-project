@@ -5,7 +5,6 @@ const Schema = {};
 Schema.createSchema = function(mongoose){
 
     var ListSchema = mongoose.Schema({
-
         email: String,
         roomIds: []
     })
@@ -18,4 +17,3 @@ Schema.createSchema = function(mongoose){
 };
 
 module.exports = Schema;
-

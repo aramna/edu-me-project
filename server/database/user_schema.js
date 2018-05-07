@@ -10,8 +10,7 @@ Schema.createSchema = function(mongoose){
         username: String,
         email: String,
         password: String,
-        created: {type: Date, default: Date.now},
-        roomId: String
+        created: {type: Date, default: Date.now}
     })
 
     // password 비교 함수

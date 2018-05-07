@@ -2,7 +2,6 @@ import React from 'react';
 import { Authentication } from 'components'
 import { connect } from 'react-redux'
 import { registerRequest } from "../actions/authentication"
-import { browserHistory } from 'react-router'
 import 'antd/dist/antd.css';
 import { message } from 'antd'
 
@@ -18,7 +17,7 @@ class Register extends React.Component {
             () => {
                 if(this.props.status === "SUCCESS") {
                     message.success('회원가입을 성공했습니다. 로그인 하세요.')
-                    browserHistory.push('/login')
+
                     return true
                 } else {
                     let errorMessage = [

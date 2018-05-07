@@ -18,6 +18,7 @@ import {Dropdown,
     Sidebar,
     Visibility,} from 'semantic-ui-react'
 import {browserHistory} from "react-router";
+import ChatContainer from './ChatContainer'
 import { ThemeProvider } from '@livechat/ui-kit'
 
 class App extends Component {
@@ -47,7 +48,7 @@ class App extends Component {
     );
 }
 
-componentDidMount() {   // 컴포넌트가 만들어지고 첫 렌더링을 마친 후 실행되는 메소드
+componentWillMount() {
     function getCookie(name) {
         var value = "; " + document.cookie
         var parts = value.split("; " + name + "=")
@@ -70,7 +71,7 @@ componentDidMount() {   // 컴포넌트가 만들어지고 첫 렌더링을 마�
     // check whether this cookie is valid or not
     this.props.getStatusRequest().then(
         () => {
-            console.log(this.props.status);
+            console.log("현재상태",this.props.status);
             // if session is not valid
             if (!this.props.status.valid) {
                 // logout the session
@@ -86,6 +87,10 @@ componentDidMount() {   // 컴포넌트가 만들어지고 첫 렌더링을 마�
     );
 }
 
+componentDidMount() {   // 컴포넌트가 만들어지고 첫 렌더링을 마친 후 실행되는 메소드
+
+}
+
 
 render() {
     let re = /(login|register)/
@@ -98,6 +103,7 @@ render() {
                                                onLogout={this.handleLogout}/>}
             {this.props.children}
         </div>
+
         </ThemeProvider>
     );
 }
@@ -106,7 +112,9 @@ render() {
 
 const mapStateToProps = (state) => {
     return {
-        status: state.authentication.status     // 로그인 or 로그아웃 상태
+        status: state.authentication.status,
+        currentUser: state.authentication.status.currentUser,
+        currentEmail: state.authentication.status.currentEmail,     // 로그인 or 로그아웃 상태
     }
 }
 

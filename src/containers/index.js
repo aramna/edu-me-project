@@ -4,5 +4,7 @@ import Login from './Login'
 import Register from './Register'
 import ChatContainer from './ChatContainer'
 import CreateTeam from './CreateTeam'
+import AddTeam from './AddTeam'
 
-export { App, Home, Login, Register, ChatContainer, CreateTeam };
+
+export { App, Home, Login, Register, ChatContainer, CreateTeam, AddTeam };

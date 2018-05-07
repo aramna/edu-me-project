@@ -1,6 +1,7 @@
 import React from 'react';
 import {Link} from "react-router";
 import {Button, Form, Grid, Checkbox} from 'semantic-ui-react'
+import { browserHistory } from 'react-router'
 
 class Authentication extends React.Component {
 
@@ -53,6 +54,9 @@ class Authentication extends React.Component {
                 }
             }
         );
+        browserHistory.push('/login')
+
+
     }
 
 

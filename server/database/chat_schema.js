@@ -11,7 +11,8 @@ Schema.createSchema = function(mongoose){
         message: String,
         created: {type: Date, default: Date.now},
         roomId: String,
-        chatCount: Number
+        chatCount: Number,
+        time: String
     })
 
     ChatSchema.static('findAll', function(callback) {
