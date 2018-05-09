@@ -249,6 +249,38 @@ module.exports = function(socket) {
 
         } else if (room.command === 'loadmsg'){
             var loadCount = room.chatSize;
+            console.log("빼애애액" + loadCount);
+            database.ChatModel.find({roomId : room.roomId}, function(err, loadmsg){
+                if (err) throw err;
+                if (loadmsg) {
+                    var divide = loadmsg.length - loadCount;
+                    var fn = loadmsg.length;
+                    console.log("빼애애애액divide" + divide);
+                    if(divide < 0)
+                    {
+                        console.log("저장된 msg길이보다 넘어온 길이가 더 큽니다.")
+                    } else if(divide == 0) {
+                        console.log("끝에 도달했습니다.")
+                    } else if(divide < 15) {
+                        st = 0
+                        console.log("fn : " + fn + ", st : " + st)
+                        var premsg_slice = loadmsg.slice(st, fn)
+                        console.log("로드메시지다 : " + premsg_slice);
+                        socket.emit('loadmsg', premsg_slice);
+                    } else {
+                        var st = divide - 15
+                        console.log("fn : " + fn + ", st : " + st)
+                        var premsg_slice = loadmsg.slice(st, fn)
+                        console.log("로드메시지다 : " + premsg_slice);
+                        socket.emit('loadmsg', premsg_slice);
+                    }
+                } else {
+                    console.log("아무것도없어");
+                }
+
+            });
+            //일단성공한코드
+            /*var loadCount = room.chatSize;
             database.ChatModel.find({roomId : room.roomId}, function(err, loadmsg){
                 if (err) throw err;
                 if (loadmsg) {
@@ -261,20 +293,20 @@ module.exports = function(socket) {
                     } else if(fn < 15) {
                         st = 0
                         console.log("fn : " + fn + ", st : " + st)
-                        var premsg_slice = premsg.slice(st, fn)
+                        var premsg_slice = loadmsg.slice(st, fn)
                     } else {
                         var st = fn - 15
                         console.log("fn : " + fn + ", st : " + st)
-                        var premsg_slice = premsg.slice(st, fn)
+                        var premsg_slice = loadmsg.slice(st, fn)
                     }
 
-                    console.log("로드메시지다 : " + loadmsg);
-                    socket.emit('loadmsg', loadmsg);
+                    console.log("로드메시지다 : " + premsg_slice);
+                    socket.emit('loadmsg', premsg_slice);
                 } else {
                     console.log("아무것도없어");
                 }
 
-            });
+            });*/
         }
         console.dir(room);
     });

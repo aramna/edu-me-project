@@ -154,6 +154,7 @@ class ChatContainer extends React.Component {
 
         this.socket.emit('room', output)
         this.setState({newMessage: ''})
+        console.log("logs: ", this.state.logs)
     }
 
     handleRefresh(e) {
@@ -212,6 +213,7 @@ class ChatContainer extends React.Component {
 
         this.socket.on('premsg', (premsg) => {
             this.setState({logs: premsg, loading: false});
+            console.log("premsg: ", this.state.logs)
         })
     }
 
@@ -221,6 +223,21 @@ class ChatContainer extends React.Component {
         container.addEventListener("scroll", () => {
             if (container.scrollTop === 0) {
                 console.log('시발')
+
+                var output = {
+                    command: 'loadmsg',
+                    chatSize: this.state.logs.length,
+                    roomId: this.state.activeChannel
+                }
+                this.socket.emit('room', output)
+
+                this.socket.on('loadmsg', (loadmsg) => {
+                    this.setState({logs: loadmsg, loading: false});
+                    console.log("확인합니다loadmsg: ", this.state.logs)
+                })
+
+                console.log(output.chatSize)
+
             }
         })
 
