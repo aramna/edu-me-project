@@ -166,61 +166,122 @@ module.exports = function(socket) {
                     console.dir('새로만든 방정보' + croom);
                 }
             });
-
         } else if (room.command === 'message') {
             //******************chatbot 예제코드******************//
+
             if(room.roomId == 'chat') {
-                console.log("쳇봇을 실행시킵니다.");
-                var classifier = bayes({
-                    tokenizer: function(text) { return text.split(' ')}
+                console.log("챗봇쪽 코드 실행됨");
+                database.BotModel.findOne({name : room.email}, function(err, bot){
+                    console.log("봇 객체 = " + bot);
+                    console.log("봇 상태 = " + bot.state);
+                    if(bot.state == 'general')
+                    {
+                        console.log("쳇봇을 실행시킵니다.");
+                        var classifier = bayes({
+                            tokenizer: function(text) { return text.split(' ')}
+                        })
+
+                        const article = fs.readFileSync("C:/test/test.txt");
+                        var lineArray = article.toString();
+                        var line = lineArray.split('\r\n');
+
+                        for(var i in line){
+                            var s = line[i].split(",");
+                            classifier.learn(s[0], s[1]);
+                        }
+                        var category = classifier.categorize(room.message);
+                        console.log("category - " + category);
+                        let chat = new database.ChatModel({
+                            name: room.name,
+                            message: room.message,
+                            email: room.email,
+                            roomId: room.roomId
+                        })
+                        var message_time = `${chat.created.getHours()}:${("0" + chat.created.getMinutes()).slice(-2)}`;
+
+                        chat.time = message_time;
+
+                            // 데이터베이스에 저장
+                        chat.save(err => {
+                            if (err) throw err
+                        })
+
+                        console.log(chat);
+                        io.sockets.emit('message', chat);
+
+                        var contents = category;
+                        if(category == 'send')
+                        {
+                            contents = '뭐라고 보낼까?';
+                            bot.state = category;
+                            bot.save(err => {
+                                if(err) throw err
+                                console.log("Bot의 state가 " +bot.state+ "로 update되었습니다.");
+                            })
+                        }
+                        let chatbot = new database.ChatModel({
+                            name: "chatbot",
+                            message: contents,
+                            email: "chatbot@naver.com",
+                            roomId: room.roomId
+                            })
+
+                        var message_time2 = `${chatbot.created.getHours()}:${("0" + chatbot.created.getMinutes()).slice(-2)}`;
+
+                        chatbot.time = message_time2;
+
+                            // 데이터베이스에 저장
+                        chatbot.save(err => {
+                            if (err) throw err
+                        })
+                        chatbot.state = category;
+                        console.log(chatbot);
+                        io.sockets.emit('message', chatbot);
+
+                    } else if(bot.state == 'send')
+                    {
+                        let chat = new database.ChatModel({
+                            name: room.name,
+                            message: room.message,
+                            email: room.email,
+                            roomId: room.roomId
+                        })
+
+                        var message_time = `${chat.created.getHours()}:${("0" + chat.created.getMinutes()).slice(-2)}`;
+
+                        chat.time = message_time;
+
+                            // 데이터베이스에 저장
+                        chat.save(err => {
+                            if (err) throw err
+                        })
+                        io.sockets.emit('message', chat);
+
+                        let chatbot = new database.ChatModel({
+                            name: "chatbot",
+                            message: room.message,
+                            email: "chatbot@naver.com",
+                            roomId: room.roomId
+                            })
+
+                        var message_time = `${chatbot.created.getHours()}:${("0" + chatbot.created.getMinutes()).slice(-2)}`;
+
+                        chatbot.time = message_time;
+
+                            // 데이터베이스에 저장
+                        chatbot.save(err => {
+                            if (err) throw err
+                        })
+                        chatbot.state = category;
+                        console.log(bot);
+                        io.sockets.emit('message', chatbot);
+                        bot.state = 'general';
+                        bot.save(err => {
+                            if(err) throw err;
+                        });
+                        console.log("전송성공 후 Bot의 state " + bot.state);
+                    }
                 })
-
-                const article = fs.readFileSync("C:/test/test.txt");
-                var lineArray = article.toString();
-                var line = lineArray.split('\r\n');
-
-                for(var i in line){
-                    var s = line[i].split(",");
-                    classifier.learn(s[0], s[1]);
-                }
-                var category = classifier.categorize(room.message);
-                console.log("category - " + category);
-                let chat = new database.ChatModel({
-                    name: room.name,
-                    message: room.message,
-                    email: room.email,
-                    roomId: room.roomId,
-                })
-                var message_time = `${chat.created.getHours()}:${("0" + chat.created.getMinutes()).slice(-2)}`;
-
-                chat.time = message_time;
-
-                    // 데이터베이스에 저장
-                chat.save(err => {
-                    if (err) throw err
-                })
-
-                console.log(chat);
-                io.sockets.emit('message', chat);
-                var question = category+'라고?';
-                let bot = new database.ChatModel({
-                    name: "chatbot",
-                    message: question,
-                    email: "chatbot@naver.com",
-                    roomId: room.roomId
-                    })
-
-                var message_time = `${bot.created.getHours()}:${("0" + bot.created.getMinutes()).slice(-2)}`;
-
-                bot.time = message_time;
-
-                    // 데이터베이스에 저장
-                bot.save(err => {
-                    if (err) throw err
-                })
-
-                console.log(bot);
-                io.sockets.emit('message', bot);
 
                 //******************chatbot 예제코드******************//
             } else {

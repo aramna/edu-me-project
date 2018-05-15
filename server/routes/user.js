@@ -43,6 +43,15 @@ router.post('/adduser', (req, res) => {
                 code: 4
             })
         }
+        let bot = new database.BotModel({
+            name: req.body.email,
+            state: 'general'
+        })
+
+        bot.save(err => {
+            if(err) throw err;
+            return console.log("개인 봇이 생성되었습니다.");
+        })
 
         // 계정 생성 (스키마생성)
         let user = new database.UserModel({
