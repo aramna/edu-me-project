@@ -151,6 +151,7 @@ module.exports = function(socket) {
             });
 
         } else if (room.command === 'message') {
+
             console.log('message 이벤트를 받았습니다.');
             var countNum;
             database.RoomModel.findOne({roomId:room.roomId}, function(err, croom){

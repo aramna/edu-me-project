@@ -3,6 +3,7 @@ import socketio from 'socket.io-client'
 import { connect } from 'react-redux'
 import _ from 'lodash'
 import {OrderedMap} from 'immutable'
+import Chatbot from './Chatbot'
 import {
     Button,
     Grid,
@@ -71,7 +72,9 @@ class ChatContainer extends React.Component {
             x: false,
             y: false,
             z: false,
+            ChatbotCheck: false,
         }
+
 
         this.socket = socketio.connect()
 
@@ -84,13 +87,17 @@ class ChatContainer extends React.Component {
         this.scrollPosition = this.scrollPosition.bind(this)
         this.searchUser = this.searchUser.bind(this)
         this.personalTalk = this.personalTalk.bind(this)
+        this.dkanrjskl=this.dkanrjskl.bind(this)
     }
 
+    dkanrjskl(){
+      console.log('온클릭됌');
+      this.setState({ ChatbotCheck: true })
 
+    }
 
     searchUser(search = ""){
       let searchItems = new OrderedMap();
-      console.log(searchItems);
       if(_.trim(search).length){
         users.filter((user) => {
           const name = _.get(user, 'name');
@@ -406,7 +413,6 @@ if (c === 1) {
 
 
     componentDidMount() {
-
         const { container } = this.refs
         // this.setState({ x: false })
 
@@ -421,9 +427,6 @@ if (c === 1) {
 
         // this.setState({loaded: true})
     }
-
-
-
 
     componentDidUpdate(prevProps, prevState) {
 
@@ -543,7 +546,7 @@ if (c === 1) {
                         if (this.state.newMessage.length > 0) {
                             this.handleSend()
                         }
-                    }}
+                    }}cmd
                     style={{ float: 'right, bottom' }}
                 >전송</Button>
             </div>
@@ -553,7 +556,7 @@ if (c === 1) {
             <Menu inverted vertical
                 style={{
                     width: '100%',
-                    height: '60%',
+                    height: '50%',
                     backgroundColor: '#455A64',
                     marginTop: 30,
                     marginBottom: 0
@@ -638,7 +641,7 @@ if (c === 1) {
         const SideView2 = (
             <div style={{
                 width: '100%',
-                height: 'calc(40% - 30px)',
+                height: 'calc(50% - 30px)',
                 backgroundColor: '#455A64',
                 marginTop: 0,
                 marginBottom: 0
@@ -665,6 +668,24 @@ if (c === 1) {
             </div>
         )
 
+        const Chatbotview = (
+            <Menu inverted vertical style={{
+                    width: '100%',
+                    height: '20px',
+                    backgroundColor: '#455A64',
+                    marginTop: 0,
+                    marginBottom: 0
+                }}>
+                <Menu.Item style={{ height: 100, overflowY: 'auto' }}>
+                    <Menu.Header>
+                        <label onClick={this.dkanrjskl}>
+                            Chatbot Helper
+                        </label>
+                    </Menu.Header>
+                </Menu.Item>
+            </Menu>
+        )
+
 
         return (
 
@@ -674,14 +695,17 @@ if (c === 1) {
                 </Dimmer>
                 <Grid.Column style={{ width: 250, backgroundColor: '#455A64', padding: 0 }}>
                     {SideView}
+                    {Chatbotview}
                     {SideView2}
                 </Grid.Column>
-                <Grid.Column style={{ width: 'calc(100% - 310px)', padding: 0 }}>
+                {this.state.ChatbotCheck ? <Chatbot /> :
+                  <Grid.Column style={{ width: 'calc(100% - 310px)', padding: 0 }}>
                     <div style={{ height: '100%', textAlign: 'center' }}>
                         {chatView}
+
                         {inputView}
                     </div>
-                </Grid.Column>
+                </Grid.Column>}
                 <Grid.Column floated='right' style={{ width: 60, backgroundColor: '#455A64' }}>
 
                 </Grid.Column>
