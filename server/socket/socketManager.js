@@ -130,6 +130,10 @@ module.exports = function(socket) {
         sockets.splice(i, 1);
     });
 
+    socket.on('transcript', function(transcript){
+        console.log(transcript);
+    });
+
     socket.on('room', function(room) {
         console.log('room 이벤트를 받았습니다.')
 

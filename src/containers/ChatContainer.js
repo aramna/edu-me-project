@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { PropTypes } from 'react';
 import socketio from 'socket.io-client'
 import { connect } from 'react-redux'
 import _ from 'lodash'
@@ -11,21 +11,15 @@ import {
     Menu,
     Divider,
     Dimmer,
-    Loader
+    Loader,
+    Modal,
+    Header,
+    Container,
+    Segment,
 } from 'semantic-ui-react'
-import { SideBar } from 'components'
 import {
     Message,
     MessageText,
-    MessageGroup,
-    MessageList,
-    Row,
-    Avatar,
-    SendButton,
-    TextComposer,
-    TextInput,
-    IconButton,
-    EmojiIcon
 } from '@livechat/ui-kit'
 import '../index.css'
 
@@ -69,6 +63,11 @@ class ChatContainer extends React.Component {
             x: false,
             y: false,
             z: false,
+            transcript: '',
+            show: false,
+            listening: false,
+            text: '말씀하세요',
+            modalOpen: false
         }
 
         this.socket = socketio.connect()
@@ -82,11 +81,15 @@ class ChatContainer extends React.Component {
         this.scrollPosition = this.scrollPosition.bind(this)
         this.searchUser = this.searchUser.bind(this)
         this.personalTalk = this.personalTalk.bind(this)
+        this.start = this.start.bind(this)
+        this.end = this.end.bind(this)
+        this.handleClose = this.handleClose.bind(this)
+        this.handleModalOpen = this.handleModalOpen.bind(this)
+        this.handleModalClose = this.handleModalClose.bind(this)
     }
 
     searchUser(search = ""){
         let searchItems = new OrderedMap();
-        console.log(searchItems);
         if(_.trim(search).length){
             this.state.users.filter((user) => {
                 const name = _.get(user, 'username');
@@ -143,16 +146,8 @@ class ChatContainer extends React.Component {
         container.scrollTop = container.scrollHeight
     }
 
-    scrollUp() {
-        const { container } = this.refs
-        container.scrollTop = 0
-    }
-
     scrollPosition() {
         const { container } = this.refs
-
-        // container.scrollTop = container.clientHeight - container.scrollTop
-
         container.scrollTop = container.clientHeight
 
     }
@@ -164,8 +159,6 @@ class ChatContainer extends React.Component {
         } else {
             this.setState({ visibleList: false })
         }
-        console.log("로그스", this.state.logs)
-        console.log('아니시발진짜', this.state.users)
     }   //sidebar
 
 
@@ -187,7 +180,6 @@ class ChatContainer extends React.Component {
     messageChanged(e) {
         this.setState({ newMessage: e.target.value })
     }
-
 
     //채팅방을 생성하는 함수
     handleRoomCreate(e) {
@@ -224,24 +216,17 @@ class ChatContainer extends React.Component {
     //Menu.Item에서 item을 클릭했을 때 그 채널을 활성화해주는 함수
     handleItemClick(e, { name }) {
         const { container } = this.refs
-        // this.setState({ x: false })
 
         container.addEventListener("scroll", () => {
 
             if (container.scrollTop === 0) {
-
-                // this.setState({ y:false, x: false })
                 console.log("메롱")
             }
 
         })
 
-        console.log("this.X : ", this.state.x)
-
         console.log(this.state.channelList)
-
         console.log("채팅방 입장시 logs: ", this.state.logs)
-        // this.setState({ y: false })
         this.setState({ activeChannel: name })
 
         var output = {
@@ -268,6 +253,7 @@ class ChatContainer extends React.Component {
         this.setState({ newMessage: '' })
         console.log("logs: ", this.state.logs)
     }
+
 
     handleRefresh(e) {
         this.handleItemClick(e, { name: this.state.activeChannel })
@@ -350,21 +336,13 @@ class ChatContainer extends React.Component {
 
     loadMoreChat() {
 
-        // var output = {
-        //     command: 'loadmsg',
-        //     chatSize: this.state.logs.length,
-        //     roomId: this.state.activeChannel
-        // }
-        // this.socket.emit('room', output)
-        // this.setState({x: true})
         var loadCount = this.state.logs.length;
-        // this.setState({x: true})
 
         if (this.state.premsg) {
             var fn = this.state.premsg.length - loadCount;
             if (fn < 0) {
                 console.log("저장된 msg길이보다 넘어온 길이가 더 큽니다.")
-            } else if (fn == 0) {
+            } else if (fn === 0) {
                 console.log("끝에 도달했습니다.")
                 // this.setState({x:true})
             } else if (fn < 15) {
@@ -387,48 +365,102 @@ class ChatContainer extends React.Component {
         }
     }
 
-    // this.socket.on('loadmsg', (loadmsg) => {
-    // if(loadmsg !== null){
-    //     this.setState({logs: this.state.logs.concat(loadmsg)})
-    //     this.setState({logs: this.state.logs.sort(dynamicSort("chatCount"))})
-
-    //     console.log("확인합니다loadmsg: ", loadmsg)
-    // }
-    // else if(loadmsg === null){
-    //     console.log("더없지롱")
-    // }
-    //     console.log("로드메시시시시")
-    // })
-
-
-    //     console.log(output.chatSize)
-    // }
-
-
 
     componentDidMount() {
-
         const { container } = this.refs
-        // this.setState({ x: false })
 
         container.addEventListener("scroll", () => {
-
             if (container.scrollTop ===0) {
                 this.loadMoreChat()
             }
         })
-
         this.scrollDown()
-        console.log("시발",this.state.users)
-        // this.setState({loaded: true})
+
+        const Recognition =
+            window.SpeechRecognition || window.webkitSpeechRecognition;
+
+        if (!Recognition) {
+            alert(
+                '크롬브라우저로 다시 시도하세요.'
+            );
+            return;
+        }
+
+        this.recognition = new Recognition();
+        this.recognition.lang = process.env.REACT_APP_LANGUAGE || 'ko-KR';
+        this.recognition.continuous = false;
+        this.recognition.interimResults = false;
+        this.recognition.maxAlternatives = 1;
+
+        this.recognition.onresult = event => {
+            const text = event.results[0][0].transcript;
+
+            console.log('transcript', text);
+            this.setState({ text: text });
+
+            var output = {
+                transcript: this.state.text
+            }
+            this.socket.emit('transcript', output)
+            this.end()
+            this.setState({modalOpen:false})
+        };
+
+        this.recognition.onspeechend = () => {
+            console.log('stopped');
+
+            this.setState({ show: true });
+        };
+
+        this.recognition.onnomatch = event => {
+            console.log('no match');
+            this.setState({ text: "또박또박!" });
+        };
+
+        this.recognition.onstart = () => {
+            this.setState({
+                listening: true,
+                text: '말씀하세요'
+            });
+        };
+
+        this.recognition.onend = () => {
+            console.log('end');
+
+            this.setState({
+                listening: false,
+            });
+
+            this.end();
+        };
+
+        this.recognition.onerror = event => {
+            console.log('error', event);
+
+            this.setState({
+                show: true,
+                text: event.error,
+            });
+        };
     }
 
+    start() {
+        this.recognition.start();
+        this.setState({modalOpen:true})
+    };
 
+    end() {
+        this.recognition.stop();
+    };
+
+    handleClose() {
+        this.setState({ show: false });
+    };
 
 
     componentDidUpdate(prevProps, prevState) {
 
-        this.historyChange = prevState.logs == this.state.logs
+        this.historyChange = prevState.logs === this.state.logs
 
         var defaultRoom = 'main'
 
@@ -446,6 +478,15 @@ class ChatContainer extends React.Component {
             this.scrollDown()
         }
 
+    }
+
+    handleModalOpen() {
+        this.setState({ modalOpen: true})
+    }
+
+    handleModalClose() {
+        this.end()
+        this.setState({modalOpen:false})
     }
 
 
@@ -522,6 +563,7 @@ class ChatContainer extends React.Component {
         )
 
 
+
         const inputView = (
             <div style={{ width: '100%', height: 80 }}>
 
@@ -547,6 +589,7 @@ class ChatContainer extends React.Component {
                         }}
                         style={{ float: 'right, bottom' }}
                 >전송</Button>
+
             </div>
         )
         const SideView = (
@@ -667,6 +710,40 @@ class ChatContainer extends React.Component {
         )
 
 
+        const SideView3 = (
+            <Modal
+                trigger={<Button circular
+                                 icon="unmute"
+                                 onClick={this.start}
+                />}
+                size='fullscreen'
+                basic
+                onClose={this.end}
+                open={this.state.modalOpen}
+            >
+                <Modal.Header>음성인식</Modal.Header>
+                <Modal.Content style={{textAlign: 'center'}}>
+                    <h1 style={{fontSize: 70, marginTop: 200}}>
+                        {
+                            this.state.text
+                        }
+                    </h1>
+                        <Modal.Description>
+                        <Icon   circular
+                                inverted
+                                color='red'
+                                name="unmute"
+                                onClick={this.handleModalClose}
+                                size='huge'
+                                link
+                                style={{marginTop: 40}}
+                        />
+                        </Modal.Description>
+                </Modal.Content>
+            </Modal>
+
+        )
+
         return (
 
             <Grid celled style={{ marginTop: 0, marginBottom: 0, width: '100%', height: 'calc(100vh - 55px)' }}>
@@ -684,7 +761,7 @@ class ChatContainer extends React.Component {
                     </div>
                 </Grid.Column>
                 <Grid.Column floated='right' style={{ width: 60, backgroundColor: '#455A64' }}>
-
+                    {SideView3}
                 </Grid.Column>
             </Grid>
 
