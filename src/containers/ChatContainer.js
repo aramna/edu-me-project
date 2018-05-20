@@ -403,7 +403,9 @@ class ChatContainer extends React.Component {
             }
             this.socket.emit('transcript', output)
             this.end()
-            this.setState({modalOpen:false})
+            setTimeout(function() {
+                this.setState({ modalOpen: false })
+            }.bind(this), 1500)
         };
 
         this.recognition.onspeechend = () => {
@@ -419,9 +421,13 @@ class ChatContainer extends React.Component {
 
         this.recognition.onstart = () => {
             this.setState({
-                listening: true,
-                text: '말씀하세요'
+                text: '말씀하세요.',
             });
+            setTimeout(function() {
+                this.setState({
+                    listening: true,
+                    text: '듣는중..' })
+            }.bind(this), 1000)
         };
 
         this.recognition.onend = () => {
@@ -439,8 +445,11 @@ class ChatContainer extends React.Component {
 
             this.setState({
                 show: true,
-                text: event.error,
+                text: '마이크 상태를 확인하세요.',
             });
+            setTimeout(function() {
+                this.setState({ modalOpen: false })
+            }.bind(this), 1200)
         };
     }
 
@@ -454,7 +463,7 @@ class ChatContainer extends React.Component {
     };
 
     handleClose() {
-        this.setState({ show: false });
+            this.setState({ show: false })
     };
 
 
