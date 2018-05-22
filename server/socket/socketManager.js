@@ -169,6 +169,9 @@ module.exports = function(socket) {
         } else if (room.command === 'message') {
             //******************chatbot 예제코드******************//
 
+            var openApiURL = 'http://aiopen.etri.re.kr:8000/WiseNLU';
+            var access_key = '23a07699-433a-4978-9cd3-c680017ac4c9';
+            var analysisCode = 'morp';
             if(room.roomId == 'chat') {
                 console.log("챗봇쪽 코드 실행됨");
                 database.BotModel.findOne({name : room.email}, function(err, bot){
@@ -176,8 +179,11 @@ module.exports = function(socket) {
                     console.log("봇 상태 = " + bot.state);
                     if(bot.state == 'general')
                     {
-                        console.log("쳇봇을 실행시킵니다.");
+                        console.log("챗봇을 실행시킵니다.");
                         var classifier = bayes({
+                            tokenizer: function(text) { return text.split(' ')}
+                        })
+                        var classifier2 = bayes({
                             tokenizer: function(text) { return text.split(' ')}
                         })
 
@@ -186,10 +192,10 @@ module.exports = function(socket) {
                         var line = lineArray.split('\r\n');
 
                         for(var i in line){
-                            var s = line[i].split(",");
+                            var s = line[i].split(", ");
                             classifier.learn(s[0], s[1]);
                         }
-                        var category = classifier.categorize(room.message);
+                        var category = classifier.categorize(room.message)[0];
                         console.log("category - " + category);
                         let chat = new database.ChatModel({
                             name: room.name,
@@ -201,43 +207,97 @@ module.exports = function(socket) {
 
                         chat.time = message_time;
 
-                            // 데이터베이스에 저장
+                        // 데이터베이스에 저장
                         chat.save(err => {
                             if (err) throw err
                         })
 
                         console.log(chat);
                         io.sockets.emit('message', chat);
-
-                        var contents = category;
+                        var name = "who"
+                        var contents = "";
                         if(category == 'send')
                         {
-                            contents = '뭐라고 보낼까?';
+                            var requestJson = {
+                                'access_key': access_key,
+                                'argument': {
+                                    'text': room.message,
+                                    'analysis_code': analysisCode
+                                }
+                            };
+                            var request = require('request');
+                            var options = {
+                                url: openApiURL,
+                                body: JSON.stringify(requestJson),
+                                headers: {'Content-Type':'application/json; charset=UTF-8'}
+                            };
+                            request.post(options, function (error, response, body) {
+                                s = body
+                                //console.log(s)
+                                var res = JSON.parse(s)
+                                for(var i in res.return_object.sentence[0].morp){
+                                    if(res.return_object.sentence[0].morp[i].type == 'JKB' && (res.return_object.sentence[0].morp[i].lemma == '한테'
+                                        || res.return_object.sentence[0].morp[i].lemma == '에게')){
+                                        if(res.return_object.sentence[0].morp[i-1].type == 'NNG' || res.return_object.sentence[0].morp[i-1].type == 'NNP'){
+                                            name = res.return_object.sentence[0].morp[i-1].lemma
+                                            console.log("name >> "+name)
+                                        }
+                                    }
+                                }
+                            });
+                            setTimeout(function () {
+                                if(name == "who"){
+                                    contents = '누구한테 보낼까요?'
+                                }
+                                else{
+                                    database.UserModel.find(function (err, resp) {
+                                        if (err) console.log('에러발생 >>'+err);
+                                        for(var i in resp){
+                                            var ss = resp[i].username.split("")
+                                            classifier2.learn(ss[0]+ss[1], resp[i].username)
+                                            classifier2.learn(ss[1]+ss[2], resp[i].username)
+                                            classifier2.learn(ss[1]+ss[2]+"이", resp[i].username)
+                                            classifier2.learn(ss[0]+ss[1]+ss[2], resp[i].username)
+                                        }
+                                        console.log("name2 : "+ name)
+                                        var receiver = classifier2.categorize(name)
+                                        console.log(receiver)
+                                        if(receiver[1] < -5 && receiver[0] == resp[0].username){
+                                            contents = '검색된 사용자가 없습니다. 전체 이름을 입력해주세요'
+                                        }else {
+                                            //console.log("수신인 >>"+receiver[0])
+                                            contents = receiver[0]+'님한테 보낼까요?'
+                                            console.log(contents)
+                                        }
+                                    })
+                                }
+                            }, 1000)
                             bot.state = category;
                             bot.save(err => {
                                 if(err) throw err
                                 console.log("Bot의 state가 " +bot.state+ "로 update되었습니다.");
                             })
+                            setTimeout(function () {
+                                let chatbot = new database.ChatModel({
+                                    name: "chatbot",
+                                    message: contents,
+                                    email: "chatbot@naver.com",
+                                    roomId: room.roomId
+                                })
+                                var message_time2 = `${chatbot.created.getHours()}:${("0" + chatbot.created.getMinutes()).slice(-2)}`;
+
+                                chatbot.time = message_time2;
+
+                                // 데이터베이스에 저장
+                                chatbot.save(err => {
+                                    if (err) throw err
+                                })
+                                chatbot.state = category;
+                                console.log(chatbot);
+                                io.sockets.emit('message', chatbot);
+                            },1100)
+
                         }
-                        let chatbot = new database.ChatModel({
-                            name: "chatbot",
-                            message: contents,
-                            email: "chatbot@naver.com",
-                            roomId: room.roomId
-                            })
-
-                        var message_time2 = `${chatbot.created.getHours()}:${("0" + chatbot.created.getMinutes()).slice(-2)}`;
-
-                        chatbot.time = message_time2;
-
-                            // 데이터베이스에 저장
-                        chatbot.save(err => {
-                            if (err) throw err
-                        })
-                        chatbot.state = category;
-                        console.log(chatbot);
-                        io.sockets.emit('message', chatbot);
-
                     } else if(bot.state == 'send')
                     {
                         let chat = new database.ChatModel({
@@ -251,7 +311,7 @@ module.exports = function(socket) {
 
                         chat.time = message_time;
 
-                            // 데이터베이스에 저장
+                        // 데이터베이스에 저장
                         chat.save(err => {
                             if (err) throw err
                         })
@@ -262,13 +322,13 @@ module.exports = function(socket) {
                             message: room.message,
                             email: "chatbot@naver.com",
                             roomId: room.roomId
-                            })
+                        })
 
                         var message_time = `${chatbot.created.getHours()}:${("0" + chatbot.created.getMinutes()).slice(-2)}`;
 
                         chatbot.time = message_time;
 
-                            // 데이터베이스에 저장
+                        // 데이터베이스에 저장
                         chatbot.save(err => {
                             if (err) throw err
                         })
@@ -372,7 +432,6 @@ module.exports = function(socket) {
                         var channellist = addList(list, created_room);
                         console.log("list뭐니" + channellist)
                     });
-
 
                     console.log(created_room.member);
                     console.log("************멤버리스트 함 볼까요************" + created_room);
