@@ -20,6 +20,8 @@ class Login extends React.Component {
         return this.props.loginRequest(email, pw).then(    //.then()은 AJAX요청이 끝난후에 할 작업
             () => {
                 if (this.props.status === "SUCCESS") {
+                    console.log("Status",this.props.status)
+
                     // session data 생성
                     let loginData = {
                         isLoggedIn: true,
@@ -33,6 +35,8 @@ class Login extends React.Component {
                     message.success("로그인을 성공했습니다.")
                     return true
                 } else {
+                    console.log("Status",this.props.status)
+
                     message.error("로그인을 실패했습니다.")
                     return false
                 }

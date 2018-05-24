@@ -25,7 +25,7 @@ class Home extends React.Component {
     render() {
 
 
-        const chatView = (<CreateTeam/>)
+        const chatView = (<ChatContainer/>)
         const homeView = (
             <Segment textAlign='center'
                      style={{ minHeight: 700,

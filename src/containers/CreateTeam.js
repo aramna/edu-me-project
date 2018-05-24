@@ -69,16 +69,6 @@ class CreateTeam extends React.Component {
                         </Grid.Column>
                     </Grid.Row>
 
-                    <Grid.Row style={{height: 10}}>
-                        <Header as='h4' color='grey'>
-                            <Header.Content>
-                                Team List
-                            </Header.Content>
-                        </Header>
-                    </Grid.Row>
-
-                    {teamListView}
-
                     <Grid.Row style={{padding: 0}}>
                         <Grid.Column style={{width: '100%', height: 100}}>
                             <Button

@@ -325,7 +325,6 @@ class ChatContainer extends React.Component {
 
         this.socket.on('usersearch', (userList) => {
             this.setState({users: this.state.users.concat(userList)})
-            console.log("시팔",this.state.users)
         })
 
         this.setState({users: this.state.users.concat( [{_Id: 1, name:"abc", email:"abc@abc.com"},
@@ -490,12 +489,12 @@ class ChatContainer extends React.Component {
     }
 
     handleModalOpen() {
-        this.setState({ modalOpen: true})
+        this.setState({ modalOpen: true, x: true})
     }
 
     handleModalClose() {
         this.end()
-        this.setState({modalOpen:false})
+        this.setState({modalOpen:false, x: false})
     }
 
 
@@ -551,12 +550,12 @@ class ChatContainer extends React.Component {
                                     e.name !== this.props.currentUser ?
                                         // sender가 상대방일 때
                                         <Message
-                                            authorName={e.name} date={getTime(new Date(Date.now()))}>
+                                            authorName={e.name} date={e.time}>
                                             <MessageText>{e.message}</MessageText>
                                         </Message>
                                         :
                                         // sender가 본인일 때
-                                        <Message isOwn deliveryStatus={getTime(new Date(Date.now()))}>
+                                        <Message isOwn deliveryStatus={e.time}>
                                             <MessageText>{e.message}</MessageText>
                                         </Message>
                                 }
@@ -637,7 +636,7 @@ class ChatContainer extends React.Component {
                         <Icon onClick={this.handleChannelAdd} name='add' style={{ float: 'right' }} />
                     </Menu.Header>
                     {this.state.visibleAdd ?
-                        <Menu.Item>
+                        <Menu.Item >
                             <Input as='search'
                                    transparent={true}
                                    icon='search'
@@ -662,6 +661,7 @@ class ChatContainer extends React.Component {
                                            }
                                        );
                                    }}
+                                   style={{marginTop: 10}}
 
                             />
                             {this.state.showSearchUser ?
@@ -720,15 +720,17 @@ class ChatContainer extends React.Component {
 
 
         const SideView3 = (
+            <div style={{height: '100%'}}>
             <Modal
                 trigger={<Button circular
                                  icon="unmute"
                                  onClick={this.start}
                 />}
-                size='fullscreen'
+                size='huge'
                 basic
-                onClose={this.end}
+                // onClose={this.end}
                 open={this.state.modalOpen}
+                style={{height: '100%'}}
             >
                 <Modal.Header>음성인식</Modal.Header>
                 <Modal.Content style={{textAlign: 'center'}}>
@@ -750,6 +752,7 @@ class ChatContainer extends React.Component {
                         </Modal.Description>
                 </Modal.Content>
             </Modal>
+            </div>
 
         )
 

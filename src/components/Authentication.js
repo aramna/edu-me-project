@@ -1,6 +1,7 @@
 import React from 'react';
 import {Link} from "react-router";
 import {Button, Form, Grid, Checkbox} from 'semantic-ui-react'
+import {message} from "antd/lib/index";
 
 class Authentication extends React.Component {
 
@@ -46,13 +47,15 @@ class Authentication extends React.Component {
             (success) => {
                 if(!success) {
                     this.setState({
-                        username: '',
-                        email: '',
+                        // username: '',
+                        // email: '',
                         password: ''
                     });
                 }
             }
         );
+        // message.success('회원가입을 성공했습니다. 로그인 하세요.')
+        // browserHistory.push('/login')
     }
 
 
@@ -81,6 +84,7 @@ class Authentication extends React.Component {
                                    type="password"
                                    onChange={this.handleChange}
                                    value={this.state.password}
+                                   onKeyPress={this.handleKeyPress}
                                    placeholder='비밀번호'
                                    style={{borderRadius: 30}}/>
                         </Form.Field>
