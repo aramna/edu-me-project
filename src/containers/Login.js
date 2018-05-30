@@ -47,7 +47,7 @@ class Login extends React.Component {
 
     render() {
         return (
-            <div>
+            <div style={{height: '100vh'}}>
                 <Authentication mode={true}
                                 onLogin={this.handleLogin}/>
             </div>

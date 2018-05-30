@@ -1,6 +1,7 @@
 var webpack = require('webpack');
 var path = require('path');
 
+
 module.exports = {
 
     entry: [
@@ -63,15 +64,17 @@ module.exports = {
             {
                 test: /\.(png|jpg|woff|woff2|eot|ttf|svg)$/,
                 loader: 'url-loader'
+            },
+            {
+                test: /\.scss$/,
+                loaders: ['style-loader', 'css-loader', 'sass-loader'],
             }
         ]
     },
 
     resolve: {
         root: path.resolve('./src')
-    }
-
-
+    },
 };
 
-//
+
