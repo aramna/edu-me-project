@@ -13,6 +13,10 @@ import {
     Dimmer,
     Loader,
     Modal,
+    Popup,
+    List,
+    Item,
+    Image,
     Header,
     Container,
     Segment, Responsive, Sidebar, SidebarPushable, SidebarPusher
@@ -22,6 +26,8 @@ import {
     MessageText,
 } from '@livechat/ui-kit'
 import '../index.css'
+import avartarImage from '../images/avatar.jpg'
+
 
 const getTime = (date) => {
     return `${date.getHours()}:${("0" + date.getMinutes()).slice(-2)}`
@@ -157,7 +163,7 @@ class ChatContainer extends React.Component {
             })
 
             this.handleItemClick2(e, {name: output.receiver})
-            console.log("원온원",this.state.oneOnOneList)
+            console.log("원온원", this.state.oneOnOneList)
 
         }
         //상대방도 초대하는 작업 백엔드로 요청코드필요하고 RoomId,RoomName 분리필요해보임//
@@ -208,9 +214,9 @@ class ChatContainer extends React.Component {
 
     handleOneOnOneAdd() {
         if (this.state.visibleAdd2 === false) {
-            this.setState({visibleAdd2 : true})
+            this.setState({visibleAdd2: true})
         } else {
-            this.setState({visibleAdd2 : false})
+            this.setState({visibleAdd2: false})
         }
     }   //sidebar
 
@@ -614,9 +620,9 @@ class ChatContainer extends React.Component {
                 </div>)
         )
 
-        const example = []
+        const user = []
         for (var i = 0; i < this.state.memberList.length; i++) {
-            example.push(
+            user.push(
                 <Menu.Item
                     name={this.state.memberList[i]}
                 />
@@ -625,10 +631,14 @@ class ChatContainer extends React.Component {
 
         const userList = (
             <div className={this.state.activeChannel}>
-                <Menu.Menu>
-                    {example}
-                </Menu.Menu>
-
+                <Popup
+                    trigger={<Button circular
+                                     icon="users"/>}
+                    header='UserList'
+                    content={user}
+                    position='bottom'
+                    on={['hover', 'click']}
+                />
             </div>
         )
 
@@ -683,7 +693,7 @@ class ChatContainer extends React.Component {
                             this.handleSend()
                         }
                     }}
-                    style={{width: '89%', height: '100%', marginTop: 10}}
+                    style={{width: 'calc(100% - 100px)', height: '100%', marginTop: 10}}
                 />
                 <Button size='mini'
                         primary
@@ -692,99 +702,136 @@ class ChatContainer extends React.Component {
                                 this.handleSend()
                             }
                         }}
-                        style={{float: 'right, bottom'}}
+                        style={{width: 55}}
                 >전송</Button>
             </div>
         )
+
         const SideView = (
-            
+
             <div style={{
                 width: '100%',
-                height: '40%',
+                height: '55%',
                 backgroundColor: '#455A64',
                 marginTop: 0,
                 marginBottom: 0
             }}>
-            <Menu inverted vertical
-                  style={{
-                      width: '100%',
-                      height: '100%',
-                      backgroundColor: '#455A64',
-                      marginTop: 0,
-                      marginBottom: 0
-                  }}>
-                <Menu.Item>
-                    <div>
-                        <Icon inverted name='user circle outline' size='huge' style={{marginRight: 10}}/>
-                        <label style={{
-                            textAlign: 'center',
-                            fontWeight: 'bold',
-                            fontSize: 17,
-                            verticalAlign: 'center'
-                        }}>
-                            {this.props.currentUser}
-                            <br/>
-                            <label style={{fontWeight: 'normal', fontSize: 13}}>
-                                {this.props.currentEmail}
+                <Menu inverted vertical
+                      style={{
+                          width: '100%',
+                          height: '100%',
+                          backgroundColor: '#455A64',
+                          marginTop: 0,
+                          marginBottom: 0
+                      }}>
+                    <Menu.Item style={{height: 100}}>
+                        <Grid style={{height: 75, marginTop: 1, marginLeft: 1, marginRight: 1}}>
+                            <Grid.Column style={{width: '100%', height: '100%', padding: 0}}>
+                                <div>
+                                    <Image avatar src={avartarImage} style={{width: 75, height: 75}}/>
+                                    <span style={{marginLeft: 20}}>{this.props.currentUser}</span>
+                                </div>
+
+                            </Grid.Column>
+
+                        </Grid>
+                    </Menu.Item>
+
+                    <Menu.Item style={{height: 'calc(100% - 100px)', overflowY: 'auto'}}>
+                        <Menu.Header>
+                            <label onClick={this.handleChannelShow}>
+                                Channels
                             </label>
-                        </label>
-                    </div>
-                </Menu.Item>
-
-                <Menu.Item style={{height: 500, overflowY: 'auto'}}>
-                    <Menu.Header>
-                        <label onClick={this.handleChannelShow}>
-                            Channels
-                        </label>
-                        <Icon onClick={this.handleChannelAdd} name='add' style={{float: 'right'}}/>
-                    </Menu.Header>
-                    {this.state.visibleAdd ?
-                        <Menu.Item>
-                            <Input as='search'
-                                   transparent={true}
-                                   icon='search'
-                                   inverted placeholder='채널검색'
-                                   value={this.state.roomId}
-                                   onChange={e => this.roomChanged(e)}
-                                   onKeyPress={e => {
-                                       e.key === 'Enter' && this.handleRoomCreate(e)
-                                   }}
-                            />
-                        
-
-                        </Menu.Item>
-                        : ""}
-                    {channel}
-                </Menu.Item>
-            </Menu>
+                            <Icon onClick={this.handleChannelAdd} name='add' style={{float: 'right'}}/>
+                        </Menu.Header>
+                        {this.state.visibleAdd ?
+                            <Menu.Item>
+                                <Input as='search'
+                                       transparent={true}
+                                       icon='search'
+                                       inverted placeholder='채널검색'
+                                       value={this.state.roomId}
+                                       onChange={e => this.roomChanged(e)}
+                                       onKeyPress={e => {
+                                           e.key === 'Enter' && this.handleRoomCreate(e)
+                                       }}
+                                />
+                            </Menu.Item>
+                            : ""}
+                        {channel}
+                    </Menu.Item>
+                </Menu>
             </div>
         )
 
-        const userListView = (
+        const OneOnOneView = (
             <div style={{
                 width: '100%',
-                height: '20%',
+                height: '45%',
                 backgroundColor: '#455A64',
                 marginTop: 0,
                 marginBottom: 0
             }}>
-                <Menu inverted vertical style={{
-                    width: '100%',
-                    height: '100%',
-                    backgroundColor: '#455A64',
-                    marginTop: 0,
-                    marginBottom: 0
-                }}>
+                <Menu inverted vertical
+                      style={{
+                          width: '100%',
+                          height: '90%',
+                          backgroundColor: '#455A64',
+                          marginTop: 0,
+                          marginBottom: 0
+                      }}>
+
                     <Menu.Item>
                     </Menu.Item>
-                    <Menu.Item>
+                    <Menu.Item style={{height: '100%', overflowY: 'auto'}}>
                         <Menu.Header>
-                            <label>UserList</label>
-                            <Icon onClick={this.handleRefresh} name='refresh' style={{float: 'right'}}/>
+                            <label onClick={this.handleOneOnOneShow}>
+                                OneOnOne
+                            </label>
+                            <Icon onClick={this.handleOneOnOneAdd} name='add' style={{float: 'right'}}/>
                         </Menu.Header>
+                        {this.state.visibleAdd2 ?
+                            <Menu.Item>
+                                <Input as='search'
+                                       transparent={true}
+                                       icon='search'
+                                       inverted placeholder='유저검색'
+                                       value={this.state.searchUser}
+                                       onChange={(e) => {
+                                           const searchUserText = _.get(e, 'target.value');
 
-                        {userList}
+                                           this.setState({
+                                                   searchUserList: searchUserText,
+                                                   showSearchUser: true,
+                                               }
+                                           );
+                                       }}
+                                       style={{marginTop: 10}}
 
+                                />
+                                {this.state.showSearchUser ?
+                                    <div>
+                                        {users2.map((user, index) => {
+                                            return <div
+                                                style={{
+                                                    marginTop: 5,
+                                                    marginBottom: 5
+                                                }}
+                                                onClick={(e) => {
+                                                    var name = _.get(user, 'username')
+                                                    var userId = _.get(user, 'email');
+                                                    this.personalTalk(e, name, userId)
+                                                }}
+                                            >
+                                                <p>{_.get(user, 'username', 'email')}</p>
+                                            </div>
+                                        })}
+
+                                    </div> : ""}
+
+                            </Menu.Item>
+                            : ""}
+                        {oneOnOne}
                     </Menu.Item>
                 </Menu>
             </div>
@@ -792,7 +839,7 @@ class ChatContainer extends React.Component {
 
 
         const STT = (
-            <div style={{height: '100%'}}>
+            <div>
                 <Modal
                     trigger={<Button circular
                                      icon="unmute"
@@ -828,82 +875,6 @@ class ChatContainer extends React.Component {
 
         )
 
-        const OneOnOneView = (
-            <div style={{
-                width: '100%',
-                height: '40%',
-                backgroundColor: '#455A64',
-                marginTop: 0,
-                marginBottom: 0
-            }}>
-            <Menu inverted vertical
-                  style={{
-                      width: '100%',
-                      height: '100%',
-                      backgroundColor: '#455A64',
-                      marginTop: 0,
-                      marginBottom: 0
-                  }}>
-                
-                  <Menu.Item>
-                  </Menu.Item>
-                <Menu.Item style={{height: 500, overflowY: 'auto'}}>
-                    <Menu.Header>
-                        <label onClick={this.handleOneOnOneShow}>
-                            OneOnOne
-                        </label>
-                        <Icon onClick={this.handleOneOnOneAdd} name='add' style={{float: 'right'}}/>
-                    </Menu.Header>
-                    {this.state.visibleAdd2 ?
-                        <Menu.Item>
-                            <Input as='search'
-                                   transparent={true}
-                                   icon='search'
-                                   inverted placeholder='유저검색'
-                                   value={this.state.searchUser}
-                                   onChange={(e) => {
-                                       const searchUserText = _.get(e, 'target.value');
-
-                                       this.setState({
-                                               searchUserList: searchUserText,
-                                               showSearchUser: true,
-                                           }
-                                       );
-                                   }}
-                                   style={{marginTop: 10}}
-
-                            />
-                            {this.state.showSearchUser ?
-                                <div>
-                                    {users2.map((user, index) => {
-                                        return <div
-                                            style={{
-                                                marginTop: 5,
-                                                marginBottom: 5
-                                            }}
-                                            onClick={(e) => {
-                                                var name = _.get(user, 'username')
-                                                var userId = _.get(user, 'email');
-                                                this.personalTalk(e, name, userId)
-                                            }}
-                                        >
-                                            <p>{_.get(user, 'username', 'email')}</p>
-                                        </div>
-                                    })}
-
-                                </div> : ""}
-
-                        </Menu.Item>
-                        : ""}
-                    {oneOnOne}
-                </Menu.Item>
-            </Menu>
-            </div>
-        )
-
-        
-
-        
 
         return (
 
@@ -913,15 +884,20 @@ class ChatContainer extends React.Component {
                     minWidth={Responsive.onlyTablet.minWidth}
                 >
 
-                    <Grid stretched celled style={{padding:0, marginTop: 0, marginBottom: 0, width: '100%', height: 'calc(100vh - 55px)'}}>
+                    <Grid stretched celled style={{
+                        padding: 0,
+                        marginTop: 0,
+                        marginBottom: 0,
+                        width: '100%',
+                        height: 'calc(100vh - 60px)'
+                    }}>
                         <Dimmer active={this.state.loading}>
                             <Loader active={this.state.loading}>채팅 불러오는중</Loader>
                         </Dimmer>
-                        <Grid.Column style={{width: 250, padding: 0, }}>
+                        <Grid.Column stretched style={{width: 250, padding: 0, height: '100%'}}>
                             <div style={{height: '100%'}}>
                                 {SideView}
                                 {OneOnOneView}
-                                {userListView}
                             </div>
                         </Grid.Column>
                         <Grid.Column style={{width: 'calc(100% - 310px)', padding: 0}}>
@@ -931,13 +907,23 @@ class ChatContainer extends React.Component {
                             </div>
                         </Grid.Column>
                         <Grid.Column floated='right' style={{width: 60, backgroundColor: '#455A64'}}>
-                            {STT}
+                            <List>
+                                <List.Item>
+                                    {STT}
+                                </List.Item>
+                                <List.Item style={{marginTop: 10}}>
+                                    {userList}
+                                </List.Item>
+                            </List>
                         </Grid.Column>
                     </Grid>
                 </Responsive>
+
+
                 <Responsive {...Responsive.onlyMobile}>
-                    <Sidebar.Pushable >
-                        <Sidebar as={Menu} animation='uncover' visible={this.state.sidebarOpened} style={{backgroundColor: '#455A64'}}>
+                    <Sidebar.Pushable>
+                        <Sidebar as={Menu} animation='uncover' visible={this.state.sidebarOpened}
+                                 style={{backgroundColor: '#455A64'}}>
                             <Grid style={{height: 'calc(100vh - 55px)'}}>
                                 <Menu inverted vertical
                                       style={{
