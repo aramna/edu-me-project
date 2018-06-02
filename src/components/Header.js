@@ -131,7 +131,7 @@ class FixedHeader extends React.Component {
                             fixed='top'
                             secondary
                             inverted
-                            style={{ marginTop: 4, width: '100%'}}
+                            style={{ marginTop: 0, width: '100%'}}
 
                         >
                                 <Menu.Item>

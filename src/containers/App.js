@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import {FixedHeader} from 'components'
 import {connect} from 'react-redux'
+import {ChatContainer, Home} from 'containers'
 import {getStatusRequest, logoutRequest} from "../actions/authentication";
 import 'antd/dist/antd.css';
 import {message} from 'antd'
@@ -101,16 +102,15 @@ class App extends Component {
                         maxWidth={Responsive.onlyComputer.maxWidth}
                         minWidth={Responsive.onlyTablet.minWidth}
                     >
-    
-                            {isAuth ? undefined : <FixedHeader isLoggedIn={this.props.status.isLoggedIn}
-                                                               onLogout={this.handleLogout}/>}
-                            {this.props.children}
-                        
+
+                        {isAuth ? undefined : <FixedHeader isLoggedIn={this.props.status.isLoggedIn}
+                                                           onLogout={this.handleLogout}/>}
+                        {this.props.children}
                     </Responsive>
                     <Responsive {...Responsive.onlyMobile}>
-                        
-                            {this.props.children}
-                    
+
+                        {this.props.children}
+
                     </Responsive>
                 </Segment.Group>
             </ThemeProvider>

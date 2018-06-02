@@ -19,7 +19,7 @@ import {
     Image,
     Header,
     Container,
-    Segment, Responsive, Sidebar, SidebarPushable, SidebarPusher
+    Segment, Responsive, Sidebar,
 } from 'semantic-ui-react'
 import {
     Message,
@@ -64,9 +64,13 @@ class ChatContainer extends React.Component {
             visibleAdd2: false,
             channelList: [],    //채널리스트
             activeChannel: '',  //활성화된 채널
+            activeOneOnOne: '',
+            activeOneOnOneRoomId: '',
             memberList: [],
             chatList: [],
             loading: true,
+            loading2: true,
+            loading3: true,
             users: [],
             x: false,
             y: false,
@@ -77,7 +81,8 @@ class ChatContainer extends React.Component {
             text: '말씀하세요',
             modalOpen: false,
             sidebarOpened: false,
-            oneOnOneList: []
+            oneOnOneList: [],
+            oneOnOne: false,
         }
 
         this.socket = socketio.connect()
@@ -89,7 +94,8 @@ class ChatContainer extends React.Component {
         this.handleItemClick = this.handleItemClick.bind(this)
         this.handleItemClick2 = this.handleItemClick2.bind(this)
         this.handleRoomCreate = this.handleRoomCreate.bind(this)
-        this.handleRefresh = this.handleRefresh.bind(this)
+        this.handleSend = this.handleSend.bind(this)
+        this.messageChanged = this.messageChanged.bind(this)
         this.scrollDown = this.scrollDown.bind(this)
         this.scrollPosition = this.scrollPosition.bind(this)
         this.searchUser = this.searchUser.bind(this)
@@ -101,6 +107,7 @@ class ChatContainer extends React.Component {
         this.handleModalClose = this.handleModalClose.bind(this)
         this.handlePusherClick = this.handlePusherClick.bind(this)
         this.handleToggle = this.handleToggle.bind(this)
+        this.roomChanged = this.roomChanged.bind(this)
     }
 
     handlePusherClick() {
@@ -147,7 +154,7 @@ class ChatContainer extends React.Component {
                 i = this.state.oneOnOneList.length;
                 this.handleItemClick2(e, {name: output.receiver})
             }
-            if (this.state.oneOnOneList[i].text === name + this.props.currentUser) {
+            if (this.state.oneOnOneList[i].text === output.creater) {
                 c = 0;
                 i = this.state.oneOnOneList.length;
                 this.handleItemClick2(e, {name: output.receiver})
@@ -220,10 +227,6 @@ class ChatContainer extends React.Component {
         }
     }   //sidebar
 
-    //inputView에서 input박스에 입력된 메시지 내용을 받아오는 함수
-    messageChanged(e) {
-        this.setState({newMessage: e.target.value})
-    }
 
     //채팅방을 생성하는 함수
     handleRoomCreate(e) {
@@ -269,9 +272,10 @@ class ChatContainer extends React.Component {
 
         })
 
-        console.log(this.state.channelList)
-        console.log("채팅방 입장시 logs: ", this.state.logs)
-        this.setState({activeChannel: name})
+        this.setState({activeChannel: name, activeOneOnOne: ''})
+        this.setState({oneonone: false})
+
+        console.log('액티브채널: ', this.state.activeChannel)
 
         var output = {
             command: 'join',
@@ -295,10 +299,10 @@ class ChatContainer extends React.Component {
 
         })
 
-        console.log(this.state.channelList)
-        console.log("채팅방 입장시 logs: ", this.state.logs)
-        this.setState({activeChannel: name})
-
+        this.setState({oneonone: true, showSearchUser: false})
+        this.setState({activeOneOnOne: name, activeChannel: ''})
+        console.log('액티브원온원: ', this.state.activeOneOnOne)
+        console.log('액티브룸아디: ', this.state.activeOneOnOneRoomId)
         var output = {
             command: 'join',
             roomId: name,
@@ -310,33 +314,50 @@ class ChatContainer extends React.Component {
         this.socket.emit('room', output)
     }   //sidebar
 
+    //inputView에서 input박스에 입력된 메시지 내용을 받아오는 함수
+    messageChanged(e) {
+        this.setState({newMessage: e.target.value})
+    }
+
     // command를 message로 하여 room 으로 emit
     handleSend() {
-        var output = {
-            command: 'message',
-            email: this.props.currentEmail,
-            name: this.props.currentUser,
-            message: this.state.newMessage,
-            roomId: this.state.activeChannel
+        if(this.state.activeOneOnOne === '') {
+            var output = {
+                command: 'message',
+                email: this.props.currentEmail,
+                name: this.props.currentUser,
+                message: this.state.newMessage,
+                roomId: this.state.activeChannel,
+                oneonone: this.state.oneonone
+            }
+            console.log('쁑',this.state.activeChannel)
+            this.socket.emit('room', output)
+            this.setState({newMessage: ''})
+        }
+        else if(this.state.activeChannel === '') {
+            var output2 = {
+                command: 'message',
+                email: this.props.currentEmail,
+                name: this.props.currentUser,
+                message: this.state.newMessage,
+                roomId: this.state.activeOneOnOne,
+                oneonone: this.state.oneonone
+            }
+            console.log('쁑',this.state.activeOneOnOne)
+            this.socket.emit('room', output2)
+            this.setState({newMessage: ''})
         }
 
-        this.socket.emit('room', output)
-        this.setState({newMessage: ''})
-        console.log("logs: ", this.state.logs)
     }
 
-
-    handleRefresh(e) {
-        this.handleItemClick(e, {name: this.state.activeChannel})
-    }
 
     componentWillMount() {
         this.socket.on('message', (obj) => {
-
             const logs2 = this.state.logs
             obj.key = 'key_' + (this.state.logs.length + 1)
             logs2.push(obj) // 로그에 추가
             this.setState({logs: logs2})
+            console.log(obj)
         })
 
         var defaultRoom = 'main'    //채팅방에 입장시 기본 채팅방을 main으로 설정
@@ -355,17 +376,12 @@ class ChatContainer extends React.Component {
             activeChannel: defaultRoom
         })
 
-        console.log("액티브채널:", this.state.channelList)
-
         if (this.state.channelList !== null) {
             this.socket.on('channellist', (channellist) => {
-                console.log("채널리스트")
-                console.log(channellist.roomIds)
                 this.setState({channelList: []})
                 this.setState({
-                    channelList: this.state.channelList.concat(channellist.roomIds)
+                    channelList: this.state.channelList.concat(channellist.roomIds),
                 })
-                console.log("채널리스트", this.state.channelList)
             })
         }
 
@@ -373,7 +389,7 @@ class ChatContainer extends React.Component {
             this.socket.on('oneononelist', (oneononelist) => {
                 this.setState({oneOnOneList: []})
                 this.setState({
-                    oneOnOneList: this.state.oneOnOneList.concat(oneononelist.oneonones)
+                    oneOnOneList: oneononelist.oneonones,
                 })
                 console.log("원온원", this.state.oneOnOneList)
             })
@@ -386,6 +402,10 @@ class ChatContainer extends React.Component {
                 memberList: memberlist.member
             })
 
+        })
+
+        this.socket.on('join', (join)=> {
+            this.setState({activeOneOnOneRoomId: join.roomId});
         })
 
         this.socket.on('premsg', (premsg) => {
@@ -406,12 +426,6 @@ class ChatContainer extends React.Component {
 
         this.socket.on('usersearch', (userList) => {
             this.setState({users: this.state.users.concat(userList)})
-        })
-
-        this.setState({
-            users: this.state.users.concat([{_Id: 1, name: "abc", email: "abc@abc.com"},
-                {_id: 2, name: "abd", email: "abd@abd.com"},
-                {_id: 3, name: "cc2", email: "cc2@cc2.com"}])
         })
 
     }
@@ -449,6 +463,8 @@ class ChatContainer extends React.Component {
 
 
     componentDidMount() {
+
+
         const {container} = this.refs
 
         container.addEventListener("scroll", () => {
@@ -591,6 +607,7 @@ class ChatContainer extends React.Component {
 
     render() {
         const {activeChannel} = this.state
+        const {activeOneOnOne} = this.state
         const users2 = this.searchUser(this.state.searchUserList);
         const channel = this.state.channelList.map(
             ({text}) => (
@@ -613,16 +630,16 @@ class ChatContainer extends React.Component {
                         <Menu.Menu>
                             <Menu.Item
                                 name={text}
-                                active={activeChannel === text}
+                                active={activeOneOnOne === text}
                                 onClick={this.handleItemClick2}
                             />
                         </Menu.Menu> : ""}
                 </div>)
         )
 
-        const user = []
+        const ChannelUser = []
         for (var i = 0; i < this.state.memberList.length; i++) {
-            user.push(
+            ChannelUser.push(
                 <Menu.Item
                     name={this.state.memberList[i]}
                 />
@@ -630,29 +647,49 @@ class ChatContainer extends React.Component {
         }
 
         const userList = (
-            <div className={this.state.activeChannel}>
-                <Popup
-                    trigger={<Button circular
-                                     icon="users"/>}
-                    header='UserList'
-                    content={user}
-                    position='bottom'
-                    on={['hover', 'click']}
-                />
+            <div>
+                {this.state.activeOneOnOne === '' ?
+                    <div className={this.state.activeChannel}>
+                        <Popup
+                            trigger={<Button circular
+                                             icon="users"/>}
+                            header='UserList'
+                            content={ChannelUser}
+                            position='bottom'
+                            on={['hover', 'click']}
+                        />
+                    </div>
+                    :
+                    <div className={this.state.activeOneOnOne}>
+                        <Popup
+                            trigger={<Button circular
+                                             icon="users"/>}
+                            header='UserList'
+                            content={ChannelUser}
+                            position='bottom'
+                            on={['hover', 'click']}
+                        />
+                    </div>
+                }
             </div>
         )
 
         const chatView = (
 
-            <div style={{height: 'calc(100% - 100px)'}}>
+            <div style={{height: 'calc(100% - 70px)'}}>
 
                 <div ref='container' style={{height: '100%', overflowY: 'scroll', backgroundColor: '#D6D6D6'}}>
 
-                    <Divider horizontal style={{color: '#455A64', fontSize: 10}}>{this.state.activeChannel}방에
-                        입장하셨습니다.</Divider>
+                    {this.state.activeChannel === '' ?
+                        <Divider horizontal style={{color: '#455A64', fontSize: 10}}>{this.state.activeOneOnOne}님과 대화를
+                            시작합니다.</Divider>
+                        :
+                        <Divider horizontal style={{color: '#455A64', fontSize: 10}}>{this.state.activeChannel}방에
+                            입장하셨습니다.</Divider>}
+
 
                     {this.state.logs.map(e => (
-                        e.roomId === this.state.activeChannel ?
+                        e.roomId === this.state.activeChannel || e.roomId === this.state.activeOneOnOneRoomId ?
                             <div className={e.roomId} style={{paddingTop: 10}}>
                                 {
                                     e.name !== this.props.currentUser ?
@@ -680,9 +717,19 @@ class ChatContainer extends React.Component {
 
 
         const inputView = (
-            <div style={{width: '100%', height: 80}}>
+            <div style={{width: '100%', height: 50}}>
 
                 <Input
+                    icon={<Button size='small'
+                                  color='blue'
+                                  onClick={() => {
+                                      if (this.state.newMessage.length > 0) {
+                                          this.handleSend()
+                                      }
+                                  }}
+                                  icon='send'
+                                  style={{width: 50}}
+                    />}
                     type='text'
                     placeholder=''
                     defaultValue='52.03'
@@ -693,17 +740,8 @@ class ChatContainer extends React.Component {
                             this.handleSend()
                         }
                     }}
-                    style={{width: 'calc(100% - 100px)', height: '100%', marginTop: 10}}
+                    style={{width: '100%', height: '100%', marginTop: 10}}
                 />
-                <Button size='mini'
-                        primary
-                        onClick={() => {
-                            if (this.state.newMessage.length > 0) {
-                                this.handleSend()
-                            }
-                        }}
-                        style={{width: 55}}
-                >전송</Button>
             </div>
         )
 
@@ -1032,8 +1070,6 @@ class ChatContainer extends React.Component {
                                         <Menu.Item>
                                             <Menu.Header>
                                                 <label>UserList</label>
-                                                <Icon onClick={this.handleRefresh} name='refresh'
-                                                      style={{float: 'right'}}/>
                                             </Menu.Header>
 
                                             {userList}
@@ -1071,6 +1107,7 @@ class ChatContainer extends React.Component {
 
 const mapStateToProps = (state) => {
     return {
+        isLoggedIn: state.authentication.status.isLoggedIn,
         status: state.authentication.status,
         currentUser: state.authentication.status.currentUser,
         currentEmail: state.authentication.status.currentEmail,

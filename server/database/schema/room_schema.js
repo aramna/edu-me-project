@@ -13,6 +13,7 @@ Schema.createSchema = function(mongoose){
         roomTitle: String,
         creater: String,
         receiver: String,
+        receiverEmail: String,
         oneonone: Boolean
     })
 
