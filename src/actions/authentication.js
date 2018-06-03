@@ -52,7 +52,6 @@ export function loginFailure() {
 /* 회원가입 */
 export function registerRequest(username, email, password) {
     return (dispatch) => {
-        // inform register API is starting
         dispatch(register());
 
         return axios.post('/api/user/adduser', { username, email, password })
@@ -72,7 +71,7 @@ export function register() {
 
 export function registerSuccess() {
     return {
-        type: AUTH_REGISTER_SUCCESS
+        type: AUTH_REGISTER_SUCCESS,
     };
 }
 

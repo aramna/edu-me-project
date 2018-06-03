@@ -1,4 +1,5 @@
 import React from 'react';
+import faker from 'faker';
 import _ from 'lodash'
 import socketio from 'socket.io-client'
 import {
@@ -22,7 +23,12 @@ import {
 } from 'semantic-ui-react'
 import {connect} from "react-redux";
 
-
+const source = _.times(5, () => ({
+    title: faker.company.companyName(),
+    description: faker.company.catchPhrase(),
+    image: faker.internet.avatar(),
+    price: faker.finance.amount(0, 100, 2, '$'),
+}))
 
 class SideBar extends React.Component {
     constructor(props) {
@@ -41,6 +47,26 @@ class SideBar extends React.Component {
 
     resetComponent() {
         this.setState({isLoading: false, results: [], value: ''})
+    }
+
+    handleResultSelect(e, {result}) {
+        this.setState({value: result.title})
+    }
+
+    handleSearchChange(e, {value}) {
+        this.setState({isLoading: true, value})
+
+        setTimeout(() => {
+            if (this.state.value.length < 1) return this.resetComponent()
+
+            const re = new RegExp(_.escapeRegExp(this.state.value), 'i')
+            const isMatch = result => re.test(result.title)
+
+            this.setState({
+                isLoading: false,
+                results: _.filter(source, isMatch),
+            })
+        }, 500)
     }
 
     handleShow() {
@@ -64,7 +90,8 @@ class SideBar extends React.Component {
     }
 
     render() {
-
+        const {activeItem} = this.state || {}
+        const Options = [{key: '1', text: '시발'}]
         return (
             <Menu inverted vertical style={{width: '100%', height: '90%', backgroundColor: '#455A64', marginTop: 30}}>
                 <Menu.Item>
@@ -91,14 +118,14 @@ class SideBar extends React.Component {
                     </Menu.Header>
                     {this.state.visibleAdd ?
                         <Menu.Item>
+
                             <Input as='search' transparent={true} icon='search' inverted placeholder='검색'/>
+
                         </Menu.Item>
                         : ""}
                     {this.state.visibleList ? <Menu.Menu>
-                        <Menu.Item onClick={this.handleItemClick}>
-                            <label>{this.state.room}</label>
-                        </Menu.Item>
-                        <Menu.Item name='channel2' onClick={this.handleItemClick}/>
+                        <Menu.Item name='channel1' active={activeItem === 'account'} onClick={this.handleItemClick}/>
+                        <Menu.Item name='channel2' active={activeItem === 'settings'} onClick={this.handleItemClick}/>
                     </Menu.Menu> : ""
 
                     }

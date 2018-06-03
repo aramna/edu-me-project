@@ -76,8 +76,7 @@ export default function authentication(state, action) {
         case types.AUTH_GET_STATUS:
             return update(state, {
                 status: {
-                    isLoggedIn: { $set: true },
-
+                    isLoggedIn: { $set: true }
                 }
             });
         case types.AUTH_GET_STATUS_SUCCESS:

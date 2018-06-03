@@ -2,6 +2,7 @@ import React from 'react';
 import { Authentication } from 'components'
 import { connect } from 'react-redux'
 import { registerRequest } from "../actions/authentication"
+import { browserHistory } from 'react-router'
 import 'antd/dist/antd.css';
 import { message } from 'antd'
 
@@ -15,16 +16,16 @@ class Register extends React.Component {
     handleRegister(username, email, pw) {
         return this.props.registerRequest(username, email, pw).then(
             () => {
-                if(this.props.status === "SUCCESS") {
+                if(this.props.status === 'SUCCESS') {
                     message.success('회원가입을 성공했습니다. 로그인 하세요.')
-
+                    browserHistory.push('/login')
                     return true
                 } else {
                     let errorMessage = [
-                        '이름 똑바로',
-                        '이메일형식이 잘못됨',
-                        '비밀번호가 넘짧자나',
-                        '이메일이 이미 존재해유'
+                        '이름 형식이 올바르지 않습니다.',
+                        '이메일 형식이 올바르지 않습니다.',
+                        '비밀번호는 4자리 이상이어야 합니다.',
+                        '중복된 이메일이 존재합니다.'
                     ];
                     message.warning(errorMessage[this.props.errorCode - 1])
                     return false
@@ -35,7 +36,7 @@ class Register extends React.Component {
 
     render() {
         return (
-            <div>
+            <div style={{height: '100vh'}}>
                 <Authentication mode={false}
                                 onRegister={this.handleRegister}/>
             </div>
@@ -59,5 +60,3 @@ const mapDispatchToProps = (dispatch) => {
 
 export default connect(mapStateToProps, mapDispatchToProps)(Register);
 
-// username , email, password
-// 이미 계정이 있다고요 ? 로그인 버튼

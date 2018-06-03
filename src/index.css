@@ -7,7 +7,9 @@
 .message-container.left {
     display: flex;
     justify-content: flex-start;
-
+    min-height: 50px;
+    margin: 10px 15px;
+    animation: .65s ease-out 0s show
 }
 
 .message.left {
@@ -34,7 +36,4 @@
     margin-bottom: 6px;
     height: 100%;
 }
-
-
-
 
