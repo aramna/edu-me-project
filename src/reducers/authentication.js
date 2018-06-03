@@ -14,6 +14,10 @@ const initialState = {
         isLoggedIn: false,
         currentUser: '',
         currentEmail: ''
+    },
+    revise: {
+      currentUser: '',
+      test: false
     }
 };
 
@@ -92,6 +96,13 @@ export default function authentication(state, action) {
                 status: {
                     valid: { $set: false },
                     isLoggedIn: { $set: false }
+                }
+            });
+
+        case types.AUTH_REREGISTER:
+            return update(state, {
+                revise: {
+                    test: { $set: true}
                 }
             });
 
