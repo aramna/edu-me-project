@@ -9,7 +9,12 @@ Schema.createSchema = function(mongoose){
         roomId: String,
         member: [],
         chatCount: {type:Number, default:0},
-        memberJoinNum: []
+        memberJoinNum: [],
+        roomTitle: String,
+        creater: String,
+        receiver: String,
+        receiverEmail: String,
+        oneonone: Boolean
     })
 
     RoomSchema.static('findAll', function(callback) {
@@ -21,4 +26,3 @@ Schema.createSchema = function(mongoose){
 
 
 module.exports = Schema;
-

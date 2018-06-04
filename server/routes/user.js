@@ -76,6 +76,9 @@ router.post('/adduser', (req, res) => {
             if (err) throw err
             return console.log("roomlist가 생성되었습니다.\n" + list);
         });
+
+        return res.json({success: true});
+
     })
 })
 

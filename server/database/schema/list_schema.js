@@ -7,7 +7,8 @@ Schema.createSchema = function(mongoose){
     var ListSchema = mongoose.Schema({
 
         email: String,
-        roomIds: []
+        roomIds: [],
+        oneonones: []
     })
 
     ListSchema.static('findAll', function(callback) {
@@ -18,4 +19,3 @@ Schema.createSchema = function(mongoose){
 };
 
 module.exports = Schema;
-

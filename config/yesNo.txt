@@ -1,0 +1,15 @@
+응,yes
+어,yes
+웅,yes
+엉,yes
+그래,yes
+구래,yes
+맞아,yes
+네,yes
+예스,yes
+아니,no
+노,no
+아니야,no
+놉,no
+아닌데,no
+아니요,no

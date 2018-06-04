@@ -4,6 +4,7 @@ import {
     Dropdown,
     Button,
     Container,
+    Header,
     Divider,
     Grid,
     Icon,
@@ -19,83 +20,109 @@ import socketio from "socket.io-client";
 import {connect} from "react-redux";
 
 
-// const socket = socketio.connect('http://localhost:3000')
+class CreateTeam extends React.Component {
+    constructor(props) {
+        super(props)
+        this.state = {
+            teamList: [],
+        }
+    }
 
 
-class CreateTeam extends React.Component{
-    // constructor(props) {
-    //     super(props)
-    //     this.state = {
-    //         logs: [],
-    //         userEmail: ''
-    //     }
-    // }
-    //
-    // send() {
-    //     var output = {
-    //         userEmail: this.props.currentEmail,
-    //     }
-    //     socket.emit('login', output)
-    // }
-    //
-    //
-    // componentDidMount() {
-    //     // 실시간으로 로그를 받게 설정
-    //     socket.on('login', (obj) => {
-    //         const logs2 = this.state.logs
-    //         obj.key = 'key_' + (this.state.logs.length + 1)
-    //         console.log(obj)
-    //         logs2.push(obj) // 로그에 추가
-    //         this.setState({logs: logs2})
-    //     })
-    // }
+    componentDidMount() {
+
+    }
 
 
     render() {
-//        const messagesFromOther = this.state.logs.map(e => {
-        //     <Comment key={e.key}>
-        //         <Comment.Author>{e.name}</Comment.Author>
-        //         <div style={
-        //             {
-        //                 background: '#fff',
-        //                 borderRadius: '5px',
-        //                 borderTopLeftRadius: 0,
-        //                 boxSizing: 'border-box',
-        //                 color: '#b3b2ca',
-        //                 height: '100%',
-        //                 padding: '10px 15px',
-        //                 position: 'relative',
-        //             }
-        //         }> {e.message}</div>
-        //         <p style={{clear: 'both'}}/>
-        //     </Comment>
-        // ))
+        const teamListView = (
+            <Grid.Row style={{paddingBottom: 10}}>
+                <Grid.Column style={{width: '100%'}}>
+                    <div style={{width: '100%', height: 150, backgroundColor: 'white', border: '1px solid #d9dde2'}}>
+                    </div>
+                </Grid.Column>
+            </Grid.Row>
+        )
 
+        const userView = (
+            <div>
+                <Grid>
+                    <Grid.Row style={{height: 10}}>
+                        <Header as='h4' color='grey'>
+                            <Header.Content>
+                                Profile
+                            </Header.Content>
+                        </Header>
+                    </Grid.Row>
+
+                    <Grid.Row verticalAlign='middle' style={{height: 100}}>
+                        <Grid.Column style={{width: 80}}>
+                            <Icon name='user circle' size='huge' style={{color: '#66bbff'}}/>
+                        </Grid.Column>
+                        <Grid.Column textAlign='left' style={{width: 150}}>
+                            <Header as='h3'>
+                                {this.props.currentUser}
+                                <Header.Subheader>
+                                    {this.props.currentEmail}
+                                </Header.Subheader>
+                            </Header>
+                        </Grid.Column>
+                    </Grid.Row>
+
+                    <Grid.Row style={{padding: 0}}>
+                        <Grid.Column style={{width: '100%', height: 100}}>
+                            <Button
+                                as={Link}
+                                to="/addTeam"
+                                fluid
+                                mobile
+                            >
+                                <Header style={{color: '#9ca6af'}}>
+                                    팀 생성하기
+                                </Header>
+                            </Button>
+                        </Grid.Column>
+                    </Grid.Row>
+
+
+                    <Grid.Row>
+                        <Button as={Link}
+                                to="/chat"
+                        >채팅으로</Button>
+                    </Grid.Row>
+
+                </Grid>
+            </div>
+        )
 
         return (
-            <Container textAlign='center' style={{width: '100%', height: '100%', marginTop: 100}}>
-                <Button as={Link}
-                        to="/chat"
-                        >채팅으로</Button>
-            </Container>
+            <div style={{
+                width: '100%',
+                backgroundColor: '#f7fbfe'
+            }}>
+                <Container textAlign='center'
+                           style={{
+                               width: '80vh',
+                               height: 'calc(100vh - 55px)',
+                               padding: 30
+                           }}>
+                    {userView}
+                </Container>
+
+            </div>
         )
     }
 }
 
 
-
-
-
 const mapStateToProps = (state) => {
 
-
     return {
-         currentUser: state.authentication.status.currentUser,
-         currentEmail: state.authentication.status.currentEmail
+        status: state.authentication.status,
+        currentUser: state.authentication.status.currentUser,
+        currentEmail: state.authentication.status.currentEmail
     }
 
-
 }
-
 
 export default connect(mapStateToProps)(CreateTeam)
