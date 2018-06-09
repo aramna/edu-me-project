@@ -28,7 +28,6 @@ import {
 import '../index.css'
 import avartarImage from '../images/avatar.jpg'
 
-
 const getTime = (date) => {
     return `${date.getHours()}:${("0" + date.getMinutes()).slice(-2)}`
 }
@@ -63,6 +62,7 @@ class ChatContainer extends React.Component {
             visibleAdd: false,
             visibleAdd2: false,
             channelList: [],    //채널리스트
+            channelList2: [],
             activeChannel: '',  //활성화된 채널
             activeOneOnOne: '',
             activeOneOnOneRoomId: '',
@@ -83,6 +83,8 @@ class ChatContainer extends React.Component {
             sidebarOpened: false,
             oneOnOneList: [],
             oneOnOne: false,
+            givetextcount: [0,0,0,0,0,0,0,0,0,0,0,0,0],
+            activeChannelIndex: 0,
         }
 
         this.socket = socketio.connect()
@@ -254,6 +256,7 @@ class ChatContainer extends React.Component {
                     text: e.target.value
                 })
             })
+            this.state.channelList2.push(e.target.value)
 
             this.handleItemClick(e, {name: e.target.value})
         }
@@ -264,18 +267,30 @@ class ChatContainer extends React.Component {
     handleItemClick(e, {name}) {
         const {container} = this.refs
 
+        const givetextcount=this.state.givetextcount
+        console.log("esajkdlkasfj",givetextcount);
+        console.log(name);
+        console.log(givetextcount[this.state.channelList2.indexOf(name)]);
+        givetextcount[this.state.channelList2.indexOf(name)] = "0"
+
         container.addEventListener("scroll", () => {
 
             if (container.scrollTop === 0) {
-                console.log("메롱")
+              //  console.log("메롱")
             }
 
         })
+        for(var i=0;i<this.state.channelList.length;i++){
+        if(name == this.state.channelList[i].text){
+          // console.log("activeindex됌");
+          // console.log(i);
+          this.setState({activeChannelIndex: i})
+          break;
+        }
+        }
 
         this.setState({activeChannel: name, activeOneOnOne: ''})
         this.setState({oneonone: false})
-
-        console.log('액티브채널: ', this.state.activeChannel)
 
         var output = {
             command: 'join',
@@ -294,7 +309,7 @@ class ChatContainer extends React.Component {
         container.addEventListener("scroll", () => {
 
             if (container.scrollTop === 0) {
-                console.log("메롱")
+
             }
 
         })
@@ -330,7 +345,7 @@ class ChatContainer extends React.Component {
                 roomId: this.state.activeChannel,
                 oneonone: this.state.oneonone
             }
-            console.log('쁑',this.state.activeChannel)
+            console.log(this.state.activeChannel)
             this.socket.emit('room', output)
             this.setState({newMessage: ''})
         }
@@ -358,6 +373,18 @@ class ChatContainer extends React.Component {
             logs2.push(obj) // 로그에 추가
             this.setState({logs: logs2})
             console.log(obj)
+            console.log(obj.roomId);
+            console.log(this.state.channelList[0]);
+            console.log(this.state.channelList2.indexOf(this.state.activeChannel));
+            console.log("fhsakdhfadljfh",this.state.channelList2);
+            if(this.state.activeChannel==obj.roomId){
+            // this.state.givetextcount[this.state.channelList2.indexOf(this.state.activeChannel)]++;
+            //   this.forceUpdate();
+            }
+            else{
+              this.state.givetextcount[this.state.channelList2.indexOf(obj.roomId)]++;
+              this.forceUpdate();
+            }
         })
 
         var defaultRoom = 'main'    //채팅방에 입장시 기본 채팅방을 main으로 설정
@@ -382,6 +409,9 @@ class ChatContainer extends React.Component {
                 this.setState({
                     channelList: this.state.channelList.concat(channellist.roomIds),
                 })
+                for(var i=0;i<channellist.roomIds.length;i++){
+                  this.state.channelList2.push(channellist.roomIds[i].text)
+                }
             })
         }
 
@@ -391,7 +421,7 @@ class ChatContainer extends React.Component {
                 this.setState({
                     oneOnOneList: oneononelist.oneonones,
                 })
-                console.log("원온원", this.state.oneOnOneList)
+                //console.log("원온원", this.state.oneOnOneList)
             })
         }
 
@@ -410,16 +440,16 @@ class ChatContainer extends React.Component {
 
         this.socket.on('premsg', (premsg) => {
             this.setState({premsg: premsg, loading: false});
-            console.log("premsg: ", this.state.premsg)
+            //console.log("premsg: ", this.state.premsg)
             var premsgLength = this.state.premsg.length
-            console.log("premsgLength: ", premsgLength)
+            //console.log("premsgLength: ", premsgLength)
             if (premsgLength < 15) {
                 start = 0
             } else {
                 var start = premsgLength - 15
             }
             var premsg_slice = this.state.premsg.slice(start, premsgLength)
-            console.log("premsg_slice: ", premsg_slice)
+            //console.log("premsg_slice: ", premsg_slice)
 
             this.setState({logs: premsg_slice})
         })
@@ -481,9 +511,9 @@ class ChatContainer extends React.Component {
             window.speechSynthesis
 
         if (!Recognition) {
-            alert(
-                '크롬브라우저로 다시 시도하세요.'
-            );
+            // alert(
+            //     '크롬브라우저로 접속해 주세요.'
+            // );
             return;
         }
 
@@ -574,7 +604,6 @@ class ChatContainer extends React.Component {
 
 
     componentDidUpdate(prevProps, prevState) {
-
         this.historyChange = prevState.logs === this.state.logs
 
         var defaultRoom = 'main'
@@ -618,7 +647,19 @@ class ChatContainer extends React.Component {
                                 name={text}
                                 active={activeChannel === text}
                                 onClick={this.handleItemClick}
+                                style={{ float : 'left', width : '155'}}
                             />
+                          {activeChannel === text ? <div>
+                            <Icon name='circle' style={{ float : 'right',width : '20'}}/>
+                            <p style={{ float : 'right',width : '38'}}>{this.state.givetextcount[this.state.activeChannelIndex]}
+                           </p></div> :
+                           <div>{this.state.givetextcount[this.state.channelList2.indexOf(text)]<1 ?
+                          <Icon name='circle outline' style={{float: 'right'}}/> :
+                             <Icon name='comment alternate outline' style={{float: 'right'}}/>}
+                            <p style={{ float : 'right',width : '38'}}>{this.state.givetextcount[this.state.channelList2.indexOf(text)]}
+                           </p></div>
+                       }
+
                         </Menu.Menu> : ""}
                 </div>)
         )
@@ -796,7 +837,9 @@ class ChatContainer extends React.Component {
                                 />
                             </Menu.Item>
                             : ""}
-                        {channel}
+                        <div>
+                          {channel}
+                        </div>
                     </Menu.Item>
                 </Menu>
             </div>
