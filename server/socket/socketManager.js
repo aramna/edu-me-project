@@ -7,12 +7,8 @@ const login_ids = [];
 module.exports = function(socket) {
     var io = require('../edume-server').io;
 
-    var name = "who"
-    var str2 = ""
     var saveMsg = [];
     var rooms = [];
-    var category = ""
-    var contents = ""
 
     console.log('connection info :', socket.request.connection._peername);
 
@@ -198,73 +194,18 @@ module.exports = function(socket) {
     socket.on('transcript', function(chatbot){
         console.log(chatbot);
 
-        //텍스트 분석 api 적용
-        var openApiURL = 'http://aiopen.etri.re.kr:8000/wiseNLU';
-        var access_key = '23a07699-433a-4978-9cd3-c680017ac4c9';
-        var analysisCode = 'morp';
-
         database.BotModel.findOne({name : chatbot.email}, function(err, bot){
             console.log("봇 객체 = " + bot);
             console.log("봇 상태 = " + bot.state);
-            var classifier = bayes({//카테고리 분류
-                tokenizer: function(text) { return text.split(' ')}
-            })
-            var classifier2 = bayes({//이름분류
-                tokenizer: function (text) {
-                    return text.split(' ')
-                }
-            })
-            var classifier3 = bayes({//yes/No 분류
-                tokenizer: function (text) {
-                    return text.split(' ')
-                }
-            })
-            const article3 = fs.readFileSync("../edu-me-project/config/yesNo.txt");
-            var lineArray3 = article3.toString();
-            var line3 = lineArray3.split('rn');
-
-            for (var i in line3) {
-                var s = line3[i].split(',');
-                classifier3.learn(s[0], s[1]);
-            }
-
             if(bot.state == 'general')
             {
                 console.log("쳇봇을 실행시킵니다.");
-                let chat = new database.ChatModel({
-                    name: chatbot.name,
-                    message: chatbot.transcript,
-                    email: chatbot.email,
-                    roomId: '나'
-                })
-
-                var message_time = `${chat.created.getHours()}:${("0" + chat.created.getMinutes()).slice(-2)}`;
-                chat.time = message_time;
-
-                // 데이터베이스에 저장
-                chat.save(err => {
-                    if (err) throw err
-                })
-                io.sockets.emit('message', chat);
 
                 //베이지안 알고리즘으로 텍스트분석
-
-                var str = chatbot.transcript;
-                var ch = ""
-                var requestJson = {
-                    'access_key': access_key,
-                    'argument': {
-                        'text': str,
-                        'analysis_code': analysisCode
-                    }
-                };
-                var options = {
-                    url: openApiURL,
-                    body: JSON.stringify(requestJson),
-                    headers: {'Content-Type':'application/json; charset=UTF-8'}
-                };
-
-                const article = fs.readFileSync("../edu-me-project/config/test.txt");
+                var classifier = bayes({
+                    tokenizer: function(text) { return text.split(' ')}
+                })
+                const article = fs.readFileSync("C:/test/test.txt");
                 var lineArray = article.toString();
                 var line = lineArray.split('\r\n');
 
@@ -272,107 +213,24 @@ module.exports = function(socket) {
                     var s = line[i].split(",");
                     classifier.learn(s[0], s[1]);
                 }
-                request.post(options, function (error, response, body) {
-                    var s = body
-                    //console.log(s)
-                    var res = JSON.parse(s)
-                    for (var i in res.return_object.sentence[0].morp) {
-                        console.log(res.return_object.sentence[0].morp[i])
-                        if (res.return_object.sentence[0].morp[i].type == 'JKB' && (res.return_object.sentence[0].morp[i].lemma == '한테'||
-                                res.return_object.sentence[0].morp[i].lemma == '에게')) {
-                            if (res.return_object.sentence[0].morp[Number(i) - 1].type == 'NNG' || res.return_object.sentence[0].morp[Number(i) - 1].type == 'NNP') {
-                                ch = res.return_object.sentence[0].morp[Number(i) - 1].lemma + res.return_object.sentence[0].morp[i].lemma
-                            }
-                        }
-                    }
-                });
-                setTimeout(function () {
-                    console.log(ch)
-                    var idx = str.indexOf(ch)
-                    if(idx == 0){
-                        str = str.substring(ch.length+1, text.length)
-                    }else{
-                        str = str.substring(0, idx-1)+str.substring(idx+ch.length, text.length)
-                    }
-                    console.log(str)
-                    category = classifier.categorize(str)[0];
-                    console.log("category - " + category);
-                    contents = category;
-                    if(category == 'send')
-                    {
-                        request.post(options, function (error, response, body) {
-                            s = body
-                            console.log(s)
-                            var res = JSON.parse(s)
-                            for (var i in res.return_object.sentence[0].morp) {
-                                if (res.return_object.sentence[0].morp[i].type == 'JKB' && (res.return_object.sentence[0].morp[i].lemma == '한테'||
-                                        res.return_object.sentence[0].morp[i].lemma == '에게')) {
-                                    if (res.return_object.sentence[0].morp[i - 1].type == 'NNG' ||  res.return_object.sentence[0].morp[i - 1].type == 'NNP') {
-                                        name = res.return_object.sentence[0].morp[i - 1].lemma
-                                        console.log("name : "+ name)
-                                    }
-                                }
-                            }
-                        });
-                        setTimeout(function () {
-                            if (name == 'who') {
-                                contents = '누구한테 보낼까요'
-                                bot.state = 'send0'
-                            }
-                            else {
-                                console.log(name + name)
-                                database.UserModel.find(function (err, resp) {
-                                    if (err) console.log('에러발생 ' + err);
-                                    for (var i in resp) {
-                                        var ss = resp[i].username.split()
-                                        classifier2.learn(ss[0] + ss[1], resp[i].username)
-                                        classifier2.learn(ss[1] + ss[2], resp[i].username)
-                                        classifier2.learn(ss[1] + ss[2] + 이, resp[i].username)
-                                        classifier2.learn(ss[0] + ss[1] + ss[2], resp[i].username)
-                                        console.log(resp[i].username)
-                                    }
-                                    var receiver = classifier2.categorize(name)
-                                    console.log(receiver)
-                                    if (receiver[1]  -5 && receiver[0] == resp[0].username) {
-                                        contents = '검색된 사용자가 없습니다. 전체 이름을 입력해주세요'
-                                        bot.state = 'send0'
-                                    } else {
-                                        name = receiver[0]
-                                        contents = receiver[0] + '님한테 보낼까요'
-                                        bot.state = 'send1'
-                                    }
-                                })
-                            }
-                        }, 600)
-                        setTimeout(function () {
-                            let chatbot = new database.ChatModel({
-                                name: 'chatbot',
-                                message: contents,
-                                email: 'chatbot@naver.com',
-                                roomId: '에듀미'
-                            })
-                            var message_time2 = `${chatbot.created.getHours()}${(0 + chatbot.created.getMinutes()).slice(-2)}`;
-                            chatbot.time = message_time2;
+                var category = classifier.categorize(chatbot.transcript);
+                console.log("category - " + category);
 
-                            //데이터베이스에 저장
-                            chatbot.save(err = {
-                                if (err){throw err}
-                            })
-                            chatbot.state = category;
-                            console.log(chatbot);
-                            io.sockets.emit('message', chatbot);
-                            bot.save(err => {
-                                if (err) throw err
-                                else{
-                                    console.log("Bot의 state가 " + bot.state + "로 update되었습니다.");
-                                }
-                            })
-                            io.sockets.emit(bot.state, bot);
-                            chatbot.state = category;
-                            console.log(chatbot);
-                        }, 700)
-                    }
-                },500)
+                //봇 상태 update
+                var contents = category;
+                if(category == 'send')
+                {
+                    contents = '뭐라고 보낼까?';
+                    bot.state = category;
+                    bot.save(err => {
+                        if(err) throw err
+                        console.log("Bot의 state가 " +bot.state+ "로 update되었습니다.");
+                    })
+                }
+                io.sockets.emit(bot.state, bot);
+                chatbot.state = category;
+                console.log(chatbot);
+
             } else if(bot.state == 'send')
             {
                 let chat = new database.ChatModel({
@@ -400,184 +258,9 @@ module.exports = function(socket) {
                 });
                 console.log("전송성공 후 Bot의 state " + bot.state);
             }
-            else if (bot.state == 'send0') {
-                let chat = new database.ChatModel({
-                    name: chatbot.name,
-                    message: chatbot.transcript,
-                    email:  chat.email,
-                    roomId : '나'
-                })
-                var message_time = `${chat.created.getHours()}${(0 + chat.created.getMinutes()).slice(-2)}`;
-
-                chat.time = message_time;
-
-                //데이터베이스에 저장
-                chat.save(err => {
-                    if (err) throw err
-                })
-                console.log(chat);
-                io.sockets.emit('message', chat);
-                if (name == 'who') {
-                    request.post(options, function (error, response, body) {
-                        s = body
-                        console.log(s)
-                        var res = JSON.parse(s)
-                        for (var i in res.return_object.sentence[0].morp) {
-                            if (res.return_object.sentence[0].morp[i].type == 'JKB' && (res.return_object.sentence[0].morp[i].lemma == '한테'||
-                                res.return_object.sentence[0].morp[i].lemma == '에게')) {
-                                if (res.return_object.sentence[0].morp[i - 1].type == 'NNG'||  res.return_object.sentence[0].morp[i - 1].type == 'NNP') {
-                                    name = res.return_object.sentence[0].morp[i - 1].lemma
-                                    console.log('send0의 name '+name)
-                                }
-                            } else {
-                                name = chatbot.transcript
-                            }
-                        }
-                    });
-                    setTimeout(function () {
-                        database.UserModel.find(function (err, resp) {
-                            if (err) console.log('에러발생 ' + err);
-                            for (var i in resp) {
-                                var ss = resp[i].username.split()
-                                classifier2.learn(ss[0] + ss[1], resp[i].username)
-                                classifier2.learn(ss[1] + ss[2], resp[i].username)
-                                classifier2.learn(ss[1] + ss[2] + 이, resp[i].username)
-                                classifier2.learn(ss[0] + ss[1] + ss[2], resp[i].username)
-                            }
-                            var receiver = classifier2.categorize(name)
-                            console.log(receiver)
-                            if (receiver[1]  -5 && receiver[0] == resp[0].username) {
-                                contents = '검색된 사용자가 없습니다. 전체 이름이 무엇입니까 이름만 말해주세요'
-                                bot.state = 'send0'
-                            } else {
-                                console.log("수신인 >>"+receiver[0])
-                                name = receiver[0]
-                                contents = receiver[0] + '님한테 보낼까요'
-                                console.log(contents)
-                                bot.state = 'send1'
-                            }
-                        })
-                    }, 1000)
-                } else {
-                    classifier2.learn(name, room.message)
-                    name = chatbot.transcript
-                    contents = '뭐라고 보낼까요'
-                    bot.state = 'send'
-                }
-                setTimeout(function () {
-                    let chatbot = new database.ChatModel({
-                        name : chatbot.name,
-                        message:  contents,
-                        email : 'chatbot@naver.com',
-                        roomId : '에듀미'
-                    })
-                    var message_time2 = `${chatbot.created.getHours()}${(0 + chatbot.created.getMinutes()).slice(-2)}`;
-
-                    chatbot.time = message_time2;
-
-                   //데이터베이스에 저장
-                    chatbot.save(err => {
-                        if (err) throw err
-                    })
-                    chatbot.state = category;
-                    console.log(chatbot);
-                    io.sockets.emit('message', chatbot);
-                    bot.save(err => {
-                        if (err) throw err
-                        console.log('Bot의 state가  '+ bot.state + '로 update되었습니다.');
-                    })
-                }, 1100)
-            }
-            else if (bot.state == 'send1') {
-                let chat = new database.ChatModel({
-                    name: chatbot.name,
-                    message:  chatbot.transcript,
-                    email : chatbot.email,
-                    roomId: '나'
-                })
-                var message_time = `${chat.created.getHours()}${(0 + chat.created.getMinutes()).slice(-2)}`;
-
-                chat.time = message_time;
-
-               // 데이터베이스에 저장
-                chat.save(err => {
-                    if (err) throw err
-                })
-
-                console.log(chat);
-                io.sockets.emit('message', chat);
-                var ans = classifier3.categorize(chatbot.transcript)
-                if (ans[0] == 'yes') {
-                    contents = '뭐라고 전송할까요'
-                    bot.state = 'send'
-                } else {
-                    name = 'who'
-                    request.post(options, function (error, response, body) {
-                        s = body
-                        console.log(s)
-                        var res = JSON.parse(s)
-                        for (var i in res.return_object.sentence[0].morp) {
-                            if (res.return_object.sentence[0].morp[i].type == 'JKB' && (res.return_object.sentence[0].morp[i].lemma == '한테'||
-                                res.return_object.sentence[0].morp[i].lemma == '에게')) {
-                                if (res.return_object.sentence[0].morp[i - 1].type == 'NNG' || res.return_object.sentence[0].morp[i - 1].type == 'NNP') {
-                                    name = res.return_object.sentence[0].morp[i - 1].lemma
-                                }
-                            }
-                        }
-                    });
-                    setTimeout(function () {
-                        if (name == 'who') {
-                           contents = '누구한테 보낼까요'
-                        }
-                        else {
-                            database.UserModel.find(function (err, resp) {
-                                if (err) console.log('에러발생 ' + err);
-                                for (var i in resp) {
-                                    var ss = resp[i].username.split()
-                                    classifier2.learn(ss[0] + ss[1], resp[i].username)
-                                    classifier2.learn(ss[1] + ss[2], resp[i].username)
-                                    classifier2.learn(ss[1] + ss[2] + 이, resp[i].username)
-                                    classifier2.learn(ss[0] + ss[1] + ss[2], resp[i].username)
-                                }
-                                var receiver = classifier2.categorize(name)
-                                console.log(receiver)
-                                if (receiver[1]  -5 && receiver[0] == resp[0].username) {
-                                    contents = '검색된 사용자가 없습니다. 전체 이름을 입력해주세요'
-                                    bot.state = 'send0'
-                                } else {
-                                    console.log('수신인 >>'+receiver[0])
-                                    name = receiver[0]
-                                    contents = receiver[0] + '님한테 보낼까요?'
-                                    console.log(contents)
-                                    bot.state = 'send1'
-                                }
-                            })
-                        }
-                    }, 1000)
-                }
-                setTimeout(function () {
-                    let chatbot = new database.ChatModel({
-                        name : chatbot.name,
-                        message : contents,
-                        email : 'chatbot@naver.com',
-                        roomId : '에듀미'
-                    })
-                    var message_time = `${chatbot.created.getHours()}${(0 + chatbot.created.getMinutes()).slice(-2)}`;
-
-                    chatbot.time = message_time;
-
-                    chatbot.save(err => {
-                        if (err) throw err
-                    })
-                    io.sockets.emit('message', chatbot);
-                    bot.save(err => {
-                        if (err) throw err
-                        console.log('Bot의 state가 ' + bot.state + '로 update되었습니다.');
-                })
-                },1100)
-            }
         })
     });
+
     socket.on('room', function(room) {
         console.log('room 이벤트를 받았습니다.')
         if(room.command === 'create') {
@@ -614,6 +297,7 @@ module.exports = function(socket) {
                 }
             });
         } else if (room.command === 'message') {
+            //******************chatbot 예제코드******************//
             console.log('message 이벤트를 받았습니다.');
             console.log('room객체알려주세요룸룸룸', room)
             if(room.oneonone == true)

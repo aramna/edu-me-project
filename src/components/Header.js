@@ -77,9 +77,9 @@ class FixedHeader extends React.Component {
                 >Sign up</Menu.Item>
 
                 <Menu.Item as={Link}
-                           to="/login"
-                           inverted
-                           style={{ marginLeft: '0.5em' }}
+                    to="/login"
+                    inverted
+                    style={{ marginLeft: '0.5em' }}
                 >Sign in</Menu.Item>
             </Grid>
         )
@@ -92,71 +92,71 @@ class FixedHeader extends React.Component {
 
 
         const NotLoginHeader = (
-
-            <Responsive
-                maxWidth={Responsive.onlyComputer.maxWidth}
-                minWidth={Responsive.onlyTablet.minWidth}
-            >
-                <Menu
-                    fixed='top'
-                    secondary
-                    inverted
-                    style={{ marginTop: 8 }}
+        
+                <Responsive
+                    maxWidth={Responsive.onlyComputer.maxWidth}
+                    minWidth={Responsive.onlyTablet.minWidth}
                 >
-                    <Container>
-                        <Menu.Item style={{ marginBottom: 0 }}>
-                            <Header size='huge' inverted>TALK</Header>
-                        </Menu.Item>
-                        <Menu.Item as='a' style={{ marginBottom: 0 }}>Introduction</Menu.Item>
-                        <Menu.Item as='a' style={{ marginBottom: 0 }}>Using</Menu.Item>
-                        <Menu.Item as='a' style={{ marginBottom: 0 }}>Careers</Menu.Item>
-                        <Menu.Item position='right'>
-                            {this.props.isLoggedIn ? logoutButton : loginButton}
-                        </Menu.Item>
-                    </Container>
-                </Menu>
-            </Responsive>
-
-        )
-
-        const LoginedHeader = (
-
-            <Responsive
-                maxWidth={Responsive.onlyComputer.maxWidth}
-                minWidth={Responsive.onlyTablet.minWidth}
-            >
-                <div
-                    style={{ textAlign: 'center', minHeight: 55, padding: 0, borderRadius: 0, backgroundColor: '#2196F3' }}>
                     <Menu
                         fixed='top'
                         secondary
                         inverted
-                        style={{ marginTop: 0, width: '100%'}}
-
+                        style={{ marginTop: 8 }}
                     >
-                        <Menu.Item>
-                            <Header size='huge' inverted>TALK</Header>
-                        </Menu.Item>
-
-                        <Menu.Item position='right'>
-                            <Menu.Item>
-                                <Icon name="alarm outline" />
+                        <Container>
+                            <Menu.Item style={{ marginBottom: 0 }}>
+                                <Header size='huge' inverted>TALK</Header>
                             </Menu.Item>
-                            <Menu.Item>
-                                <Icon name="add user" />
-                            </Menu.Item>
-                            <Menu.Item>
-                                <Icon name="users" />
-                            </Menu.Item>
-                            <Menu.Item style={{ marginLeft: 20, marginRight: 0 }}>
+                            <Menu.Item as='a' style={{ marginBottom: 0 }}>Introduction</Menu.Item>
+                            <Menu.Item as='a' style={{ marginBottom: 0 }}>Using</Menu.Item>
+                            <Menu.Item as='a' style={{ marginBottom: 0 }}>Careers</Menu.Item>
+                            <Menu.Item position='right'>
                                 {this.props.isLoggedIn ? logoutButton : loginButton}
                             </Menu.Item>
-                        </Menu.Item>
-
+                        </Container>
                     </Menu>
-                </div>
-            </Responsive>
+                </Responsive>
+     
+        )
 
+        const LoginedHeader = (
+        
+                <Responsive
+                    maxWidth={Responsive.onlyComputer.maxWidth}
+                    minWidth={Responsive.onlyTablet.minWidth}
+                >
+                    <div
+                        style={{ textAlign: 'center', minHeight: 55, padding: 0, borderRadius: 0, backgroundColor: '#2196F3' }}>
+                        <Menu
+                            fixed='top'
+                            secondary
+                            inverted
+                            style={{ marginTop: 0, width: '100%'}}
+
+                        >
+                                <Menu.Item>
+                                    <Header size='huge' inverted>TALK</Header>
+                                </Menu.Item>
+
+                                <Menu.Item position='right'>
+                                    <Menu.Item>
+                                        <Icon name="alarm outline" />
+                                    </Menu.Item>
+                                    <Menu.Item>
+                                        <Icon name="add user" />
+                                    </Menu.Item>
+                                    <Menu.Item>
+                                        <Icon name="users" />
+                                    </Menu.Item>
+                                    <Menu.Item style={{ marginLeft: 20, marginRight: 0 }}>
+                                        {this.props.isLoggedIn ? logoutButton : loginButton}
+                                    </Menu.Item>
+                                </Menu.Item>
+                           
+                        </Menu>
+                    </div>
+                </Responsive>
+           
         )
 
 
