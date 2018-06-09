@@ -17,9 +17,12 @@ import {
 } from 'semantic-ui-react'
 import whitelogoImage from '../images/logo.png'
 import blacklogoImage from '../images/logo2.png'
-import { Link } from 'react-router'
+import {browserHistory, Link} from 'react-router'
 import { connect } from 'react-redux'
 import backgroundImage from '../images/Scooter.jpg'
+import {socketConnect} from 'socket.io-react'
+import {getStatusRequest, logoutRequest} from "../actions/authentication";
+
 
 
 class FixedHeader extends React.Component {
@@ -27,10 +30,11 @@ class FixedHeader extends React.Component {
         super(props);
         this.state = {
             sidebarOpened: false
-        };
+        }
 
-        this.handlePusherClick = this.handlePusherClick.bind(this);
-        this.handleToggle = this.handleToggle.bind(this);
+        this.handlePusherClick = this.handlePusherClick.bind(this)
+        this.handleToggle = this.handleToggle.bind(this)
+        this.handleLogout = this.handleLogout.bind(this)
     }
 
     handlePusherClick() {
@@ -38,6 +42,30 @@ class FixedHeader extends React.Component {
         if (sidebarOpened) {
             this.setState({ sidebarOpened: true })
         }
+    }
+
+    handleLogout() {
+        const {socket} = this.props
+
+        socket.emit('logout', this.props.currentEmail)
+        console.log('로그아웃 소켓', this.props.currentEmail)
+
+        this.props.logoutRequest().then(
+            () => {
+                browserHistory.push('/')
+                message.success("로그아웃이 완료되었습니다.")
+
+                // EMPTIES THE SESSION
+                let loginData = {
+                    isLoggedIn: false,
+                    email: ''
+                };
+
+                document.cookie = 'key=' + btoa(JSON.stringify(loginData));
+                socket.emit('logout', this.props.currentEmail)
+                console.log('로그아웃 소켓')
+            }
+        );
     }
 
     handleToggle() {
@@ -60,11 +88,11 @@ class FixedHeader extends React.Component {
             { key: 'profile', text: '나의 프로필' },
             { key: 'help', text: '도움말' },
             { key: 'settings', text: '설정' },
-            { key: 'sign-out', text: '로그아웃', onClick: this.props.onLogout },
+            { key: 'sign-out', text: '로그아웃', onClick: this.handleLogout },
         ]
 
         const DropdownTrigger = () => (
-            <Dropdown trigger={trigger} options={options} />
+            <Dropdown className='loginedHeader' trigger={trigger} options={options} />
         )
 
 
@@ -126,6 +154,7 @@ class FixedHeader extends React.Component {
                     minWidth={Responsive.onlyTablet.minWidth}
                 >
                     <div
+
                         style={{ textAlign: 'center', minHeight: 55, padding: 0, borderRadius: 0, backgroundColor: '#2196F3' }}>
                         <Menu
                             fixed='top'
@@ -172,8 +201,22 @@ class FixedHeader extends React.Component {
 const mapStateToProps = (state) => {
     return {
         isLoggedIn: state.authentication.status.isLoggedIn,
-        currentUser: state.authentication.status.currentUser
+        currentUser: state.authentication.status.currentUser,
+        currentEmail: state.authentication.status.currentEmail,
+        status: state.authentication.status     // 로그인 or 로그아웃 상태
+
     }
 }
 
-export default connect(mapStateToProps)(FixedHeader)
+const mapDispatchToProps = (dispatch) => {
+    return {
+        getStatusRequest: () => {
+            return dispatch(getStatusRequest())
+        },
+        logoutRequest: () => {
+            return dispatch(logoutRequest())
+        }
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(socketConnect(FixedHeader))

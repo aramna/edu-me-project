@@ -1,6 +1,7 @@
 import React, {PropTypes} from 'react';
 import socketio from 'socket.io-client'
 import {connect} from 'react-redux'
+import {Link} from "react-router";
 import _ from 'lodash'
 import {OrderedMap} from 'immutable'
 import {
@@ -19,7 +20,11 @@ import {
     Image,
     Header,
     Container,
-    Segment, Responsive, Sidebar,
+    Tab,
+    Segment,
+    Responsive,
+    Sidebar,
+    Pagination,
 } from 'semantic-ui-react'
 import {
     Message,
@@ -27,11 +32,13 @@ import {
 } from '@livechat/ui-kit'
 import '../index.css'
 import avartarImage from '../images/avatar.jpg'
+import {socketConnect} from 'socket.io-react'
 
 
 const getTime = (date) => {
     return `${date.getHours()}:${("0" + date.getMinutes()).slice(-2)}`
 }
+
 
 function dynamicSort(property) {
     var sortOrder = 1
@@ -83,9 +90,10 @@ class ChatContainer extends React.Component {
             sidebarOpened: false,
             oneOnOneList: [],
             oneOnOne: false,
+            mobileView: false,
+            channelORoneOnOne: false,
         }
 
-        this.socket = socketio.connect()
 
         this.handleChannelShow = this.handleChannelShow.bind(this)    //sidebar
         this.handleOneOnOneShow = this.handleOneOnOneShow.bind(this)    //sidebar
@@ -108,6 +116,9 @@ class ChatContainer extends React.Component {
         this.handlePusherClick = this.handlePusherClick.bind(this)
         this.handleToggle = this.handleToggle.bind(this)
         this.roomChanged = this.roomChanged.bind(this)
+        this.handleMobile = this.handleMobile.bind(this)
+        this.handleChannel = this.handleChannel.bind(this)
+        this.handleOneOnOne = this.handleOneOnOne.bind(this)
     }
 
     handlePusherClick() {
@@ -119,6 +130,18 @@ class ChatContainer extends React.Component {
 
     handleToggle() {
         this.setState({sidebarOpened: !this.state.sidebarOpened})
+    }
+
+    handleMobile() {
+        this.setState({mobileView: !this.state.mobileView})
+    }
+
+    handleChannel() {
+        this.setState({channelORoneOnOne: false})
+    }
+
+    handleOneOnOne() {
+        this.setState({channelORoneOnOne: true})
     }
 
     searchUser(search = "") {
@@ -137,6 +160,7 @@ class ChatContainer extends React.Component {
     }
 
     personalTalk(e, name, userId) {
+        const {socket} = this.props
         console.log("개인대화 생성");
         var c = 1;
         var output = {
@@ -162,7 +186,7 @@ class ChatContainer extends React.Component {
 
         }
         if (c === 1) {
-            this.socket.emit('oneonone', output)
+            socket.emit('oneonone', output)
             this.setState({
                 oneOnOneList: this.state.oneOnOneList.concat({
                     text: output.receiver
@@ -248,7 +272,8 @@ class ChatContainer extends React.Component {
         }
 
         if (c === 1) {
-            this.socket.emit('room', output)
+            const {socket} = this.props
+            socket.emit('room', output)
             this.setState({
                 channelList: this.state.channelList.concat({
                     text: e.target.value
@@ -258,19 +283,15 @@ class ChatContainer extends React.Component {
             this.handleItemClick(e, {name: e.target.value})
         }
 
+        this.setState({roomId: ''})
+
+
     }
 
     //Menu.Item에서 item을 클릭했을 때 그 채널을 활성화해주는 함수
     handleItemClick(e, {name}) {
         const {container} = this.refs
-
-        container.addEventListener("scroll", () => {
-
-            if (container.scrollTop === 0) {
-                console.log("메롱")
-            }
-
-        })
+        const {socket} = this.props
 
         this.setState({activeChannel: name, activeOneOnOne: ''})
         this.setState({oneonone: false})
@@ -285,19 +306,14 @@ class ChatContainer extends React.Component {
             oneonone: false
         }
 
-        this.socket.emit('room', output)
+        socket.emit('room', output)
+        this.handleMobile()
     }   //sidebar
 
     handleItemClick2(e, {name}) {
         const {container} = this.refs
-
-        container.addEventListener("scroll", () => {
-
-            if (container.scrollTop === 0) {
-                console.log("메롱")
-            }
-
-        })
+        const {socket} = this.props
+        this.handleMobile()
 
         this.setState({oneonone: true, showSearchUser: false})
         this.setState({activeOneOnOne: name, activeChannel: ''})
@@ -311,7 +327,7 @@ class ChatContainer extends React.Component {
             oneonone: true
         }
 
-        this.socket.emit('room', output)
+        socket.emit('room', output)
     }   //sidebar
 
     //inputView에서 input박스에 입력된 메시지 내용을 받아오는 함수
@@ -321,7 +337,8 @@ class ChatContainer extends React.Component {
 
     // command를 message로 하여 room 으로 emit
     handleSend() {
-        if(this.state.activeOneOnOne === '') {
+        const {socket} = this.props
+        if (this.state.activeOneOnOne === '') {
             var output = {
                 command: 'message',
                 email: this.props.currentEmail,
@@ -330,11 +347,10 @@ class ChatContainer extends React.Component {
                 roomId: this.state.activeChannel,
                 oneonone: this.state.oneonone
             }
-            console.log('쁑',this.state.activeChannel)
-            this.socket.emit('room', output)
+            socket.emit('room', output)
             this.setState({newMessage: ''})
         }
-        else if(this.state.activeChannel === '') {
+        else if (this.state.activeChannel === '') {
             var output2 = {
                 command: 'message',
                 email: this.props.currentEmail,
@@ -343,8 +359,7 @@ class ChatContainer extends React.Component {
                 roomId: this.state.activeOneOnOne,
                 oneonone: this.state.oneonone
             }
-            console.log('쁑',this.state.activeOneOnOne)
-            this.socket.emit('room', output2)
+            socket.emit('room', output2)
             this.setState({newMessage: ''})
         }
 
@@ -352,12 +367,13 @@ class ChatContainer extends React.Component {
 
 
     componentWillMount() {
-        this.socket.on('message', (obj) => {
+        const {socket} = this.props
+        socket.on('message', (obj) => {
             const logs2 = this.state.logs
             obj.key = 'key_' + (this.state.logs.length + 1)
             logs2.push(obj) // 로그에 추가
             this.setState({logs: logs2})
-            console.log(obj)
+            console.log("로그가뭐꼬", obj)
         })
 
         var defaultRoom = 'main'    //채팅방에 입장시 기본 채팅방을 main으로 설정
@@ -368,16 +384,16 @@ class ChatContainer extends React.Component {
         }
         // console.log("현재유저:",this.props.currentUser)
         if (this.props.currentUser !== '') {
-            this.socket.emit('login', output)
+            socket.emit('login', output)
         }
 
         this.setState({
-            roomId: defaultRoom,
+            // roomId: defaultRoom,
             activeChannel: defaultRoom
         })
 
         if (this.state.channelList !== null) {
-            this.socket.on('channellist', (channellist) => {
+            socket.on('channellist', (channellist) => {
                 this.setState({channelList: []})
                 this.setState({
                     channelList: this.state.channelList.concat(channellist.roomIds),
@@ -386,7 +402,7 @@ class ChatContainer extends React.Component {
         }
 
         if (this.state.oneOnOneList !== null) {
-            this.socket.on('oneononelist', (oneononelist) => {
+            socket.on('oneononelist', (oneononelist) => {
                 this.setState({oneOnOneList: []})
                 this.setState({
                     oneOnOneList: oneononelist.oneonones,
@@ -395,22 +411,24 @@ class ChatContainer extends React.Component {
             })
         }
 
-        this.socket.on('memberlist', (memberlist) => {
+        socket.on('memberlist', (memberlist) => {
             this.setState({memberList: []})
 
             this.setState({
                 memberList: memberlist.member
             })
-
+            console.log('멤버리스트', this.state.memberList)
         })
 
-        this.socket.on('join', (join)=> {
+        socket.on('join', (join) => {
             this.setState({activeOneOnOneRoomId: join.roomId});
         })
 
-        this.socket.on('premsg', (premsg) => {
+        socket.on('premsg', (premsg) => {
             this.setState({premsg: premsg, loading: false});
             console.log("premsg: ", this.state.premsg)
+
+
             var premsgLength = this.state.premsg.length
             console.log("premsgLength: ", premsgLength)
             if (premsgLength < 15) {
@@ -422,11 +440,14 @@ class ChatContainer extends React.Component {
             console.log("premsg_slice: ", premsg_slice)
 
             this.setState({logs: premsg_slice})
+
+
         })
 
-        this.socket.on('usersearch', (userList) => {
+        socket.on('usersearch', (userList) => {
             this.setState({users: this.state.users.concat(userList)})
         })
+
 
     }
 
@@ -463,7 +484,7 @@ class ChatContainer extends React.Component {
 
 
     componentDidMount() {
-
+        const {socket} = this.props
 
         const {container} = this.refs
 
@@ -487,6 +508,10 @@ class ChatContainer extends React.Component {
             return;
         }
 
+        socket.on('request', (obj) => {
+            this.setState({text: obj})
+        })
+
         this.recognition = new Recognition();
         this.recognition.lang = process.env.REACT_APP_LANGUAGE || 'ko-KR';
         this.recognition.continuous = false;
@@ -504,13 +529,15 @@ class ChatContainer extends React.Component {
             TextToSpeech.speak(sayThis)
 
             var output = {
+                email: this.props.currentEmail,
+                name: this.props.currentUser,
                 transcript: this.state.text
             }
-            this.socket.emit('transcript', output)
+            socket.emit('transcript', output)
             this.end()
             setTimeout(function () {
                 this.setState({modalOpen: false})
-            }.bind(this), 1500)
+            }.bind(this), 10000)
         };
 
         this.recognition.onspeechend = () => {
@@ -574,7 +601,7 @@ class ChatContainer extends React.Component {
 
 
     componentDidUpdate(prevProps, prevState) {
-
+        const {socket} = this.props
         this.historyChange = prevState.logs === this.state.logs
 
         var defaultRoom = 'main'
@@ -586,12 +613,13 @@ class ChatContainer extends React.Component {
                 roomId: defaultRoom
             }
             if (this.props.currentUser !== '') {
-                this.socket.emit('login', output)
+                socket.emit('login', output)
             }
         }
         if (this.historyChange) {
             this.scrollDown()
         }
+        // console.log("라스트챗", this.state.lastChat)
 
     }
 
@@ -623,6 +651,63 @@ class ChatContainer extends React.Component {
                 </div>)
         )
 
+        const ChannelUser = []
+        for (var i = 0; i < this.state.memberList.length; i++) {
+            ChannelUser.push(
+                <Menu.Item
+                    name={this.state.memberList[i]}
+                />
+            )
+        }
+
+        const mobileChannel = this.state.channelList.map(
+            ({text}) => (
+                <div>
+                    <Item as='a'>
+                        <Item.Content>
+                            <Item.Header>
+                                <Header size='small'>
+                                <Menu.Item
+                                    name={text}
+                                    active={activeChannel === text}
+                                    onClick={this.handleItemClick}
+                                />
+                                </Header>
+                            </Item.Header>
+                            <Item.Description>
+                                최근 메세지 내용 추가
+                            </Item.Description>
+                        </Item.Content>
+                    </Item>
+                    <Divider fitted style={{marginTop: 5, marginBottom: 5}}/>
+                </div>
+            )
+        )
+
+        const mobileOneOnOne = this.state.oneOnOneList.map(
+            ({text}) => (
+                <div>
+                    <Item as='a'>
+                        <Item.Content>
+                            <Item.Header>
+                                <Header size='small'>
+                                    <Menu.Item
+                                        name={text}
+                                        active={activeChannel === text}
+                                        onClick={this.handleItemClick}
+                                    />
+                                </Header>
+                            </Item.Header>
+                            <Item.Description>
+                                최근 메세지 내용 추가
+                            </Item.Description>
+                        </Item.Content>
+                    </Item>
+                    <Divider fitted style={{marginTop: 5, marginBottom: 5}}/>
+                </div>
+            )
+        )
+
         const oneOnOne = this.state.oneOnOneList.map(
             ({text}) => (
                 <div>
@@ -637,14 +722,6 @@ class ChatContainer extends React.Component {
                 </div>)
         )
 
-        const ChannelUser = []
-        for (var i = 0; i < this.state.memberList.length; i++) {
-            ChannelUser.push(
-                <Menu.Item
-                    name={this.state.memberList[i]}
-                />
-            )
-        }
 
         const userList = (
             <div>
@@ -768,8 +845,8 @@ class ChatContainer extends React.Component {
                                 <div>
                                     <Image avatar src={avartarImage} style={{width: 75, height: 75}}/>
                                     <span style={{marginLeft: 20}}>{this.props.currentUser}</span>
+                                    <span><Button size='mini' as={Link} to='/mypage'>프로필 수정</Button></span>
                                 </div>
-
                             </Grid.Column>
 
                         </Grid>
@@ -910,12 +987,71 @@ class ChatContainer extends React.Component {
                     </Modal.Content>
                 </Modal>
             </div>
+        )
 
+        const MobileChannelList = (
+            <div style={{overflowY: 'auto'}}>
+                {mobileChannel}
+            </div>
         )
 
 
-        return (
+        const MobileListView = (
+            <div>
+                <Segment attached vertical tertiary textAlign='center' style={{
+                    marginTop: 0,
+                    marginBottom: 0,
+                    paddingLeft: 13,
+                    paddingRight: 13,
+                    paddingTop: 10,
+                    backgroundColor: '#f5f5f5'
+                }}>
+                    {this.state.channelORoneOnOne === false ?
+                        <Button.Group widths={2} style={{width: 200, marginBottom: 10}}>
+                            <Button active inverted color='blue' onClick={this.handleChannel}>채널</Button>
+                            <Button inverted color='blue' onClick={this.handleOneOnOne}>일대일</Button>
+                        </Button.Group>
+                        :
+                        <Button.Group widths={2} style={{width: 200, marginBottom: 10}}>
+                            <Button inverted color='blue' onClick={this.handleChannel}>채널</Button>
+                            <Button active inverted color='blue' onClick={this.handleOneOnOne}>일대일</Button>
+                        </Button.Group>}
 
+                    <Input as='search'
+                           icon='search'
+                           placeholder='채널검색'
+                           value={this.state.roomId}
+                           onChange={e => this.roomChanged(e)}
+                           onKeyPress={e => {
+                               e.key === 'Enter' && this.handleRoomCreate(e)
+                           }}
+                           style={{width: '100%'}}
+                    />
+                </Segment>
+                {this.state.channelORoneOnOne === false ?
+                    <div style={{
+                    overflowY: 'auto',
+                    height: 'calc(100vh - 161px)',
+                    paddingLeft: 15,
+                    paddingRight: 15,
+                    paddingTop: 10,
+                    outline: 0
+                }}>{mobileChannel}</div>
+                    :
+                    <div style={{
+                    overflowY: 'auto',
+                    height: 'calc(100vh - 161px)',
+                    paddingLeft: 15,
+                    paddingRight: 15,
+                    paddingTop: 10,
+                    outline: 0
+                }}>{mobileOneOnOne}</div>}
+
+            </div>
+
+        )
+
+        return (
             <Segment.Group>
                 <Responsive
                     maxWidth={Responsive.onlyComputer.maxWidth}
@@ -959,148 +1095,77 @@ class ChatContainer extends React.Component {
 
 
                 <Responsive {...Responsive.onlyMobile}>
-                    <Sidebar.Pushable>
-                        <Sidebar as={Menu} animation='uncover' visible={this.state.sidebarOpened}
-                                 style={{backgroundColor: '#455A64'}}>
-                            <Grid style={{height: 'calc(100vh - 55px)'}}>
-                                <Menu inverted vertical
-                                      style={{
-                                          width: '100%',
-                                          height: '60%',
-                                          backgroundColor: '#455A64',
-                                          marginTop: 30,
-                                          marginBottom: 0
-                                      }}>
-                                    <Menu.Item>
-                                        <div>
-                                            <Icon inverted name='user circle outline' size='huge'
-                                                  style={{marginRight: 10}}/>
-                                            <label style={{
-                                                textAlign: 'center',
-                                                fontWeight: 'bold',
-                                                fontSize: 17,
-                                                verticalAlign: 'center'
-                                            }}>
-                                                {this.props.currentUser}
-                                                <br/>
-                                                <label style={{fontWeight: 'normal', fontSize: 13}}>
-                                                    {this.props.currentEmail}
-                                                </label>
-                                            </label>
-                                        </div>
-                                    </Menu.Item>
-
-                                    <Menu.Item style={{height: 500, overflowY: 'auto'}}>
-                                        <Menu.Header>
-                                            <label onClick={this.handleItemShow}>
-                                                Channels
-                                            </label>
-                                            <Icon onClick={this.handleChannelAdd} name='add' style={{float: 'right'}}/>
-                                        </Menu.Header>
-                                        {this.state.visibleAdd ?
-                                            <Menu.Item>
-                                                <Input as='search'
-                                                       transparent={true}
-                                                       icon='search'
-                                                       inverted placeholder='채널검색'
-                                                       value={this.state.roomId}
-                                                       onChange={e => this.roomChanged(e)}
-                                                       onKeyPress={e => {
-                                                           e.key === 'Enter' && this.handleRoomCreate(e)
-                                                       }}
-                                                />
-                                                <Input as='search'
-                                                       transparent={true}
-                                                       icon='search'
-                                                       inverted placeholder='유저검색'
-                                                       value={this.state.searchUser}
-                                                       onChange={(e) => {
-                                                           const searchUserText = _.get(e, 'target.value');
-
-                                                           this.setState({
-                                                                   searchUserList: searchUserText,
-                                                                   showSearchUser: true,
-                                                               }
-                                                           );
-                                                       }}
-                                                       style={{marginTop: 10}}
-
-                                                />
-                                                {this.state.showSearchUser ?
-                                                    <div>
-                                                        {users2.map((user, index) => {
-                                                            return <div
-                                                                style={{
-                                                                    marginTop: 5,
-                                                                    marginBottom: 5
-                                                                }}
-                                                                onClick={(e) => {
-                                                                    var name = _.get(user, 'username')
-                                                                    var userId = _.get(user, 'email');
-                                                                    this.personalTalk(e, name, userId)
-                                                                }}
-                                                            >
-                                                                <p>{_.get(user, 'username', 'email')}</p>
-                                                            </div>
-                                                        })}
-
-                                                    </div> : ""}
-
-                                            </Menu.Item>
-                                            : ""}
-                                        {channel}
-                                    </Menu.Item>
-                                </Menu>
+                    {this.state.mobileView ?
+                        <Menu compact secondary icon attached='top' style={{
+                            width: '100vh',
+                            height: 55,
+                            backgroundColor: '#2196F3',
+                            opacity: 0.8,
+                            position: 'absolute'
+                        }}>
+                            <Menu.Item
+                                onClick={this.handleMobile}
+                                style={{width: 50}}
+                            >
+                                <Icon inverted name='angle left' size='big'/>
+                            </Menu.Item>
+                            <Menu.Item style={{width: 'calc(100% - 140px)'}}>
                                 <div style={{
+                                    textAlign: 'center',
                                     width: '100%',
-                                    height: 'calc(40% - 30px)',
-                                    backgroundColor: '#455A64',
-                                    marginTop: 0,
-                                    marginBottom: 0
+                                    height: '100%',
+                                    color: 'white',
+                                    fontSize: 20
                                 }}>
-                                    <Menu inverted vertical style={{
-                                        width: '100%',
-                                        height: '100%',
-                                        backgroundColor: '#455A64',
-                                        marginTop: 0,
-                                        marginBottom: 0
-                                    }}>
-                                        <Menu.Item>
-                                        </Menu.Item>
-                                        <Menu.Item>
-                                            <Menu.Header>
-                                                <label>UserList</label>
-                                            </Menu.Header>
-
-                                            {userList}
-
-                                        </Menu.Item>
-                                    </Menu>
+                                    TalkON
                                 </div>
-                            </Grid>
-                        </Sidebar>
+                            </Menu.Item>
+                            <Menu.Item
+                                position='right'
+                                style={{width: 50, marginRight: 15}}
+                            >
+                                {STT}
+                            </Menu.Item>
+                        </Menu>
+                        :
+                        <Menu compact secondary icon attached='top' style={{
+                            width: '100vh',
+                            height: 55,
+                            backgroundColor: '#c4c4c4',
+                            opacity: 0.8,
+                            position: 'absolute'
+                        }}>
+                            <Menu.Item
+                                onClick={this.handleMobile}
+                                style={{width: 50}}
+                            >
+                                <Icon name='angle left' size='big'/>
+                            </Menu.Item>
+                            <Menu.Item style={{width: 'calc(100% - 140px)'}}>
+                                <Header style={{width: '100%'}}>
+                                    {this.state.channelORoneOnOne ? this.state.activeOneOnOne : this.state.activeChannel}
+                                </Header>
+                            </Menu.Item>
+                            <Menu.Item
+                                position='right'
+                                style={{width: 50, marginRight: 15}}
+                            >
+                                {STT}
+                            </Menu.Item>
+                        </Menu>
+                    }
 
-                        <Sidebar.Pusher dimmed={this.state.sidebarOpened}
-                                        onClick={this.handlePusherClick}
-                                        style={{minHeight: 50}}>
-                            <Menu>
-                                <Menu.Item onClick={this.handleToggle}>
-                                    <Icon name='sidebar'/>
-                                </Menu.Item>
-                            </Menu>
-                        </Sidebar.Pusher>
-                        <div style={{height: 'calc(100vh - 55px)'}}>
-                            <div style={{height: '100%', textAlign: 'center'}}>
-                                {chatView}
-                                {inputView}
-                            </div>
+                    {this.state.mobileView ?
+                        <div style={{marginTop: 55}}>
+                            {MobileListView}
                         </div>
-
-                    </Sidebar.Pushable>
-
+                        :
+                        <div style={{height: 'calc(100vh - 5px)', top: 0, zIndex: 1}}>
+                            {chatView}
+                            {inputView}
+                        </div>}
                 </Responsive>
             </Segment.Group>
-
         )
     }
 }
@@ -1114,4 +1179,4 @@ const mapStateToProps = (state) => {
     }
 }
 
-export default connect(mapStateToProps)(ChatContainer)
+export default connect(mapStateToProps)(socketConnect(ChatContainer))

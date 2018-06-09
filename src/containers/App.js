@@ -22,34 +22,17 @@ import {
 } from 'semantic-ui-react'
 import {browserHistory} from "react-router";
 import {ThemeProvider} from '@livechat/ui-kit'
+import socketio from "socket.io-client";
+import {SocketProvider} from 'socket.io-react'
 
+const socket = socketio.connect()
 
 class App extends Component {
 
     constructor(props) {
         super(props);
-        this.handleLogout = this.handleLogout.bind(this);
     }
 
-    /* CODES */
-
-    handleLogout() {
-        this.props.logoutRequest().then(
-            () => {
-                browserHistory.push('/')
-                message.success("로그아웃이 완료되었습니다.")
-
-                // EMPTIES THE SESSION
-                let loginData = {
-                    isLoggedIn: false,
-                    email: ''
-                };
-
-                document.cookie = 'key=' + btoa(JSON.stringify(loginData));
-
-            }
-        );
-    }
 
     componentDidMount() {   // 컴포넌트가 만들어지고 첫 렌더링을 마친 후 실행되는 메소드
         function getCookie(name) {
@@ -97,14 +80,14 @@ class App extends Component {
 
         return (
             <ThemeProvider>
+                <SocketProvider socket={socket}>
                 <Segment.Group>
                     <Responsive
                         maxWidth={Responsive.onlyComputer.maxWidth}
                         minWidth={Responsive.onlyTablet.minWidth}
                     >
 
-                        {isAuth ? undefined : <FixedHeader isLoggedIn={this.props.status.isLoggedIn}
-                                                           onLogout={this.handleLogout}/>}
+                        {isAuth ? undefined : <FixedHeader isLoggedIn={this.props.status.isLoggedIn}/>}
                         {this.props.children}
                     </Responsive>
                     <Responsive {...Responsive.onlyMobile}>
@@ -113,6 +96,7 @@ class App extends Component {
 
                     </Responsive>
                 </Segment.Group>
+                </SocketProvider>
             </ThemeProvider>
         );
     }
@@ -129,9 +113,6 @@ const mapDispatchToProps = (dispatch) => {
     return {
         getStatusRequest: () => {
             return dispatch(getStatusRequest())
-        },
-        logoutRequest: () => {
-            return dispatch(logoutRequest())
         }
     }
 }

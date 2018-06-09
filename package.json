@@ -41,11 +41,13 @@
     "reactstrap": "^5.0.0-beta",
     "redux": "^3.5.2",
     "redux-thunk": "^2.1.0",
+    "request": "^2.87.0",
     "semantic-ui-css": "^2.2.14",
     "semantic-ui-react": "^0.78.2",
     "serve-static": "^1.13.1",
     "socket.io": "^2.0.4",
     "socket.io-client": "^2.0.4",
+    "socket.io-react": "^1.2.0",
     "style-loader": "^0.20.1",
     "superagent": "^3.8.2",
     "url-loader": "^0.6.2"

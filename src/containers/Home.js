@@ -20,7 +20,7 @@ import {
 } from 'semantic-ui-react'
 import backgroundImage from '../images/Scooter.jpg'
 
-import '../sample.scss'
+// import '../sample.scss'
 import {Link} from "react-router";
 
 class Home extends React.Component {
