@@ -1,5 +1,4 @@
-import React, {PropTypes} from 'react';
-import socketio from 'socket.io-client'
+import React from 'react';
 import {connect} from 'react-redux'
 import {Link} from "react-router";
 import _ from 'lodash'
@@ -34,12 +33,6 @@ import '../index.css'
 import avartarImage from '../images/avatar.jpg'
 import {socketConnect} from 'socket.io-react'
 
-
-const getTime = (date) => {
-    return `${date.getHours()}:${("0" + date.getMinutes()).slice(-2)}`
-}
-
-
 function dynamicSort(property) {
     var sortOrder = 1
     if (property[0] === "-") {
@@ -51,7 +44,6 @@ function dynamicSort(property) {
         return result * sortOrder;
     }
 }
-
 
 class ChatContainer extends React.Component {
 
@@ -194,10 +186,7 @@ class ChatContainer extends React.Component {
             })
 
             this.handleItemClick2(e, {name: output.receiver})
-            console.log("원온원", this.state.oneOnOneList)
-
         }
-        //상대방도 초대하는 작업 백엔드로 요청코드필요하고 RoomId,RoomName 분리필요해보임//
     }
 
     scrollDown() {
@@ -279,10 +268,8 @@ class ChatContainer extends React.Component {
                     text: e.target.value
                 })
             })
-
             this.handleItemClick(e, {name: e.target.value})
         }
-
         this.setState({roomId: ''})
 
 
@@ -290,13 +277,10 @@ class ChatContainer extends React.Component {
 
     //Menu.Item에서 item을 클릭했을 때 그 채널을 활성화해주는 함수
     handleItemClick(e, {name}) {
-        const {container} = this.refs
         const {socket} = this.props
 
         this.setState({activeChannel: name, activeOneOnOne: ''})
         this.setState({oneonone: false})
-
-        console.log('액티브채널: ', this.state.activeChannel)
 
         var output = {
             command: 'join',
@@ -308,17 +292,14 @@ class ChatContainer extends React.Component {
 
         socket.emit('room', output)
         this.handleMobile()
-    }   //sidebar
+    }
 
     handleItemClick2(e, {name}) {
-        const {container} = this.refs
         const {socket} = this.props
-        this.handleMobile()
 
         this.setState({oneonone: true, showSearchUser: false})
         this.setState({activeOneOnOne: name, activeChannel: ''})
-        console.log('액티브원온원: ', this.state.activeOneOnOne)
-        console.log('액티브룸아디: ', this.state.activeOneOnOneRoomId)
+
         var output = {
             command: 'join',
             roomId: name,
@@ -328,6 +309,7 @@ class ChatContainer extends React.Component {
         }
 
         socket.emit('room', output)
+        this.handleMobile()
     }   //sidebar
 
     //inputView에서 input박스에 입력된 메시지 내용을 받아오는 함수
@@ -373,7 +355,6 @@ class ChatContainer extends React.Component {
             obj.key = 'key_' + (this.state.logs.length + 1)
             logs2.push(obj) // 로그에 추가
             this.setState({logs: logs2})
-            console.log("로그가뭐꼬", obj)
         })
 
         var defaultRoom = 'main'    //채팅방에 입장시 기본 채팅방을 main으로 설정
@@ -407,7 +388,6 @@ class ChatContainer extends React.Component {
                 this.setState({
                     oneOnOneList: oneononelist.oneonones,
                 })
-                console.log("원온원", this.state.oneOnOneList)
             })
         }
 
@@ -417,7 +397,6 @@ class ChatContainer extends React.Component {
             this.setState({
                 memberList: memberlist.member
             })
-            console.log('멤버리스트', this.state.memberList)
         })
 
         socket.on('join', (join) => {
@@ -426,22 +405,16 @@ class ChatContainer extends React.Component {
 
         socket.on('premsg', (premsg) => {
             this.setState({premsg: premsg, loading: false});
-            console.log("premsg: ", this.state.premsg)
-
 
             var premsgLength = this.state.premsg.length
-            console.log("premsgLength: ", premsgLength)
             if (premsgLength < 15) {
                 start = 0
             } else {
                 var start = premsgLength - 15
             }
             var premsg_slice = this.state.premsg.slice(start, premsgLength)
-            console.log("premsg_slice: ", premsg_slice)
 
             this.setState({logs: premsg_slice})
-
-
         })
 
         socket.on('usersearch', (userList) => {
@@ -472,15 +445,14 @@ class ChatContainer extends React.Component {
             } else {
                 var st = fn - 15
                 console.log("fn : " + fn + ", st : " + st)
-                var premsg_slice = this.state.premsg.slice(st, fn)
+                var premsg_slice2 = this.state.premsg.slice(st, fn)
                 this.scrollPosition()
-                this.setState({logs: this.state.logs.concat(premsg_slice).sort(dynamicSort("chatCount"))})
+                this.setState({logs: this.state.logs.concat(premsg_slice2).sort(dynamicSort("chatCount"))})
 
             }
-        } else {
-            console.log("아무것도없어");
         }
     }
+
 
 
     componentDidMount() {
@@ -619,7 +591,6 @@ class ChatContainer extends React.Component {
         if (this.historyChange) {
             this.scrollDown()
         }
-        // console.log("라스트챗", this.state.lastChat)
 
     }
 
@@ -693,8 +664,8 @@ class ChatContainer extends React.Component {
                                 <Header size='small'>
                                     <Menu.Item
                                         name={text}
-                                        active={activeChannel === text}
-                                        onClick={this.handleItemClick}
+                                        active={activeOneOnOne === text}
+                                        onClick={this.handleItemClick2}
                                     />
                                 </Header>
                             </Item.Header>
