@@ -14,7 +14,8 @@ Schema.createSchema = function(mongoose){
         creater: String,
         receiver: String,
         receiverEmail: String,
-        oneonone: Boolean
+        oneonone: Boolean,
+        messageNum: {type:Number, default:0}//총 메시지 갯수
     })
 
     RoomSchema.static('findAll', function(callback) {

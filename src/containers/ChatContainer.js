@@ -504,7 +504,9 @@ class ChatContainer extends React.Component {
             TextToSpeech.speak(sayThis)
 
             var output = {
-                transcript: this.state.text
+                transcript: this.state.text,
+                email: this.props.currentEmail,
+                name: this.props.currentUser
             }
             this.socket.emit('transcript', output)
             this.end()
