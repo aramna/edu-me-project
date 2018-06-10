@@ -2,6 +2,7 @@ import React from 'react';
 import {connect} from 'react-redux'
 import {Link} from "react-router";
 import _ from 'lodash'
+import faker from 'faker'
 import {OrderedMap} from 'immutable'
 import {
     Button,
@@ -19,11 +20,10 @@ import {
     Image,
     Header,
     Container,
-    Tab,
     Segment,
     Responsive,
     Sidebar,
-    Pagination,
+    Search,
 } from 'semantic-ui-react'
 import {
     Message,
@@ -44,6 +44,7 @@ function dynamicSort(property) {
         return result * sortOrder;
     }
 }
+
 
 class ChatContainer extends React.Component {
 
@@ -71,9 +72,6 @@ class ChatContainer extends React.Component {
             loading2: true,
             loading3: true,
             users: [],
-            x: false,
-            y: false,
-            z: false,
             transcript: '',
             show: false,
             listening: false,
@@ -84,6 +82,9 @@ class ChatContainer extends React.Component {
             oneOnOne: false,
             mobileView: false,
             channelORoneOnOne: false,
+            isLoading: false,
+            results: [],
+            value: ''
         }
 
 
@@ -111,6 +112,9 @@ class ChatContainer extends React.Component {
         this.handleMobile = this.handleMobile.bind(this)
         this.handleChannel = this.handleChannel.bind(this)
         this.handleOneOnOne = this.handleOneOnOne.bind(this)
+        this.resetComponent = this.resetComponent.bind(this)
+        this.handleResultSelect = this.handleResultSelect.bind(this)
+        this.handleSearchChange = this.handleSearchChange.bind(this)
     }
 
     handlePusherClick() {
@@ -347,8 +351,58 @@ class ChatContainer extends React.Component {
 
     }
 
+    resetComponent() {
+        this.setState({isLoading: false, results: [], value: ''})
+    }
+
+    handleResultSelect(e, {result}) {
+        this.personalTalk(e, result.title, result.description)
+        this.setState({value: result.title})
+    }
+
+    handleSearchChange(e, {value}) {
+        const source = this.state.users.map((user) => ({
+            title: user.username,
+            description: user.email,
+        }))
+
+        console.log('this.state.users', this.state.users)
+
+        this.setState({isLoading: true, value})
+        setTimeout(() => {
+            if (this.state.value.length < 1) {
+                return this.resetComponent()
+            }
+
+            const re = new RegExp(_.escapeRegExp(this.state.value), 'i')
+            const isMatch = result => re.test(result.title)
+
+            this.setState({
+                isLoading: false,
+                results: _.filter(source, isMatch),
+            })
+        }, 300)
+    }
+
+    // searchUser(search = "") {
+    //     let searchItems = new OrderedMap();
+    //     if (_.trim(search).length) {
+    //         this.state.users.filter((user) => {
+    //             const name = _.get(user, 'username');
+    //             const userId = _.get(user, 'email');
+    //             if (_.includes(name, search)) {
+    //                 searchItems = searchItems.set(userId, user);
+    //             }
+    //         })
+    //     }
+    //     return searchItems.valueSeq();
+    //
+    // }
+
 
     componentWillMount() {
+        this.resetComponent()
+
         const {socket} = this.props
         socket.on('message', (obj) => {
             const logs2 = this.state.logs
@@ -452,7 +506,6 @@ class ChatContainer extends React.Component {
             }
         }
     }
-
 
 
     componentDidMount() {
@@ -605,6 +658,7 @@ class ChatContainer extends React.Component {
 
 
     render() {
+        const {isLoading, value, results} = this.state
         const {activeChannel} = this.state
         const {activeOneOnOne} = this.state
         const users2 = this.searchUser(this.state.searchUserList);
@@ -622,6 +676,7 @@ class ChatContainer extends React.Component {
                 </div>)
         )
 
+
         const ChannelUser = []
         for (var i = 0; i < this.state.memberList.length; i++) {
             ChannelUser.push(
@@ -638,11 +693,11 @@ class ChatContainer extends React.Component {
                         <Item.Content>
                             <Item.Header>
                                 <Header size='small'>
-                                <Menu.Item
-                                    name={text}
-                                    active={activeChannel === text}
-                                    onClick={this.handleItemClick}
-                                />
+                                    <Menu.Item
+                                        name={text}
+                                        active={activeChannel === text}
+                                        onClick={this.handleItemClick}
+                                    />
                                 </Header>
                             </Item.Header>
                             <Item.Description>
@@ -878,43 +933,15 @@ class ChatContainer extends React.Component {
                         </Menu.Header>
                         {this.state.visibleAdd2 ?
                             <Menu.Item>
-                                <Input as='search'
-                                       transparent={true}
-                                       icon='search'
-                                       inverted placeholder='유저검색'
-                                       value={this.state.searchUser}
-                                       onChange={(e) => {
-                                           const searchUserText = _.get(e, 'target.value');
-
-                                           this.setState({
-                                                   searchUserList: searchUserText,
-                                                   showSearchUser: true,
-                                               }
-                                           );
-                                       }}
-                                       style={{marginTop: 10}}
-
+                                <Search
+                                    loading={isLoading}
+                                    onResultSelect={this.handleResultSelect}
+                                    onSearchChange={_.debounce(this.handleSearchChange, 500, {leading: true})}
+                                    results={results}
+                                    value={value}
+                                    size='mini'
+                                    {...this.props}
                                 />
-                                {this.state.showSearchUser ?
-                                    <div>
-                                        {users2.map((user, index) => {
-                                            return <div
-                                                style={{
-                                                    marginTop: 5,
-                                                    marginBottom: 5
-                                                }}
-                                                onClick={(e) => {
-                                                    var name = _.get(user, 'username')
-                                                    var userId = _.get(user, 'email');
-                                                    this.personalTalk(e, name, userId)
-                                                }}
-                                            >
-                                                <p>{_.get(user, 'username', 'email')}</p>
-                                            </div>
-                                        })}
-
-                                    </div> : ""}
-
                             </Menu.Item>
                             : ""}
                         {oneOnOne}
@@ -960,16 +987,11 @@ class ChatContainer extends React.Component {
             </div>
         )
 
-        const MobileChannelList = (
-            <div style={{overflowY: 'auto'}}>
-                {mobileChannel}
-            </div>
-        )
-
 
         const MobileListView = (
             <div>
                 <Segment attached vertical tertiary textAlign='center' style={{
+                    width: '100%',
                     marginTop: 0,
                     marginBottom: 0,
                     paddingLeft: 13,
@@ -987,36 +1009,49 @@ class ChatContainer extends React.Component {
                             <Button inverted color='blue' onClick={this.handleChannel}>채널</Button>
                             <Button active inverted color='blue' onClick={this.handleOneOnOne}>일대일</Button>
                         </Button.Group>}
+                    {this.state.channelORoneOnOne === false ?
+                        <Input as='search'
+                               icon='search'
+                               placeholder='채널검색'
+                               value={this.state.roomId}
+                               onChange={e => this.roomChanged(e)}
+                               onKeyPress={e => {
+                                   e.key === 'Enter' && this.handleRoomCreate(e)
+                               }}
+                               style={{width: '100%'}}
+                        />
+                        :
+                        <Search
+                            input={{fluid: true, placeholder: '사람검색'}}
+                            loading={isLoading}
+                            onResultSelect={this.handleResultSelect}
+                            onSearchChange={_.debounce(this.handleSearchChange, 500, {leading: true})}
+                            results={results}
+                            value={value}
+                            noResultsMessage='존재하지 않습니다.'
+                            style={{width: '100%'}}
+                            {...this.props}
+                        />}
 
-                    <Input as='search'
-                           icon='search'
-                           placeholder='채널검색'
-                           value={this.state.roomId}
-                           onChange={e => this.roomChanged(e)}
-                           onKeyPress={e => {
-                               e.key === 'Enter' && this.handleRoomCreate(e)
-                           }}
-                           style={{width: '100%'}}
-                    />
                 </Segment>
                 {this.state.channelORoneOnOne === false ?
                     <div style={{
-                    overflowY: 'auto',
-                    height: 'calc(100vh - 161px)',
-                    paddingLeft: 15,
-                    paddingRight: 15,
-                    paddingTop: 10,
-                    outline: 0
-                }}>{mobileChannel}</div>
+                        overflowY: 'auto',
+                        height: 'calc(100vh - 161px)',
+                        paddingLeft: 15,
+                        paddingRight: 15,
+                        paddingTop: 10,
+                        outline: 0
+                    }}>{mobileChannel}</div>
                     :
                     <div style={{
-                    overflowY: 'auto',
-                    height: 'calc(100vh - 161px)',
-                    paddingLeft: 15,
-                    paddingRight: 15,
-                    paddingTop: 10,
-                    outline: 0
-                }}>{mobileOneOnOne}</div>}
+                        overflowY: 'auto',
+                        height: 'calc(100vh - 161px)',
+                        paddingLeft: 15,
+                        paddingRight: 15,
+                        paddingTop: 10,
+                        outline: 0
+                    }}>{mobileOneOnOne}</div>}
 
             </div>
 
