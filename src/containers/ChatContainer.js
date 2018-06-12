@@ -3,6 +3,7 @@ import socketio from 'socket.io-client'
 import {connect} from 'react-redux'
 import _ from 'lodash'
 import {OrderedMap} from 'immutable'
+var audio = new Audio('audio_file.mp3');
 import {
     Button,
     Grid,
@@ -83,7 +84,7 @@ class ChatContainer extends React.Component {
             sidebarOpened: false,
             oneOnOneList: [],
             oneOnOne: false,
-            givetextcount: [0,0,0,0,0,0,0,0,0,0,0,0,0],
+            givetextcount: [0,0,0,0,0,0,0,0,0,0,0,0,],
             activeChannelIndex: 0,
         }
 
@@ -110,6 +111,12 @@ class ChatContainer extends React.Component {
         this.handlePusherClick = this.handlePusherClick.bind(this)
         this.handleToggle = this.handleToggle.bind(this)
         this.roomChanged = this.roomChanged.bind(this)
+        this.audioQ = this.audioQ.bind(this)
+    }
+
+    audioQ(){
+      audio.play()
+      console.log("dsfjkhfkjsdalhf");
     }
 
     handlePusherClick() {
@@ -268,9 +275,9 @@ class ChatContainer extends React.Component {
         const {container} = this.refs
 
         const givetextcount=this.state.givetextcount
-        console.log("esajkdlkasfj",givetextcount);
-        console.log(name);
-        console.log(givetextcount[this.state.channelList2.indexOf(name)]);
+        // console.log("esajkdlkasfj",givetextcount);
+        // console.log(name);
+        // console.log(givetextcount[this.state.channelList2.indexOf(name)]);
         givetextcount[this.state.channelList2.indexOf(name)] = "0"
 
         container.addEventListener("scroll", () => {
@@ -368,15 +375,16 @@ class ChatContainer extends React.Component {
 
     componentWillMount() {
         this.socket.on('message', (obj) => {
+            if(obj.email!==this.props.currentEmail){
+            this.audioQ()
+            }
             const logs2 = this.state.logs
             obj.key = 'key_' + (this.state.logs.length + 1)
             logs2.push(obj) // 로그에 추가
             this.setState({logs: logs2})
-            console.log(obj)
-            console.log(obj.roomId);
-            console.log(this.state.channelList[0]);
-            console.log(this.state.channelList2.indexOf(this.state.activeChannel));
-            console.log("fhsakdhfadljfh",this.state.channelList2);
+            // console.log(this.state.channelList[0]);
+            // console.log(this.state.channelList2.indexOf(this.state.activeChannel));
+            // console.log("fhsakdhfadljfh",this.state.channelList2);
             if(this.state.activeChannel==obj.roomId){
             // this.state.givetextcount[this.state.channelList2.indexOf(this.state.activeChannel)]++;
             //   this.forceUpdate();
@@ -821,6 +829,7 @@ class ChatContainer extends React.Component {
                             <label onClick={this.handleChannelShow}>
                                 Channels
                             </label>
+                            <Icon onClick={this.audioQ} name='play' style={{float: 'right'}}/>
                             <Icon onClick={this.handleChannelAdd} name='add' style={{float: 'right'}}/>
                         </Menu.Header>
                         {this.state.visibleAdd ?
@@ -964,7 +973,6 @@ class ChatContainer extends React.Component {
                     maxWidth={Responsive.onlyComputer.maxWidth}
                     minWidth={Responsive.onlyTablet.minWidth}
                 >
-
                     <Grid stretched celled style={{
                         padding: 0,
                         marginTop: 0,
@@ -983,7 +991,7 @@ class ChatContainer extends React.Component {
                         </Grid.Column>
                         <Grid.Column style={{width: 'calc(100% - 310px)', padding: 0}}>
                             <div style={{height: '100%', textAlign: 'center'}}>
-                                {chatView}
+                                {chatView }
                                 {inputView}
                             </div>
                         </Grid.Column>
