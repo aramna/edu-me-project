@@ -32,6 +32,7 @@ import {
 import '../index.css'
 import avartarImage from '../images/avatar.jpg'
 import {socketConnect} from 'socket.io-react'
+var audio = new Audio('audio_file.mp3');
 
 function dynamicSort(property) {
     var sortOrder = 1
@@ -63,6 +64,7 @@ class ChatContainer extends React.Component {
             visibleAdd: false,
             visibleAdd2: false,
             channelList: [],    //채널리스트
+            channelList2: [],
             activeChannel: '',  //활성화된 채널
             activeOneOnOne: '',
             activeOneOnOneRoomId: '',
@@ -84,7 +86,10 @@ class ChatContainer extends React.Component {
             channelORoneOnOne: false,
             isLoading: false,
             results: [],
-            value: ''
+            value: '',
+            givetextcount: [0,0,0,0,0,0,0,0,0,0,0,0,],
+            givemessage: [0,0,0,0,0,0,0,0,0,0,0,0,],
+            activeChannelIndex: 0,
         }
 
 
@@ -115,6 +120,12 @@ class ChatContainer extends React.Component {
         this.resetComponent = this.resetComponent.bind(this)
         this.handleResultSelect = this.handleResultSelect.bind(this)
         this.handleSearchChange = this.handleSearchChange.bind(this)
+        this.audioQ = this.audioQ.bind(this)
+    }
+
+    audioQ(){
+        audio.play()
+        console.log("dsfjkhfkjsdalhf");
     }
 
     handlePusherClick() {
@@ -272,6 +283,8 @@ class ChatContainer extends React.Component {
                     text: e.target.value
                 })
             })
+            this.state.channelList2.push(e.target.value)
+
             this.handleItemClick(e, {name: e.target.value})
         }
         this.setState({roomId: ''})
@@ -282,6 +295,8 @@ class ChatContainer extends React.Component {
     //Menu.Item에서 item을 클릭했을 때 그 채널을 활성화해주는 함수
     handleItemClick(e, {name}) {
         const {socket} = this.props
+        const givetextcount=this.state.givetextcount
+        givetextcount[this.state.channelList2.indexOf(name)] = "0"
 
         this.setState({activeChannel: name, activeOneOnOne: ''})
         this.setState({oneonone: false})
@@ -384,21 +399,6 @@ class ChatContainer extends React.Component {
         }, 300)
     }
 
-    // searchUser(search = "") {
-    //     let searchItems = new OrderedMap();
-    //     if (_.trim(search).length) {
-    //         this.state.users.filter((user) => {
-    //             const name = _.get(user, 'username');
-    //             const userId = _.get(user, 'email');
-    //             if (_.includes(name, search)) {
-    //                 searchItems = searchItems.set(userId, user);
-    //             }
-    //         })
-    //     }
-    //     return searchItems.valueSeq();
-    //
-    // }
-
 
     componentWillMount() {
         this.resetComponent()
@@ -409,6 +409,20 @@ class ChatContainer extends React.Component {
             obj.key = 'key_' + (this.state.logs.length + 1)
             logs2.push(obj) // 로그에 추가
             this.setState({logs: logs2})
+            console.log('message',obj)
+
+            if(this.state.activeChannel===obj.roomId){
+                // this.state.givetextcount[this.state.channelList2.indexOf(this.state.activeChannel)]++;
+                //   this.forceUpdate();
+            }
+            else{
+                this.state.givetextcount[this.state.channelList2.indexOf(obj.roomId)]++;
+                this.forceUpdate();
+            }
+
+            if(obj.email!==this.props.currentEmail){
+                this.audioQ()
+            }
         })
 
         var defaultRoom = 'main'    //채팅방에 입장시 기본 채팅방을 main으로 설정
@@ -433,6 +447,9 @@ class ChatContainer extends React.Component {
                 this.setState({
                     channelList: this.state.channelList.concat(channellist.roomIds),
                 })
+                for(var i=0;i<channellist.roomIds.length;i++){
+                    this.state.channelList2.push(channellist.roomIds[i].text)
+                }
             })
         }
 
@@ -507,10 +524,8 @@ class ChatContainer extends React.Component {
         }
     }
 
-
     componentDidMount() {
         const {socket} = this.props
-
         const {container} = this.refs
 
         container.addEventListener("scroll", () => {
@@ -534,8 +549,75 @@ class ChatContainer extends React.Component {
         }
 
         socket.on('request', (obj) => {
-            this.setState({text: obj})
+            console.log("obj",obj,"길이", obj.length)
+            if(obj.length === 1) {
+                this.setState({
+                    listening: true,
+                    text: obj
+                })
+                this.recognition.onstart = () => {
+                    this.setState({
+                        text: obj,
+                    });
+                    setTimeout(function () {
+                        this.setState({
+                            listening: true,
+                            text: '듣는중..'
+                        })
+                    }.bind(this), 1000)
+                };
+                this.recognition.onresult = event => {
+                    const text = event.results[0][0].transcript;
+
+                    console.log('transcript', text);
+
+                    let sayThis = new SpeechSynthesisUtterance(text)
+
+                    TextToSpeech.speak(sayThis)
+
+                    socket.emit('transcript', text)
+                    this.recognition.stop();
+                };
+
+            }
+            else if(obj.length === 2) {
+                this.setState({
+                    text: obj[0]
+                })
+                setTimeout(function () {
+                    this.setState({
+                        listening: true,
+                        text: obj[1]
+                    })
+                }.bind(this), 3000)
+
+                this.recognition.onstart = () => {
+                    this.setState({
+                        text: obj[1],
+                    });
+                    setTimeout(function () {
+                        this.setState({
+                            listening: true,
+                            text: '듣는중..'
+                        })
+                    }.bind(this), 1000)
+                };
+                this.recognition.onresult = event => {
+                    const text = event.results[0][0].transcript;
+
+                    console.log('transcript', text);
+
+                    let sayThis = new SpeechSynthesisUtterance(text)
+
+                    TextToSpeech.speak(sayThis)
+
+                    socket.emit('transcript', text)
+                    this.recognition.stop();
+                };
+            }
         })
+
+
 
         this.recognition = new Recognition();
         this.recognition.lang = process.env.REACT_APP_LANGUAGE || 'ko-KR';
@@ -559,10 +641,8 @@ class ChatContainer extends React.Component {
                 transcript: this.state.text
             }
             socket.emit('transcript', output)
-            this.end()
-            setTimeout(function () {
-                this.setState({modalOpen: false})
-            }.bind(this), 10000)
+            this.recognition.stop();
+
         };
 
         this.recognition.onspeechend = () => {
@@ -603,7 +683,7 @@ class ChatContainer extends React.Component {
 
             this.setState({
                 show: true,
-                text: '마이크 상태를 확인하세요.',
+                text: '듣는중..',
             });
             setTimeout(function () {
                 this.setState({modalOpen: false})
@@ -661,7 +741,6 @@ class ChatContainer extends React.Component {
         const {isLoading, value, results} = this.state
         const {activeChannel} = this.state
         const {activeOneOnOne} = this.state
-        const users2 = this.searchUser(this.state.searchUserList);
         const channel = this.state.channelList.map(
             ({text}) => (
                 <div>
@@ -671,7 +750,19 @@ class ChatContainer extends React.Component {
                                 name={text}
                                 active={activeChannel === text}
                                 onClick={this.handleItemClick}
+                                style={{ float : 'left', width : '155'}}
                             />
+                            {activeChannel === text ? <div>
+                                    <Icon name='circle' style={{ float : 'right',width : '20'}}/>
+                                    <p style={{ float : 'right',width : '38'}}>{this.state.givetextcount[this.state.activeChannelIndex]}
+                                    </p></div> :
+                                <div>{this.state.givetextcount[this.state.channelList2.indexOf(text)]<1 ?
+                                    <Icon name='circle outline' style={{float: 'right'}}/> :
+                                    <Icon name='comment alternate outline' style={{float: 'right'}}/>}
+                                    <p style={{ float : 'right',width : '38'}}>{this.state.givetextcount[this.state.channelList2.indexOf(text)]}
+                                    </p></div>
+                            }
+
                         </Menu.Menu> : ""}
                 </div>)
         )
@@ -701,7 +792,7 @@ class ChatContainer extends React.Component {
                                 </Header>
                             </Item.Header>
                             <Item.Description>
-                                최근 메세지 내용 추가
+                                {this.state.givemessage[this.state.channelList2.indexOf(text)]}
                             </Item.Description>
                         </Item.Content>
                     </Item>
@@ -871,7 +962,6 @@ class ChatContainer extends React.Component {
                                 <div>
                                     <Image avatar src={avartarImage} style={{width: 75, height: 75}}/>
                                     <span style={{marginLeft: 20}}>{this.props.currentUser}</span>
-                                    <span><Button size='mini' as={Link} to='/mypage'>프로필 수정</Button></span>
                                 </div>
                             </Grid.Column>
 

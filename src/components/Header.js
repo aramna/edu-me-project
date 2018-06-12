@@ -15,11 +15,8 @@ import {
     Visibility,
     Header,
 } from 'semantic-ui-react'
-import whitelogoImage from '../images/logo.png'
-import blacklogoImage from '../images/logo2.png'
 import {browserHistory, Link} from 'react-router'
 import { connect } from 'react-redux'
-import backgroundImage from '../images/Scooter.jpg'
 import {socketConnect} from 'socket.io-react'
 import {getStatusRequest, logoutRequest} from "../actions/authentication";
 
@@ -68,31 +65,21 @@ class FixedHeader extends React.Component {
         );
     }
 
+
     handleToggle() {
         this.setState({ sidebarOpened: !this.state.sidebarOpened })
     }
 
     render() {
-        const trigger = (
-            <span>
-                <Icon name='user' /> {this.props.currentUser}
-            </span>
-        )
-
-        const options = [
-            {
-                key: 'user',
-                text: <span><strong>{this.props.currentUser}</strong>님</span>,
-                disabled: true,
-            },
-            { key: 'profile', text: '나의 프로필' },
-            { key: 'help', text: '도움말' },
-            { key: 'settings', text: '설정' },
-            { key: 'sign-out', text: '로그아웃', onClick: this.handleLogout },
-        ]
-
-        const DropdownTrigger = () => (
-            <Dropdown className='loginedHeader' trigger={trigger} options={options} />
+        const logoutButton = (
+            <Dropdown text={this.props.currentUser} pointing='top right'>
+                <Dropdown.Menu>
+                    <Dropdown.Item active='false' text={this.props.currentEmail}/>
+                    <Dropdown.Divider/>
+                    <Dropdown.Item icon='settings' text='프로필 수정' as={Link} to='/mypage'/>
+                    <Dropdown.Item icon='sign out' text='로그아웃' onClick={this.handleLogout}/>
+                </Dropdown.Menu>
+            </Dropdown>
         )
 
 
@@ -112,13 +99,6 @@ class FixedHeader extends React.Component {
             </Grid>
         )
 
-        const logoutButton = (
-            <div>
-                <DropdownTrigger />
-            </div>
-        )
-
-
         const NotLoginHeader = (
         
                 <Responsive
@@ -128,12 +108,11 @@ class FixedHeader extends React.Component {
                     <Menu
                         fixed='top'
                         secondary
-                        inverted
-                        style={{ marginTop: 8 }}
+                        style={{ marginTop: 0, backgroundColor: 'white' }}
                     >
                         <Container>
                             <Menu.Item style={{ marginBottom: 0 }}>
-                                <Header size='huge' inverted>TALK</Header>
+                                <Header size='huge'>TALK</Header>
                             </Menu.Item>
                             <Menu.Item as='a' style={{ marginBottom: 0 }}>Introduction</Menu.Item>
                             <Menu.Item as='a' style={{ marginBottom: 0 }}>Using</Menu.Item>
@@ -177,7 +156,7 @@ class FixedHeader extends React.Component {
                                     <Menu.Item>
                                         <Icon name="users" />
                                     </Menu.Item>
-                                    <Menu.Item style={{ marginLeft: 20, marginRight: 0 }}>
+                                    <Menu.Item style={{ marginRight: 0}}>
                                         {this.props.isLoggedIn ? logoutButton : loginButton}
                                     </Menu.Item>
                                 </Menu.Item>
