@@ -397,7 +397,7 @@ module.exports = function(socket) {
                         database.UserModel.find({username: receiverData}, function(err, sendRe){
                             if (sendRe)
                             {
-                                content1 = sendRe.email + '님이 맞나요?'
+                                content1 = sendRe.email + '님이 맞나요?'       //sendRe.email
                                 console.log('수신인 찾음' + sendRe)
                                 nickname = chatbot.transcript
                                 bot.sendReceiver = sendRe[0]

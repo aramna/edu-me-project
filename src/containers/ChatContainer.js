@@ -84,6 +84,7 @@ class ChatContainer extends React.Component {
             oneOnOne: false,
             mobileView: false,
             channelORoneOnOne: false,
+            x: false,
             isLoading: false,
             results: [],
             value: '',
@@ -108,6 +109,7 @@ class ChatContainer extends React.Component {
         this.personalTalk = this.personalTalk.bind(this)
         this.start = this.start.bind(this)
         this.end = this.end.bind(this)
+        this.speechstart = this.speechstart.bind(this)
         this.handleClose = this.handleClose.bind(this)
         this.handleModalOpen = this.handleModalOpen.bind(this)
         this.handleModalClose = this.handleModalClose.bind(this)
@@ -493,6 +495,8 @@ class ChatContainer extends React.Component {
         })
 
 
+
+
     }
 
     loadMoreChat() {
@@ -548,80 +552,9 @@ class ChatContainer extends React.Component {
             return;
         }
 
-        socket.on('request', (obj) => {
-            console.log("obj",obj,"길이", obj.length)
-            if(obj.length === 1) {
-                this.setState({
-                    listening: true,
-                    text: obj
-                })
-                this.recognition.onstart = () => {
-                    this.setState({
-                        text: obj,
-                    });
-                    setTimeout(function () {
-                        this.setState({
-                            listening: true,
-                            text: '듣는중..'
-                        })
-                    }.bind(this), 1000)
-                };
-                this.recognition.onresult = event => {
-                    const text = event.results[0][0].transcript;
-
-                    console.log('transcript', text);
-
-                    let sayThis = new SpeechSynthesisUtterance(text)
-
-                    TextToSpeech.speak(sayThis)
-
-                    socket.emit('transcript', text)
-                    this.recognition.stop();
-                };
-
-            }
-            else if(obj.length === 2) {
-                this.setState({
-                    text: obj[0]
-                })
-                setTimeout(function () {
-                    this.setState({
-                        listening: true,
-                        text: obj[1]
-                    })
-                }.bind(this), 3000)
-
-                this.recognition.onstart = () => {
-                    this.setState({
-                        text: obj[1],
-                    });
-                    setTimeout(function () {
-                        this.setState({
-                            listening: true,
-                            text: '듣는중..'
-                        })
-                    }.bind(this), 1000)
-                };
-                this.recognition.onresult = event => {
-                    const text = event.results[0][0].transcript;
-
-                    console.log('transcript', text);
-
-                    let sayThis = new SpeechSynthesisUtterance(text)
-
-                    TextToSpeech.speak(sayThis)
-
-                    socket.emit('transcript', text)
-                    this.recognition.stop();
-                };
-            }
-        })
-
-
-
         this.recognition = new Recognition();
         this.recognition.lang = process.env.REACT_APP_LANGUAGE || 'ko-KR';
-        this.recognition.continuous = false;
+        this.recognition.continuous = true;
         this.recognition.interimResults = false;
         this.recognition.maxAlternatives = 1;
 
@@ -631,9 +564,9 @@ class ChatContainer extends React.Component {
             console.log('transcript', text);
             this.setState({text: text});
 
-            let sayThis = new SpeechSynthesisUtterance(text)
-
-            TextToSpeech.speak(sayThis)
+            // let sayThis = new SpeechSynthesisUtterance(text)
+            //
+            // TextToSpeech.speak(sayThis)
 
             var output = {
                 email: this.props.currentEmail,
@@ -641,54 +574,71 @@ class ChatContainer extends React.Component {
                 transcript: this.state.text
             }
             socket.emit('transcript', output)
-            this.recognition.stop();
-
+            this.recognition.onend()
         };
 
-        this.recognition.onspeechend = () => {
-            console.log('stopped');
+        this.recognition.onend = () => {
+            if(this.state.modalOpen === false) {
+                this.end()
+                console.log('end')
+            } else {
+                this.end()
+                this.start()
+                console.log('end')
+            }
 
-            this.setState({show: true});
-        };
+        }
+
 
         this.recognition.onnomatch = event => {
             console.log('no match');
             this.setState({text: "또박또박!"});
         };
 
-        this.recognition.onstart = () => {
-            this.setState({
-                text: '말씀하세요.',
-            });
-            setTimeout(function () {
+        this.recognition.onspeechstart = () => {
+                console.log('소리 감지')
                 this.setState({
                     listening: true,
-                    text: '듣는중..'
                 })
-            }.bind(this), 1000)
         };
 
-        this.recognition.onend = () => {
-            console.log('end');
 
-            this.setState({
-                listening: false,
-            });
-
-            this.end();
-        };
 
         this.recognition.onerror = event => {
             console.log('error', event);
 
-            this.setState({
-                show: true,
-                text: '듣는중..',
-            });
             setTimeout(function () {
                 this.setState({modalOpen: false})
             }.bind(this), 1200)
         };
+
+        socket.on('request', (obj) => {
+            console.log("obj",obj)
+            if(obj.length === 1) {
+
+                this.setState({
+                    text: obj
+                })
+
+                console.log('text: ',this.state.text)
+            }
+            else if(obj.length === 2) {
+                this.setState({
+                    text: obj[0]
+                })
+                console.log('text: ',this.state.text)
+                setTimeout(function () {
+                    this.setState({
+                        text: obj[1]
+                    })
+                    console.log('text: ',this.state.text)
+                }.bind(this), 2000)
+            }
+
+        })
+
+
+
     }
 
     start() {
@@ -703,6 +653,10 @@ class ChatContainer extends React.Component {
     handleClose() {
         this.setState({show: false})
     };
+
+    speechstart() {
+        this.recognition.onspeechstart()
+    }
 
 
     componentDidUpdate(prevProps, prevState) {

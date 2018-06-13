@@ -106,18 +106,19 @@ class FixedHeader extends React.Component {
                     minWidth={Responsive.onlyTablet.minWidth}
                 >
                     <Menu
+                        inverted
                         fixed='top'
                         secondary
-                        style={{ marginTop: 0, backgroundColor: 'white' }}
+                        style={{ marginTop: 0, backgroundColor: 'black' }}
                     >
                         <Container>
-                            <Menu.Item style={{ marginBottom: 0 }}>
-                                <Header size='huge'>TALK</Header>
+                            <Menu.Item inverted style={{ marginBottom: 0 }}>
+                                <Header size='huge' inverted>TALK</Header>
                             </Menu.Item>
-                            <Menu.Item as='a' style={{ marginBottom: 0 }}>Introduction</Menu.Item>
-                            <Menu.Item as='a' style={{ marginBottom: 0 }}>Using</Menu.Item>
-                            <Menu.Item as='a' style={{ marginBottom: 0 }}>Careers</Menu.Item>
-                            <Menu.Item position='right'>
+                            <Menu.Item inverted as='a' style={{ marginBottom: 0 }}>Introduction</Menu.Item>
+                            <Menu.Item inverted as='a' style={{ marginBottom: 0 }}>Using</Menu.Item>
+                            <Menu.Item inverted as='a' style={{ marginBottom: 0 }}>Careers</Menu.Item>
+                            <Menu.Item inverted position='right'>
                                 {this.props.isLoggedIn ? logoutButton : loginButton}
                             </Menu.Item>
                         </Container>

@@ -95,7 +95,7 @@ class Home extends React.Component {
                         }}
                         vertical>
 
-                            <h1 style={{position: 'absolute', top: '35%', left: '5%', fontSize: '4.5rem', fontWeight: 200, color: 'white', textAlign: 'left'}}>Let's Talking Sibal</h1>
+                            <h1 style={{position: 'absolute', top: '35%', left: '5%', fontSize: '4.5rem', fontWeight: 200, color: 'white', textAlign: 'left'}}>Let's Talking</h1>
                             <canvas id="waves"></canvas>
 
                     </Segment>
@@ -109,7 +109,7 @@ class Home extends React.Component {
                         }}
                         vertical>
 
-                            <h1 style={{position: 'absolute', top: '35%', left: '5%', fontSize: '4.5rem', fontWeight: 200, color: 'white', textAlign: 'left'}}>Let's Talking Sibal</h1>
+                            <h1 style={{position: 'absolute', top: '35%', left: '5%', fontSize: '4.5rem', fontWeight: 200, color: 'white', textAlign: 'left'}}>Let's Talking</h1>
                             <canvas id="waves"></canvas>
 
                     </Segment>
