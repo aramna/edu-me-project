@@ -1,6 +1,6 @@
 import FixedHeader from './Header';
 import Authentication from './Authentication'
-import SideBar from './SideBar'
+import BotCharacter from './BotCharacter'
 
-export { FixedHeader, Authentication, SideBar };
+export { FixedHeader, Authentication, BotCharacter };
 

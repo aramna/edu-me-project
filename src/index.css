@@ -37,3 +37,13 @@
     height: 100%;
 }
 
+.btnColor1 {
+    background-color: #2196F3;
+    color: #fff;
+}
+
+.btnColor2 {
+    background-color: #fff;
+    color: #2196F3;
+}
+

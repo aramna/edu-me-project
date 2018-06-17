@@ -28,18 +28,9 @@ class FixedHeader extends React.Component {
         this.state = {
             sidebarOpened: false
         }
-
-        this.handlePusherClick = this.handlePusherClick.bind(this)
-        this.handleToggle = this.handleToggle.bind(this)
         this.handleLogout = this.handleLogout.bind(this)
     }
 
-    handlePusherClick() {
-        const { sidebarOpened } = this.state
-        if (sidebarOpened) {
-            this.setState({ sidebarOpened: true })
-        }
-    }
 
     handleLogout() {
         const {socket} = this.props
@@ -65,14 +56,9 @@ class FixedHeader extends React.Component {
         );
     }
 
-
-    handleToggle() {
-        this.setState({ sidebarOpened: !this.state.sidebarOpened })
-    }
-
     render() {
         const logoutButton = (
-            <Dropdown text={this.props.currentUser} pointing='top right'>
+            <Dropdown text={this.props.currentUser} pointing='top right' style={{fontFamily: "Jeju Gothic"}}>
                 <Dropdown.Menu>
                     <Dropdown.Item active='false' text={this.props.currentEmail}/>
                     <Dropdown.Divider/>
@@ -106,19 +92,17 @@ class FixedHeader extends React.Component {
                     minWidth={Responsive.onlyTablet.minWidth}
                 >
                     <Menu
-                        inverted
                         fixed='top'
                         secondary
-                        style={{ marginTop: 0, backgroundColor: 'black' }}
+                        size='large'
+                        style={{ marginTop: 0, minHeight: 55,backgroundColor: 'white',fontFamily: 'Quicksand' }}
                     >
                         <Container>
-                            <Menu.Item inverted style={{ marginBottom: 0 }}>
-                                <Header size='huge' inverted>TALK</Header>
+                            <Menu.Item style={{ marginBottom: 0 }}>
+                                <Header size='huge' style={{fontFamily: 'Quicksand'}} >Talky</Header>
                             </Menu.Item>
-                            <Menu.Item inverted as='a' style={{ marginBottom: 0 }}>Introduction</Menu.Item>
-                            <Menu.Item inverted as='a' style={{ marginBottom: 0 }}>Using</Menu.Item>
-                            <Menu.Item inverted as='a' style={{ marginBottom: 0 }}>Careers</Menu.Item>
-                            <Menu.Item inverted position='right'>
+
+                            <Menu.Item position='right'>
                                 {this.props.isLoggedIn ? logoutButton : loginButton}
                             </Menu.Item>
                         </Container>
@@ -144,7 +128,7 @@ class FixedHeader extends React.Component {
 
                         >
                                 <Menu.Item>
-                                    <Header size='huge' inverted>TALK</Header>
+                                    <Header inverted size='huge' style={{fontFamily: 'Quicksand'}} >Talky</Header>
                                 </Menu.Item>
 
                                 <Menu.Item position='right'>

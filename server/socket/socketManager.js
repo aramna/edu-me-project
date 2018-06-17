@@ -2,8 +2,10 @@ import database from '../database/database'
 import bayes from 'bayes'
 import fs from 'fs'
 import request from 'request'
+import _ from 'underscore'
 //const users = {socketId: String, email: String};
 const login_ids = [];
+const recentMsg = [];
 
 module.exports = function(socket) {
     var io = require('../edume-server').io;
@@ -18,7 +20,32 @@ module.exports = function(socket) {
     var rooms = [];
     var sentence_receiver = '';
     var newText;
+
     var nickname;
+
+    //마스터봇 없으면 생성
+    /*database.BotModel.find({name: MASTER}, function(err, master){
+        if (err) throw err
+        if (master)
+            console.log(master+"봇 객체 존재함")
+        else
+        {
+            console.log("봇 객체 존재하지 않아 생성하여 저장함")
+            let masterBot = new database.BotModel({
+                name: MASTER,
+                state: MASTER,
+                check: ['응,yes','예,yes','맞아,yes','응그거,yes','어,yes','예아,yes','예압,yes','옛,yes','잉,yes','옹,yes','웅,yes','앙,yes','아니,no','노,no','그거말고,no','말고,no','아냐,no','그거아냐,no','그거아니야,no','아니야,no','틀렸어,no','달라,no','틀려,no','다른거,no','안되,no','아니라고,no'],
+                order: ['보내줘,send','전송해줘,send','보내,send','전송,send','전송해줄래,send','보내봐,send','전송해,send','전송해봐,send','전송좀,send','보내봐라,send','메시지 보내줘,send','메시지 보내 줘,send','메시지 전송해줘,send','메시지 보내,send','메시지 전송,send','메시지 보내줄래,send','메시지 전송해줄래,send','메시지 보내봐,send','메시지 전송해,send','메시지 전송해봐,send','메시지 전송좀 해줘,send','메시지좀 보내줘,send','메시지좀 보내 줘,send','메시지좀 전송해줘,send','메시지좀 보내,send','메시지좀 전송,send','메시지좀 보내줄래,send','메시지좀 전송해줄래,send','메시지좀 보내봐,send','메시지좀 전송해,send','메시지좀 전송해봐,send','메시지좀 전송좀 해줘,send','문자 보내 줘,send','문자 보내줘,send','문자 전송해줘,send','문자 보내,send','문자 전송,send','문자 보내줄래,send','문자 전송해줄래,send','문자 보내봐,send','문자 전송해,send','문자 전송해봐,send','문자 전송좀 해줘,send','문자좀 보내줘,send','문자좀 보내 줘,send','문자좀 전송해줘,send','문자좀 보내,send','문자좀 전송,send','문자좀 보내줄래,send','문자좀 전송해줄래,send','문자좀 보내봐,send','문자좀 전송해,send','문자좀 전송해봐,send','문자좀 전송좀 해줘,send','문자온거 있어?,receive','문자 확인해줘,receive','메시지 확인해줘,receive','수신된 메시지 확인해줘?,receive','메세지가 왔는지 확인좀 해줘,receive','문자 왔니?,receive','메시지 온거 있나?,receive','수신된 문자 있어?,receive','문자 온것좀 확인해줘,receive','메시지 온것좀 확인해줘,receive','온 메시지 확인좀 해줘,receive','메시지 왔어?,receive','메시지 누구한테 왔니?,receivelist','누구한테 문자 왔는지 확인좀,receivelist','누구한테 메시지 왔었어?,receivelist','문자 누구한테 왔었는지 확인해줘,receivelist','메시지 누구한테 왔는지 확인해줘,receivelist','메세지 누구한테 왔어?,receivelist'],
+                nick: []
+            })
+
+            masterBot.save(err =>{
+                if (err) throw err
+            });
+
+        }
+    })*/
+
     console.log('connection info :', socket.request.connection._peername);
 
     socket.remoteAddress = socket.request.connection._peername.address;
@@ -31,7 +58,17 @@ module.exports = function(socket) {
     socket.on('login', function(login){
         console.log('login 이벤트를 받았습니다.');
         console.dir(login);
+        database.BotModel.findOne({name: login.userEmail}, function(err, userBot){
+            console.log('봇초기화여')
+            userBot.state = 'general';
+            userBot.sendReceiver = null
+            userBot.receiverName = null
 
+            console.log("유저봇상태 확인" + userBot)
+            userBot.save(err=> {
+                if(err) throw err
+            })
+        })
         //main방 존재 여부 확인
         database.RoomModel.findOne({roomId : login.roomId}, function(err, room){
 
@@ -87,8 +124,8 @@ module.exports = function(socket) {
                     console.log("login에서진행해이자식아")
                     var channellist = addList(list, room);
                     socket.emit('channellist', channellist);
-                    socket.emit('oneononelist', channellist);
                     console.log('login에서보여주는 list' + channellist);
+
                 });
             }
         });
@@ -119,6 +156,39 @@ module.exports = function(socket) {
                 console.log("아무것도없어");
             }
         });
+        database.ChatModel.find(function(err, premsg){
+            if(recentMsg !== null){
+                recentMsg.splice(0,recentMsg.length)
+            }
+            var classified = []
+            var classifyRoomId = _.uniq(premsg, 'roomId')
+            console.log('classifyRoomId: ',classifyRoomId)
+            for(var i =0; i< classifyRoomId.length; i++){
+                for(var j=0; j<premsg.length; j++){
+                    if(classifyRoomId[i].roomId === premsg[j].roomId){
+                        classified.push(premsg[j])
+
+                    }
+                }
+            }
+            for(var k =0; k< classifyRoomId.length; k++){
+                var temp = []
+                classified.map((e) => {
+                    if(e.roomId === classifyRoomId[k].roomId){
+                        temp.push({chatCount: e.chatCount, roomId: e.roomId, message: e.message})
+                    }
+                })
+                recentMsg.push(_.max(temp, function (obj) {
+                    return obj.chatCount
+                }))
+            }
+
+            var slice = _.uniq(recentMsg, 'roomId')
+
+
+            console.log('recentMsg:', slice)
+            socket.emit('recentmsg', slice);
+        });
         database.ListModel.find(function(err, roomlist){
             io.sockets.emit('roomsearch', roomlist);
             console.log('룸리스트서치요'+roomlist);
@@ -145,6 +215,16 @@ module.exports = function(socket) {
         login_ids.splice(i, 1);
         console.log('로긴아이디쑤');
         console.dir(login_ids);
+        database.BotModel.findOne({name : logout}, function(err, logoutBot){
+            console.log("로그아웃하여 봇을 초기화함")
+            logoutBot.state = 'general';
+            logoutBot.sendReceiver = null;
+            logoutBot.receiverName = null;
+
+            logoutBot.save(err=>{
+                if(err) throw err
+            })
+        })
     });
 
     socket.on('oneonone', function(oneonone){
@@ -229,6 +309,11 @@ module.exports = function(socket) {
                     if(err) throw err
                     console.log("Bot의 state가 "+bot.state+" 로 업데이트 되었습니다.")
                 })
+                content1 = '말씀하세요'
+                content2 = '듣는중'
+                contents.push(content1)
+                contents.push(content2)
+                socket.emit('request', contents);
             } else
             {
                 if(bot.state == 'general')//챗봇 명령 처음단계
@@ -239,7 +324,7 @@ module.exports = function(socket) {
                     category = null//명령 카테고리
                     receiverList = []
                     receiverEmail = null//동일이름일 경우 수신인의 이메일 초기화
-                    sentence_receiver = null
+                    sentence_receiver = ""
                     nickname = null
 
                     var classifier = bayes({//카테고리 분류
@@ -274,13 +359,44 @@ module.exports = function(socket) {
                     request.post(options, function (error, response, body) {//형태소 분석
                         var s = body
                         var res = JSON.parse(s)
+                        var sentence_NNG = [];
                         for (var i in res.return_object.sentence[0].morp) {
+                            sentence_NNG.push(res.return_object.sentence[0].morp[i].lemma)
+                            console.log("sentence_NNG : " + sentence_NNG)
                             //console.log(res.return_object.sentence[0].morp[i])
                             if (res.return_object.sentence[0].morp[i].type == 'JKB' && (res.return_object.sentence[0].morp[i].lemma == '한테'||
                                 res.return_object.sentence[0].morp[i].lemma == '에게')) {
                                 if (res.return_object.sentence[0].morp[Number(i) - 1].type == 'NNG' || res.return_object.sentence[0].morp[Number(i) - 1].type == 'NNP') {
-                                    ch = res.return_object.sentence[0].morp[Number(i) - 1].lemma + res.return_object.sentence[0].morp[i].lemma
-                                    sentence_receiver = res.return_object.sentence[0].morp[i - 1].lemma//수신인 이름
+                                    if(res.return_object.sentence[0].morp[i - 1].lemma == '형' || res.return_object.sentence[0].morp[i - 1].lemma == '누나' || res.return_object.sentence[0].morp[i - 1].lemma == '언니'|| res.return_object.sentence[0].morp[i - 1].lemma == '오빠')
+                                    {
+                                        console.log('res.return_object.sentence[0].morp.length : ' + res.return_object.sentence[0].morp.length)
+                                        for(var  j = 0; j < sentence_NNG.length; j++)
+                                        {
+                                            ch = res.return_object.sentence[0].morp[i-j].lemma + ch
+                                            console.log("ch 바뀌는거 : " + ch)
+                                        }
+
+                                        for(var k = 1; k < sentence_NNG.length; k++)
+                                        {
+                                            sentence_receiver = res.return_object.sentence[0].morp[i - k].lemma + sentence_receiver
+                                            console.log('sentence_receiver 바뀌는거 : ' + sentence_receiver)
+                                        }
+
+                                        /*if(res.return_object.sentence[0].morp[i - 3].lemma)
+                                        {
+                                            ch = res.return_object.sentence[0].morp[i - 3].lema + res.return_object.sentence[0].morp[i - 2].lema + res.return_object.sentence[0].morp[Number(i) - 1].lemma + res.return_object.sentence[0].morp[i].lemma
+                                            sentence_receiver = res.return_object.sentence[0].morp[i - 3].lemma + res.return_object.sentence[0].morp[i - 2].lemma + res.return_object.sentence[0].morp[i - 1].lemma
+                                        } else
+                                        {
+                                            ch =res.return_object.sentence[0].morp[i - 2].lema + res.return_object.sentence[0].morp[Number(i) - 1].lemma + res.return_object.sentence[0].morp[i].lemma
+                                            sentence_receiver = res.return_object.sentence[0].morp[i - 2].lemma + res.return_object.sentence[0].morp[i - 1].lemma
+                                        }*/
+
+                                    } else
+                                    {
+                                        ch = res.return_object.sentence[0].morp[Number(i) - 1].lemma + res.return_object.sentence[0].morp[i].lemma
+                                        sentence_receiver = res.return_object.sentence[0].morp[i - 1].lemma
+                                    }
                                 }//"주희한테 문자 보내줘"->ch = "주희한테"
                             }
                         }
@@ -331,9 +447,17 @@ module.exports = function(socket) {
                                 database.UserModel.find({username: sendReceiver}, function(err, sendRe){
                                     console.log('sendRe'+sendRe)//다시하기
                                     console.log("sendReceiver = " + sendReceiver)
+                                    if(sendReceiver == chatbot.name)
+                                    {
+                                        console.log('나랑같은사람찾음');
+                                        sendRe = null
+                                    }
+
                                     if (sendRe)
                                     {
-                                        content2 = sendRe.email + '님이 맞나요?'
+                                        console.log("타입은"+typeof(sendRe))
+                                        console.log("수신인 이름" + sendReceiver)
+                                        content2 = sendReceiver + '님이 맞나요?'
                                         console.log('수신인 찾음' + sendRe)
                                         nickname = sentence_receiver
                                         bot.sendReceiver = sendRe[0]
@@ -375,49 +499,68 @@ module.exports = function(socket) {
 
                         }
                         console.log("######general end######")
-                    },2000)
+                    },2500)
                 } else if (bot.state == 'send-receiver')
                 {
-                    var classifier2 = bayes({//사용자 분류
-                        tokenizer: function(text) {
-                            return text.split('')}
-                    })
-
-                    const article2 = fs.readFileSync("../edu-me-project/config/name.txt");
-                    var lineArray2 = article2.toString();
-                    var line2 = lineArray2.split('\n');
-                    for(var i in line2){
-                        var s2 = line2[i].split(",");
-                        classifier2.learn(s2[0], s2[1]);
-                    }
-                    //수신자 분류 찾기
-                    setTimeout(function(){
-                        var receiverData = classifier2.categorize(chatbot.transcript)
-                        console.log('새로받은 정보의 수신자 찾기' + receiverData)
-                        database.UserModel.find({username: receiverData}, function(err, sendRe){
-                            if (sendRe)
-                            {
-                                content1 = sendRe.email + '님이 맞나요?'       //sendRe.email
-                                console.log('수신인 찾음' + sendRe)
-                                nickname = chatbot.transcript
-                                bot.sendReceiver = sendRe[0]
-                                bot.state = 'send-find'
-                                bot.save(err => {
-                                    if (err) throw err
-                                    console.log("Bot의 state가 "+bot.state+" 로 업데이트 되었습니다.")
-                                })
-                                contents.push(content1)
-                                socket.emit('request', contents)
-                            } else
-                            {
-                                console.log('찾지못했다.')
-                                nickname = null;
-                                content1 = '이름만 정확히 말씀해 주세요'
-                                contents.push(content1)
-                                socket.emit('request', contents)
-                            }
+                    if(chatbot.transcript.length < 5)
+                    {
+                        var classifier2 = bayes({//사용자 분류
+                            tokenizer: function(text) {
+                                return text.split('')}
                         })
-                    },500);
+
+                        const article2 = fs.readFileSync("../edu-me-project/config/name.txt");
+                        var lineArray2 = article2.toString();
+                        var line2 = lineArray2.split('\n');
+                        for(var i in line2){
+                            var s2 = line2[i].split(",");
+                            classifier2.learn(s2[0], s2[1]);
+                        }
+
+                        var receiverData = classifier2.categorize(chatbot.transcript)
+                        //수신자 분류 찾기
+                        setTimeout(function(){
+                            console.log('새로받은 정보의 수신자 찾기' + receiverData)
+                            database.UserModel.find({username: receiverData}, function(err, sendRec){
+                                if(receiverData == chatbot.name)
+                                {
+                                    console.log('나랑 같은사람 찾음')
+                                    sendRec = null;
+                                }
+                                if (sendRec != null)
+                                {
+                                    console.log("sendRe : "+sendRec)
+                                    console.log("sendRe.email : "+receiverData)
+                                    content1 = receiverData + '님이 맞나요?'
+                                    console.log('수신인 찾음' + sendRec)
+                                    nickname = chatbot.transcript
+                                    bot.sendReceiver = sendRec[0]
+                                    bot.state = 'send-find'
+                                    bot.save(err => {
+                                        if (err) throw err
+                                        console.log("Bot의 state가 "+bot.state+" 로 업데이트 되었습니다.")
+                                    })
+                                    contents.push(content1)
+                                    socket.emit('request', contents)
+                                } else
+                                {
+                                    console.log('찾지못했다.')
+                                    nickname = null;
+                                    content1 = '이름만 정확히 말씀해 주세요'
+                                    contents.push(content1)
+                                    socket.emit('request', contents)
+                                }
+                            })
+                        },2500);
+                    } else
+                    {
+                        console.log('찾지못했다.')
+                        nickname = null;
+                        content1 = '이름만 정확히 말씀해 주세요'
+                        contents.push(content1)
+                        socket.emit('request', contents)
+                    }
+
                 } else if (bot.state == 'send-find')
                 {
                     var classifier3 = bayes({//응답 분류
@@ -482,8 +625,6 @@ module.exports = function(socket) {
                             }
                         },700)
 
-
-
                         socket.emit('request', contents);
                     } else
                     {
@@ -494,6 +635,7 @@ module.exports = function(socket) {
                             if(err) throw err
                             console.log("Bot의 state가 "+bot.state+" 로 업데이트 되었습니다.")
                         })
+                        sendReceiver = null;
                         content1 = '다시 수신자 이름만 말씀해 주세요'
                         contents.push(content1)
                         socket.emit('request', contents)
@@ -566,7 +708,7 @@ module.exports = function(socket) {
                                             } else
                                             {
                                                 console.log("받는놈이 접속을 안했다")
-                                                io.sockets.in(oneonone.roomId).emit('oneononelist', channellist);
+                                                socket.broadcast.to(oneonone.roomId).emit('oneononelist', channellist);
                                             }
                                             //io.sockets.in(jroom.roomId).emit('oneononelist', channellist);
                                         })
@@ -639,7 +781,7 @@ module.exports = function(socket) {
                                                     } else
                                                     {
                                                         console.log("받는놈이 접속을 안했다")
-                                                        io.sockets.in(oneonone2.roomId).emit('oneononelist', channellist);
+                                                        socket.broadcast.to(oneonone2.roomId).emit('oneononelist', channellist);
                                                     }
                                                     console.log("에듀미가봐야할내용이잖아")
                                                     console.log("확인해보자 chatCount : " + oneonone2.chatCount);
@@ -729,7 +871,7 @@ module.exports = function(socket) {
                                                     } else
                                                     {
                                                         console.log("받는놈이 접속을 안했다")
-                                                        io.sockets.in(Troom.roomId).emit('oneononelist', channellist);
+                                                        socket.broadcast.to(Troom.roomId).emit('oneononelist', channellist);
                                                     }
                                                     //io.sockets.in(jroom.roomId).emit('oneononelist', channellist);
                                                 })
@@ -776,6 +918,8 @@ module.exports = function(socket) {
                         });
                         console.log("전송성공 후 Bot의 state " + bot.state);
                         console.log("######send end######")
+                        var modal = true
+                        socket.emit('request', modal)
                     }
                 }
             }
@@ -819,6 +963,7 @@ module.exports = function(socket) {
             });
         } else if (room.command === 'message') {
             //******************chatbot 예제코드******************//
+
             console.log('message 이벤트를 받았습니다.');
             console.log('room객체알려주세요룸룸룸', room)
             if(room.oneonone == true)
@@ -855,7 +1000,18 @@ module.exports = function(socket) {
                             if (err) throw err
                         })
                         console.log('쳌쳌쳌체셋쳇쳇쳇'+chat);
-                        io.sockets.in(jroom.roomId).emit('message', chat);
+
+                        for(var i =0; i<recentMsg.length; i++){
+                            if(recentMsg[i].roomId === jroom.roomId) {
+                                recentMsg.splice(i, 1)
+                            }
+                        }
+
+                        recentMsg.push({chatCount: countNum, roomId: jroom.roomId, message: room.message})
+                        //object
+                        console.log('recentMsg시방',recentMsg)
+                        io.sockets.in(chat.roomId).emit('message', chat);
+                        io.sockets.in(chat.roomId).emit('recentmsg', recentMsg)
                     }
                 })
                 database.RoomModel.findOne({creater:room.name, receiver: room.roomId}, function(err, jroom){
@@ -919,9 +1075,22 @@ module.exports = function(socket) {
                             if (err) throw err
                         })
                         console.log(chat);
+
+                        for(var i =0; i<recentMsg.length; i++){
+                            if(recentMsg[i].roomId === jroom.roomId) {
+                                recentMsg.splice(i, 1)
+                            }
+                        }
+
+                        recentMsg.push({chatCount: countNum, roomId: jroom.roomId, message: room.message})
+                        //object
+                        console.log('recentMsg시방',recentMsg)
                         io.sockets.in(chat.roomId).emit('message', chat);
+                        io.sockets.in(chat.roomId).emit('recentmsg', recentMsg)
+
                     }
                 })
+
             } else
             {
 
@@ -957,7 +1126,18 @@ module.exports = function(socket) {
                             if (err) throw err
                         })
                         console.log(chat);
+
+                        for(var i =0; i<recentMsg.length; i++){
+                            if(recentMsg[i].roomId === room.roomId) {
+                                recentMsg.splice(i, 1)
+                            }
+                        }
+
+                        recentMsg.push({chatCount: countNum, roomId: room.roomId, message: room.message})
+                        //object
+                        console.log('recentMsg시방',recentMsg)
                         io.sockets.in(chat.roomId).emit('message', chat);
+                        io.sockets.in(chat.roomId).emit('recentmsg', recentMsg)
                     }
                 })
             }

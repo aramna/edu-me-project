@@ -6,7 +6,7 @@
 보내봐,send
 전송해,send
 전송해봐,send
-전송좀,send
+전송 좀,send
 보내봐라,send
 메시지 보내줘,send
 메시지 전송해줘,send
@@ -17,7 +17,7 @@
 메시지 보내봐,send
 메시지 전송해,send
 메시지 전송해봐,send
-메시지 전송좀 해줘,send
+메시지 전송 좀 해줘,send
 메시지좀 보내줘,send
 메시지좀 전송해줘,send
 메시지좀 보내,send
@@ -27,7 +27,7 @@
 메시지좀 보내봐,send
 메시지좀 전송해,send
 메시지좀 전송해봐,send
-메시지좀 전송좀 해줘,send
+메시지좀 전송 좀 해줘,send
 문자 보내줘,send
 문자 전송해줘,send
 문자 보내,send
@@ -47,12 +47,12 @@
 문자좀 보내봐,send
 문자좀 전송해,send
 문자좀 전송해봐,send
-문자좀 전송좀 해줘,send
+문자좀 전송 좀 해줘,send
 문자온거 있어?,receive
 문자 확인해줘,receive
 메시지 확인해줘,receive
 수신된 메시지 확인해줘?,receive
-메세지가 왔는지 확인좀 해줘,receive
+메세지가 왔는지 확인 좀 해줘,receive
 문자 왔니?,receive
 메시지 온거 있나?,receive
 수신된 문자 있어?,receive

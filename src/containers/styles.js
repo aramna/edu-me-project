@@ -13,7 +13,7 @@ $(function() {
         },
 
         height: function() {
-            return $(window).height() - 37;
+            return $(window).height() - 100;
         },
 
         rotate: 180,

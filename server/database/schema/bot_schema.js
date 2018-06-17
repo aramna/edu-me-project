@@ -8,7 +8,6 @@ Schema.createSchema = function(mongoose){
         name: String,
         state: String,
         sendReceiver: {type:Object, default:null},
-        receiverList: [],
         receiverName: String,
         nick: [],
         check: [],

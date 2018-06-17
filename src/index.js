@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import {Router, Route, IndexRoute, browserHistory} from 'react-router';
 import {App, Home, Login, Register, ChatContainer, MyPage} from 'containers'
+import {BotCharacter} from 'components'
 
 // Redux
 import {Provider} from 'react-redux'
@@ -26,6 +27,7 @@ ReactDOM.render(
                 <Route path="register" component={Register}/>
                 <Route path="chat" component={ChatContainer}/>
                 <Route path="mypage" component={MyPage}/>
+                <Route path="bot" component={BotCharacter}/>
             </Route>
         </Router>
     </Provider>,

@@ -8,38 +8,23 @@ import {
     Responsive,
     Segment,
     Sidebar,
-    Dropdown
+    Dropdown,
+    Button,
+    Form,
+    Image,
+    Header
 } from 'semantic-ui-react'
 import {Link} from "react-router"
 import './styles'
+import image from '../images/mainhome.png'
 
 class Home extends React.Component {
     constructor(props) {
         super(props);
-        this.state = {
-            sidebarOpened: false
-        };
-
-        this.handlePusherClick = this.handlePusherClick.bind(this);
-        this.handleToggle = this.handleToggle.bind(this);
-    }
-
-    handlePusherClick() {
-        const {sidebarOpened} = this.state
-        if (sidebarOpened) {
-            this.setState({sidebarOpened: false})
-        }
-    }
-
-    handleToggle() {
-        this.setState({sidebarOpened: !this.state.sidebarOpened})
-    }
-
-    componentDidMount() {
-
     }
 
     render() {
+
         const trigger = (
             <span>
             <Icon name='user'/> {this.props.currentUser}
@@ -62,80 +47,43 @@ class Home extends React.Component {
             <Dropdown trigger={trigger} options={options}/>
         )
 
-        const loginButton = (
-            <Grid>
-                <Menu.Item
-                    as={Link}
-                    to="/register"
-                    inverted
-                >Sign up</Menu.Item>
-
-                <Menu.Item as={Link}
-                           to="/login"
-                           inverted
-                           style={{marginLeft: '0.5em'}}
-                >Sign in</Menu.Item>
-            </Grid>
-        )
-
-        const logoutButton = (
-            <div>
-                <DropdownTrigger/>
-            </div>
-        )
-
         const chatView = (<ChatContainer/>)
         const homeView = (
             <Segment.Group>
                 <Responsive {...Responsive.onlyComputer}>
                     <Segment
                         style={{
-                            minHeight: 'calc(100vh - 100px)',
-                            backgroundColor: '#2196f3'
+                            height: '100vh',
+                            backgroundImage: 'url(' + image + ')',
+                            backgroundSize: 'cover',
+                            backgroundPosition: 'right'
                         }}
                         vertical>
-
-                            <h1 style={{position: 'absolute', top: '35%', left: '5%', fontSize: '4.5rem', fontWeight: 200, color: 'white', textAlign: 'left'}}>Let's Talking</h1>
-                            <canvas id="waves"></canvas>
-
                     </Segment>
-                </Responsive>
 
+
+                </Responsive>
                 <Responsive {...Responsive.onlyTablet}>
                     <Segment
                         style={{
-                            minHeight: 'calc(100vh - 100px)',
-                            backgroundColor: '#2196f3'
+                            height: '100vh',
+                            backgroundImage: 'url(' + image + ')',
+                            backgroundSize: 'cover',
+                            backgroundPosition: 'left'
+
                         }}
                         vertical>
-
-                            <h1 style={{position: 'absolute', top: '35%', left: '5%', fontSize: '4.5rem', fontWeight: 200, color: 'white', textAlign: 'left'}}>Let's Talking</h1>
-                            <canvas id="waves"></canvas>
+                        <h1 style={{position: 'absolute', top: '35%', left: '5%', fontSize: '4.5rem', fontWeight: 200, color: 'black', textAlign: 'left'}}>Let's Talking</h1>
 
                     </Segment>
                 </Responsive>
 
                 <Responsive {...Responsive.onlyMobile}>
-                    <Sidebar.Pushable as={Segment}>
-                        <Sidebar as={Menu} animation='uncover' inverted vertical visible={this.state.sidebarOpened}>
 
-                            <Menu.Item as='a' style={{marginBottom: 0}}>Introduction</Menu.Item>
-                            <Menu.Item as='a' style={{marginBottom: 0}}>Using</Menu.Item>
-                            <Menu.Item as='a' style={{marginBottom: 0}}>Careers</Menu.Item>
-                            <Menu.Item position='right'>
-                                {this.props.isLoggedIn ? logoutButton : loginButton}
-                            </Menu.Item>
-                        </Sidebar>
-
-                        <Sidebar.Pusher dimmed={this.state.sidebarOpened}
-                                        onClick={this.handlePusherClick}
-                                        style={{minHeight: '100vh'}}
-                        >
-                            <Segment inverted textAlign='center' style={{minHeight: '100vh', padding: 0}}>
-
+                            <Segment textAlign='center' style={{minHeight: '100vh', padding: 0, backgroundColor: '#2196F3'}}>
                                 <Menu inverted secondary style={{marginTop: 0}}>
-                                    <Menu.Item onClick={this.handleToggle}>
-                                        <Icon name='sidebar' style={{marginLeft: 8}}/>
+                                    <Menu.Item style={{marginLeft: 10}}>
+                                        <Header inverted size='huge' style={{fontFamily: 'Quicksand'}} >Talky</Header>
                                     </Menu.Item>
                                     <Menu.Item position='right'>
                                         <Menu.Item
@@ -150,10 +98,9 @@ class Home extends React.Component {
                                         >Sign in</Menu.Item>
                                     </Menu.Item>
                                 </Menu>
-
+                                <canvas id="waves"></canvas>
                             </Segment>
-                        </Sidebar.Pusher>
-                    </Sidebar.Pushable>
+
                 </Responsive>
             </Segment.Group>
         )

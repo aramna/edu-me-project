@@ -150,7 +150,7 @@ class Authentication extends React.Component {
                                     동의하는 것으로 간주합니다.</label>
                             </Form.Field><br/><br/>
                             <Form.Field style={{textAlign: 'center'}}>
-                                <label>이미 에듀미 계정이 있으신가요?</label>
+                                <label>이미 Talky 계정이 있으신가요?</label>
                             </Form.Field>
                             <Form.Field>
                                 <Button basic
