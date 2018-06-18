@@ -2,16 +2,10 @@ import React from 'react';
 import {connect} from 'react-redux'
 import {ChatContainer} from 'containers'
 import {
-    Grid,
     Icon,
     Menu,
     Responsive,
     Segment,
-    Sidebar,
-    Dropdown,
-    Button,
-    Form,
-    Image,
     Header
 } from 'semantic-ui-react'
 import {Link} from "react-router"
@@ -43,9 +37,6 @@ class Home extends React.Component {
             {key: 'sign-out', text: '로그아웃', onClick: this.props.onLogout},
         ]
 
-        const DropdownTrigger = () => (
-            <Dropdown trigger={trigger} options={options}/>
-        )
 
         const chatView = (<ChatContainer/>)
         const homeView = (

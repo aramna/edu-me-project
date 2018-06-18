@@ -1,26 +1,17 @@
 import React from 'react';
 import {
     Dropdown,
-    Button,
     Container,
-    Divider,
     Grid,
     Icon,
-    Image,
-    List,
     Menu,
     Responsive,
-    Segment,
-    Sidebar,
-    Visibility,
     Header,
 } from 'semantic-ui-react'
 import {browserHistory, Link} from 'react-router'
 import { connect } from 'react-redux'
 import {socketConnect} from 'socket.io-react'
 import {getStatusRequest, logoutRequest} from "../actions/authentication";
-
-
 
 class FixedHeader extends React.Component {
     constructor(props) {

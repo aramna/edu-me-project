@@ -1,26 +1,12 @@
 import React, {Component} from 'react';
 import {FixedHeader} from 'components'
 import {connect} from 'react-redux'
-import {ChatContainer, Home} from 'containers'
-import {getStatusRequest, logoutRequest} from "../actions/authentication";
+import {getStatusRequest} from "../actions/authentication";
 import 'antd/dist/antd.css';
-import {message} from 'antd'
 import {
-    Dropdown,
-    Button,
-    Container,
-    Divider,
-    Grid,
-    Icon,
-    Image,
-    List,
-    Menu,
     Responsive,
     Segment,
-    Sidebar,
-    Visibility,
 } from 'semantic-ui-react'
-import {browserHistory} from "react-router";
 import {ThemeProvider} from '@livechat/ui-kit'
 import socketio from "socket.io-client";
 import {SocketProvider} from 'socket.io-react'

@@ -1,8 +1,6 @@
 import React from 'react';
 import {connect} from 'react-redux'
-import {browserHistory, Link} from "react-router";
-import faker from 'faker'
-import {OrderedMap} from 'immutable'
+import {browserHistory} from "react-router";
 import {
     Button,
     Grid,
@@ -22,7 +20,6 @@ import {
     Responsive,
     Dropdown,
     Search,
-    Container
 } from 'semantic-ui-react'
 import {
     Message,
@@ -32,13 +29,10 @@ import '../index.css'
 import avartarImage from '../images/avatar.jpg'
 import {socketConnect} from 'socket.io-react'
 import {getStatusRequest, logoutRequest} from "../actions/authentication";
-import BotCharacter from '../components/BotCharacter'
-import jerry from '../components/jerry'
 import _ from 'underscore'
 
 
 var audio = new Audio('audio_file.mp3');
-var channelList3 = [];
 
 function dynamicSort(property) {
     var sortOrder = 1
@@ -113,7 +107,6 @@ class ChatContainer extends React.Component {
         this.messageChanged = this.messageChanged.bind(this)
         this.scrollDown = this.scrollDown.bind(this)
         this.scrollPosition = this.scrollPosition.bind(this)
-        this.searchUser = this.searchUser.bind(this)
         this.personalTalk = this.personalTalk.bind(this)
         this.start = this.start.bind(this)
         this.end = this.end.bind(this)
@@ -171,21 +164,6 @@ class ChatContainer extends React.Component {
 
     handleOneOnOne() {
         this.setState({channelORoneOnOne: true})
-    }
-
-    searchUser(search = "") {
-        let searchItems = new OrderedMap();
-        if (_.trim(search).length) {
-            this.state.users.filter((user) => {
-                const name = _.get(user, 'username');
-                const userId = _.get(user, 'email');
-                if (_.includes(name, search)) {
-                    searchItems = searchItems.set(userId, user);
-                }
-            })
-        }
-        return searchItems.valueSeq();
-
     }
 
     personalTalk(e, name, userId) {
@@ -306,7 +284,6 @@ class ChatContainer extends React.Component {
                 })
             })
             this.state.channelList2.push(e.target.value)
-
             this.handleItemClick(e, {name: e.target.value})
         }
         this.setState({roomId: ''})
@@ -421,6 +398,35 @@ class ChatContainer extends React.Component {
         }, 300)
     }
 
+    loadMoreChat() {
+
+        var loadCount = this.state.logs.length;
+
+        if (this.state.premsg) {
+            var fn = this.state.premsg.length - loadCount;
+            if (fn < 0) {
+                console.log("저장된 msg길이보다 넘어온 길이가 더 큽니다.")
+            } else if (fn === 0) {
+                console.log("끝에 도달했습니다.")
+                // this.setState({x:true})
+            } else if (fn < 15) {
+                st = 0
+                console.log("fn : " + fn + ", st : " + st)
+                var premsg_slice = this.state.premsg.slice(st, fn)
+                this.scrollPosition()
+                this.setState({logs: this.state.logs.concat(premsg_slice).sort(dynamicSort("chatCount"))})
+
+            } else {
+                var st = fn - 15
+                console.log("fn : " + fn + ", st : " + st)
+                var premsg_slice2 = this.state.premsg.slice(st, fn)
+                this.scrollPosition()
+                this.setState({logs: this.state.logs.concat(premsg_slice2).sort(dynamicSort("chatCount"))})
+
+            }
+        }
+    }
+
 
     componentWillMount() {
         this.resetComponent()
@@ -432,36 +438,12 @@ class ChatContainer extends React.Component {
             logs2.push(obj) // 로그에 추가
             this.setState({logs: logs2})
             console.log('message',obj)
-
-
-
-
             // const TextToSpeech = window.speechSynthesis
             //
             // let sayThis = new SpeechSynthesisUtterance(obj.message)
             //
             // TextToSpeech.speak(sayThis)
 
-            // if(obj.message.length > 17)
-            // {
-            //     var modifymeesage = obj.message.substring(0,17);
-            //     modifymeesage = modifymeesage+"..."
-            //     this.state.givemessage[this.state.channelList2.indexOf(obj.roomId)] = modifymeesage;
-            //     console.log(obj.message.length);
-            // }
-            // else {
-            //     this.state.givemessage[this.state.channelList2.indexOf(obj.roomId)] = obj.message;
-            //     console.log(obj.message.length);
-            // }
-            // console.log('zzzzzzzzzzzzz',this.state.givemessage);
-            //
-            // if(this.state.activeChannel===obj.roomId){
-            //     // this.state.givetextcount[this.state.channelList2.indexOf(this.state.activeChannel)]++;
-            //     //   this.forceUpdate();
-            // }
-            // else{
-            //     this.state.givetextcount[this.state.channelList2.indexOf(obj.roomId)]++;
-            // }
 
             // if(obj.email!==this.props.currentEmail){
             //     this.audioQ()
@@ -474,17 +456,13 @@ class ChatContainer extends React.Component {
             id: this.props.currentUser,
             roomId: defaultRoom
         }
-        // console.log("현재유저:",this.props.currentUser)
         if (this.props.currentUser !== '') {
             socket.emit('login', output)
         }
 
         this.setState({
-            // roomId: defaultRoom,
             activeChannel: defaultRoom
         })
-
-
 
         if (this.state.oneOnOneList !== null) {
             socket.on('oneononelist', (oneononelist) => {
@@ -501,10 +479,8 @@ class ChatContainer extends React.Component {
                         userEmail: this.props.currentEmail,
                         oneonone: true
                     }
-
                     socket.emit('room', output)
                 }
-
             })
         }
 
@@ -565,41 +541,8 @@ class ChatContainer extends React.Component {
             this.setState({recentMsg: recentmsg, recentLoading: false})
             console.log('recentmsg', recentmsg)
         })
-
-
-
-
-
      }
 
-    loadMoreChat() {
-
-        var loadCount = this.state.logs.length;
-
-        if (this.state.premsg) {
-            var fn = this.state.premsg.length - loadCount;
-            if (fn < 0) {
-                console.log("저장된 msg길이보다 넘어온 길이가 더 큽니다.")
-            } else if (fn === 0) {
-                console.log("끝에 도달했습니다.")
-                // this.setState({x:true})
-            } else if (fn < 15) {
-                st = 0
-                console.log("fn : " + fn + ", st : " + st)
-                var premsg_slice = this.state.premsg.slice(st, fn)
-                this.scrollPosition()
-                this.setState({logs: this.state.logs.concat(premsg_slice).sort(dynamicSort("chatCount"))})
-
-            } else {
-                var st = fn - 15
-                console.log("fn : " + fn + ", st : " + st)
-                var premsg_slice2 = this.state.premsg.slice(st, fn)
-                this.scrollPosition()
-                this.setState({logs: this.state.logs.concat(premsg_slice2).sort(dynamicSort("chatCount"))})
-
-            }
-        }
-    }
 
     componentDidMount() {
         const {socket} = this.props
@@ -626,7 +569,7 @@ class ChatContainer extends React.Component {
         if (!Recognition) {
             alert(
                 '크롬브라우저로 다시 시도하세요.'
-            );
+            )
             return;
         }
 
@@ -641,10 +584,6 @@ class ChatContainer extends React.Component {
 
             console.log('transcript', text);
             this.setState({text: text});
-
-            // let sayThis = new SpeechSynthesisUtterance(text)
-            //
-            // TextToSpeech.speak(sayThis)
 
             var output = {
                 email: this.props.currentEmail,
@@ -664,9 +603,7 @@ class ChatContainer extends React.Component {
                 this.start()
                 console.log('end')
             }
-
         }
-
 
         this.recognition.onnomatch = event => {
             console.log('no match');
@@ -679,7 +616,6 @@ class ChatContainer extends React.Component {
                 listening: true,
             })
         };
-
 
         this.recognition.onerror = event => {
             console.log('error', event);
@@ -697,7 +633,6 @@ class ChatContainer extends React.Component {
                 })
             }
             if (obj.length === 1) {
-
                 this.setState({
                     text: obj
                 })
@@ -718,22 +653,20 @@ class ChatContainer extends React.Component {
             }
         })
 
-
-
     }
 
     start() {
         this.recognition.start();
         this.setState({modalOpen: true})
-    };
+    }
 
     end() {
         this.recognition.stop();
-    };
+    }
 
     handleClose() {
         this.setState({show: false})
-    };
+    }
 
     speechstart() {
         this.recognition.onspeechstart()
@@ -759,11 +692,6 @@ class ChatContainer extends React.Component {
         if (this.historyChange) {
             this.scrollDown()
         }
-
-        if(this.state.recentMsg !== prevState.recentMsg) {
-            console.log('시바')
-        }
-
     }
 
     handleModalOpen() {
@@ -785,7 +713,6 @@ class ChatContainer extends React.Component {
                 <Dropdown.Menu>
                     <Dropdown.Item active='false' text={this.props.currentEmail}/>
                     <Dropdown.Divider/>
-                    <Dropdown.Item icon='settings' text='프로필 수정' as={Link} to='/mypage'/>
                     <Dropdown.Item icon='sign out' text='로그아웃' onClick={this.handleLogout}/>
                 </Dropdown.Menu>
             </Dropdown>
@@ -796,7 +723,6 @@ class ChatContainer extends React.Component {
                 <Dropdown.Menu>
                     <Dropdown.Item active='false' text={this.props.currentEmail}/>
                     <Dropdown.Divider/>
-                    <Dropdown.Item icon='settings' text='프로필 수정' as={Link} to='/mypage'/>
                     <Dropdown.Item icon='sign out' text='로그아웃' onClick={this.handleLogout}/>
                 </Dropdown.Menu>
             </Dropdown>
@@ -851,7 +777,7 @@ class ChatContainer extends React.Component {
                                         name={text}
                                         active={activeChannel === text}
                                         onClick={this.handleItemClick}
-                                        style={{fontFamily: "Jeju Gothic"}}
+                                        style={{fontFamily: "Jeju Gothic", color: '#424b5b'}}
                                     />
                                 </Header>
                             </Item.Header>
@@ -859,7 +785,7 @@ class ChatContainer extends React.Component {
                                 {this.state.recentMsg.map((e) => (
 
                                     e.roomId === text ?
-                                        <div style={{fontFamily: "Jeju Gothic"}}>{e.message}</div> : ''
+                                        <div style={{fontFamily: "Jeju Gothic", color: '#4f596b'}}>{e.message}</div> : ''
 
 
                                 ))}
@@ -882,7 +808,7 @@ class ChatContainer extends React.Component {
                                         name={text}
                                         active={activeOneOnOne === text}
                                         onClick={this.handleItemClick2}
-                                        style={{fontFamily: "Jeju Gothic"}}
+                                        style={{fontFamily: "Jeju Gothic", color: '#424b5b'}}
                                     />
                                 </Header>
                             </Item.Header>
@@ -890,7 +816,7 @@ class ChatContainer extends React.Component {
                                 {this.state.recentMsg.map((e) => (
 
                                     e.roomId.match(text) ?
-                                        <div style={{fontFamily: "Jeju Gothic"}}>{e.message}</div> : ''
+                                        <div style={{fontFamily: "Jeju Gothic", color: '#4f596b'}}>{e.message}</div> : ''
 
 
                                 ))}
@@ -967,13 +893,13 @@ class ChatContainer extends React.Component {
                                     e.name !== this.props.currentUser ?
                                         // sender가 상대방일 때
                                         <Message
-                                            authorName={e.name} date={e.time}>
-                                            <MessageText style={{fontFamily: "Jeju Gothic"}}>{e.message}</MessageText>
+                                            authorName={e.name} date={e.time} style={{fontFamily: "Jeju Gothic", fontSize: 14}}>
+                                            <MessageText>{e.message}</MessageText>
                                         </Message>
                                         :
                                         // sender가 본인일 때
-                                        <Message isOwn deliveryStatus={e.time}>
-                                            <MessageText style={{fontFamily: "Jeju Gothic"}}>{e.message}</MessageText>
+                                        <Message isOwn deliveryStatus={e.time} style={{fontFamily: "Jeju Gothic", fontSize: 14}}>
+                                            <MessageText>{e.message}</MessageText>
                                         </Message>
                                 }
                             </div>
@@ -1135,7 +1061,7 @@ class ChatContainer extends React.Component {
                 >
                     <Modal.Header>음성인식</Modal.Header>
                     <Modal.Content style={{textAlign: 'center'}}>
-                        <h1 style={{fontSize: 70, marginTop: 200}}>
+                        <h1 style={{fontSize: 70, marginTop: 200, color: 'white' }}>
                             {
                                 this.state.text
                             }
@@ -1175,7 +1101,7 @@ class ChatContainer extends React.Component {
                 >
                     <Modal.Header>음성인식</Modal.Header>
                     <Modal.Content style={{textAlign: 'center'}}>
-                        <h1 style={{fontSize: 70, marginTop: 200}}>
+                        <h1 style={{fontSize: 70, marginTop: 200, color: 'white'}}>
                             {
                                 this.state.text
                             }
@@ -1460,15 +1386,16 @@ class ChatContainer extends React.Component {
                                 >
                                     <Icon name='angle left' size='big'/>
                                 </Menu.Item>
-                                <Menu.Item style={{width: 'calc(100% - 170px)'}}>
+                                <Menu.Item style={{width: 'calc(100% - 200px)'}}>
                                     <Header style={{width: '100%'}}>
                                         {this.state.channelORoneOnOne ? this.state.activeOneOnOne : this.state.activeChannel}
                                     </Header>
                                 </Menu.Item>
                                 <Menu.Item
                                     position='right'
-                                    style={{width: 100}}
+                                    style={{width: 130}}
                                 >
+                                    {userList}
                                     {STT}
                                     {logoutButton2}
                                 </Menu.Item>
@@ -1532,8 +1459,6 @@ class ChatContainer extends React.Component {
                             </div>
                         }
                     </div>
-
-
                 </Responsive>
             </Segment.Group>
         )

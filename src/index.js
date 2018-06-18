@@ -1,8 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import {Router, Route, IndexRoute, browserHistory} from 'react-router';
-import {App, Home, Login, Register, ChatContainer, MyPage} from 'containers'
-import {BotCharacter} from 'components'
+import {App, Home, Login, Register, ChatContainer} from 'containers'
 
 // Redux
 import {Provider} from 'react-redux'
@@ -11,7 +10,6 @@ import reducers from 'reducers'
 import thunk from 'redux-thunk'
 
 import 'semantic-ui-css/semantic.min.css'
-import 'bootstrap/dist/css/bootstrap.css';
 import 'antd/dist/antd.css';
 
 const store = createStore(reducers, applyMiddleware(thunk))
@@ -26,8 +24,6 @@ ReactDOM.render(
                 <Route path="login" component={Login}/>
                 <Route path="register" component={Register}/>
                 <Route path="chat" component={ChatContainer}/>
-                <Route path="mypage" component={MyPage}/>
-                <Route path="bot" component={BotCharacter}/>
             </Route>
         </Router>
     </Provider>,

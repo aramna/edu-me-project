@@ -1,7 +1,6 @@
 import $ from 'jquery'
 import SineWaves from 'sine-waves'
 
-
 $(function() {
     var waves = new SineWaves({
         el: document.getElementById('waves'),

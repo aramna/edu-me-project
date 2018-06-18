@@ -1,7 +1,6 @@
 import React from 'react';
 import {Link} from "react-router";
-import {Button, Form, Grid, Checkbox, Segment, Container} from 'semantic-ui-react'
-import {message} from "antd/lib/index";
+import {Button, Form, Grid, Checkbox} from 'semantic-ui-react'
 
 class Authentication extends React.Component {
 
