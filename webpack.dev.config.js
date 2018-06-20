@@ -76,5 +76,3 @@ module.exports = {
         root: path.resolve('./src')
     },
 };
-
-
