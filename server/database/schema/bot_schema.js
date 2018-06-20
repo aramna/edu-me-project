@@ -6,8 +6,14 @@ Schema.createSchema = function(mongoose){
 
     var BotSchema = mongoose.Schema({
         name: String,
-        state: String
-
+        state: String,
+        sendReceiver: {type:Object, default:null},
+        receiverList: [],
+        receiverName: String,
+        nick: [],
+        check: [],
+        order: [],
+        choiceNum: []
     })
 
     BotSchema.static('findAll', function(callback) {

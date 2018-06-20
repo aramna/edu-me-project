@@ -1,7 +1,7 @@
 import express from 'express'
 import database from '../database/database'
 const router = express.Router();
-
+import fs from 'fs'
 
 // 회원가입 구현
 router.post('/adduser', (req, res) => {
@@ -77,14 +77,41 @@ router.post('/adduser', (req, res) => {
             return console.log("roomlist가 생성되었습니다.\n" + list);
         });
 
-        return res.json({success: true});
+        // var file = '../em/config/name.txt'
+        // var data = user.username+','+user.username+'\n';
+        //
+        // fs.open(file, 'a+', function(err, fd){
+        //     if (err) throw err;
+        //     if(fd == '9')
+        //     {
+        //         console.log('file create.');
+        //         fs.writeFile(file, data, 'utf8', function(err){
+        //             if(err) throw err
+        //         })
+        //     } else
+        //     {
+        //         fs.appendFile(file, data, function(err){
+        //             if (err) throw err
+        //         })
+        //     }
+        // })
 
+
+
+
+
+
+        var data2 = user.username + '이';
+
+
+        return res.json({success: true});
     })
 })
 
 // 로그인 구현
 router.route('/login').post(function (req, res) {
     console.log('로그인 라우트 응답 받음')
+
     if (typeof req.body.password !== "string") {
         return res.status(401).json({
             error: "로그인 실패",
@@ -135,24 +162,6 @@ router.post('/logout', (req, res) => {
     });
 
     return res.json({success: true});
-});
-
-router.post('/reregister', (req, res) => {
-    console.log('재등록 라우트 요청받음');
-
-    let user = new database.UserModel({
-        username: req.session.loginInfo.username,
-        email: req.session.loginInfo.email,
-        password: req.session.loginInfo.password
-    })
-    console.log("받은유저네임:",req.body.username);
-    user.save((err, user) => {
-      if(err) throw err;
-      return res.json({
-          success: true,
-          user
-      });
-    });
 });
 
 // 세션확인 구현

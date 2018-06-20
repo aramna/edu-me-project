@@ -8,7 +8,6 @@ import {
     AUTH_GET_STATUS,
     AUTH_GET_STATUS_SUCCESS,
     AUTH_GET_STATUS_FAILURE,
-    AUTH_REREGISTER,
     AUTH_LOGOUT
 } from './ActionTypes';
 import axios from 'axios';
@@ -114,22 +113,6 @@ export function getStatusSuccess(userData) {
 export function getStatusFailure() {
     return {
         type: AUTH_GET_STATUS_FAILURE
-    };
-}
-
-/* 리레지스터 */
-export function reRegister(username){
-  return (dispatch) => {
-      return axios.post('api/user/reregister', {username})
-          .then((response) => {
-              dispatch(reregister());
-          });
-  };
-}
-
-export function reregister() {
-    return {
-        type: AUTH_REREGISTER
     };
 }
 
