@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="0bd5ae95-0326-4285-b0af-da1a6903294c" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/public/" />
     <ignored path="$PROJECT_DIR$/.tmp/" />
@@ -17,12 +17,19 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="package.json" pinned="false" current-in-tab="true">
+      <file leaf-file-name="package.json" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/package.json">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="286">
-              <caret line="1183" column="73" selection-start-line="1183" selection-start-column="73" selection-end-line="1183" selection-end-column="73" />
+            <state relative-caret-position="370">
+              <caret line="1187" column="18" lean-forward="true" selection-start-line="1187" selection-start-column="18" selection-end-line="1187" selection-end-column="18" />
             </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="edume-server.js" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/build/edume-server.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-2276" />
           </provider>
         </entry>
       </file>
@@ -56,16 +63,7 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="static.json" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/static.json">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="21">
-              <caret line="1" column="11" selection-start-line="1" selection-start-column="11" selection-end-line="1" selection-end-column="11" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Procfile" pinned="false" current-in-tab="false">
+      <file leaf-file-name="Procfile" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Procfile">
           <provider selected="true" editor-type-id="text-editor" />
         </entry>
@@ -226,10 +224,10 @@
         <option value="$PROJECT_DIR$/src/containers/ChatContainer.js" />
         <option value="$PROJECT_DIR$/server/socket/socketManager.js" />
         <option value="$PROJECT_DIR$/static.json" />
-        <option value="$PROJECT_DIR$/Procfile" />
         <option value="$PROJECT_DIR$/build/config/config.js" />
         <option value="$PROJECT_DIR$/server/config/config.js" />
         <option value="$PROJECT_DIR$/package.json" />
+        <option value="$PROJECT_DIR$/Procfile" />
       </list>
     </option>
   </component>
@@ -452,7 +450,7 @@
       <workItem from="1529302069054" duration="2537000" />
       <workItem from="1529336340997" duration="46704000" />
       <workItem from="1529580146980" duration="4529000" />
-      <workItem from="1529601473803" duration="11799000" />
+      <workItem from="1529601473803" duration="12732000" />
     </task>
     <task id="LOCAL-00001" summary="5.19">
       <created>1526738659689</created>
@@ -556,13 +554,12 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="425563000" />
+    <option name="totallyTimeSpent" value="426496000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="720" y="0" width="948" height="1047" extended-state="0" />
-    <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="3" visible="true" weight="0.23318386" />
+      <window_info content_ui="combo" id="Project" order="3" visible="true" weight="0.23318386" />
       <window_info anchor="bottom" id="TODO" order="6" />
       <window_info anchor="bottom" id="Docker" order="7" show_stripe_button="false" />
       <window_info anchor="bottom" id="Event Log" order="8" side_tool="true" />
@@ -571,7 +568,7 @@
       <window_info id="npm" order="1" side_tool="true" />
       <window_info id="Structure" order="0" side_tool="true" weight="0.25" />
       <window_info anchor="right" id="Mongo Explorer" order="3" weight="0.3224401" />
-      <window_info anchor="bottom" id="Terminal" order="10" visible="true" weight="0.40268457" />
+      <window_info active="true" anchor="bottom" id="Terminal" order="10" visible="true" weight="0.40268457" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="TypeScript" order="11" />
@@ -604,7 +601,6 @@
     <option name="LAST_COMMIT_MESSAGE" value="6.22" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/images/logo2.png" />
     <entry file="file://$PROJECT_DIR$/src/images/logo.png" />
     <entry file="file://$PROJECT_DIR$/src/images/blueback2.jpg" />
     <entry file="file://$PROJECT_DIR$/src/images/blueback.jpg" />
@@ -798,9 +794,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Procfile">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
     <entry file="file://$PROJECT_DIR$/build/config/config.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="168">
@@ -834,11 +827,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/server/database/database.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-63" />
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/server/config/config.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="63">
@@ -853,12 +841,25 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/build/edume-server.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-2276" />
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/package.json">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="286">
-          <caret line="1183" column="73" selection-start-line="1183" selection-start-column="73" selection-end-line="1183" selection-end-column="73" />
+        <state relative-caret-position="370">
+          <caret line="1187" column="18" lean-forward="true" selection-start-line="1187" selection-start-column="18" selection-end-line="1187" selection-end-column="18" />
         </state>
       </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/server/database/database.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-63" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Procfile">
+      <provider selected="true" editor-type-id="text-editor" />
     </entry>
   </component>
 </project>

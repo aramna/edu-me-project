@@ -1,7 +1,7 @@
 module.exports = {
     server_port: 3000,
     devServer_port: 4000,
-    db_url: 'mongodb://nardkf92:goatmxj0)@ds153700.mlab.com:53700/nardkf92',
+    db_url: 'mongodb://dydcks5:c1w1s1c1!!@ds018168.mlab.com:18168/oz',
     db_schemas: [
         {file:'./schema/user_schema', collection:'Users', schemaName:'UserSchema', modelName:'UserModel'},
         {file:'./schema/chat_schema', collection:'Chats', schemaName:'ChatSchema', modelName:'ChatModel'},
