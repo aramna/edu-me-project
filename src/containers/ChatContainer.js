@@ -269,6 +269,7 @@ class ChatContainer extends React.Component {
 
     //채팅방을 생성하는 함수
     handleRoomCreate(e) {
+        const {socket} = this.props
         var c = 1;
         var output = {
             command: 'create',
@@ -276,26 +277,36 @@ class ChatContainer extends React.Component {
             roomId: e.target.value,
             id: this.props.currentUser,
         }
+        var output2 = {
+            command: 'join',
+            roomId: name,
+            id: this.props.currentUser,
+            userEmail: this.props.currentEmail,
+            oneonone: false
+        }
+
+
+        this.setState({activeChannel: e.target.value, activeOneOnOne: ''})
+
+
 
         for (var i = 0; i < this.state.channelList.length; i++) {
 
             if (this.state.channelList[i].text === e.target.value) {
                 c = 0;
                 i = this.state.channelList.length;
-                this.handleItemClick(e, {name: e.target.value})
+                socket.emit('room', output2)
             }
         }
 
         if (c === 1) {
-            const {socket} = this.props
             socket.emit('room', output)
+            socket.emit('room', output2)
             this.setState({
                 channelList: this.state.channelList.concat({
                     text: e.target.value
                 })
             })
-            this.state.channelList2.push(e.target.value)
-            this.handleItemClick(e, {name: e.target.value})
         }
         this.setState({roomId: ''})
 
@@ -306,8 +317,6 @@ class ChatContainer extends React.Component {
     handleItemClick(e, {name}) {
         this.setState({main: false})
         const {socket} = this.props
-        const givetextcount = this.state.givetextcount
-        givetextcount[this.state.channelList2.indexOf(name)] = "0"
 
         this.setState({activeChannel: name, activeOneOnOne: ''})
         this.setState({oneonone: false})
@@ -486,17 +495,17 @@ class ChatContainer extends React.Component {
                     oneOnOneList: oneononelist.oneonones,
                 })
                 console.log('일대일리스트', this.state.oneOnOneList)
-                for (var i = 0; i < this.state.oneOnOneList.length; i++) {
-                    var output = {
-                        command: 'join',
-                        roomId: this.state.oneOnOneList[i].text,
-                        id: this.props.currentUser,
-                        userEmail: this.props.currentEmail,
-                        oneonone: true
-                    }
-                    socket.emit('room', output)
-
-                }
+                // for (var i = 0; i < this.state.oneOnOneList.length; i++) {
+                //     var output = {
+                //         command: 'join',
+                //         roomId: this.state.oneOnOneList[i].text,
+                //         id: this.props.currentUser,
+                //         userEmail: this.props.currentEmail,
+                //         oneonone: true
+                //     }
+                //     socket.emit('room', output)
+                //
+                // }
 
 
             })
@@ -509,18 +518,18 @@ class ChatContainer extends React.Component {
                 this.setState({
                     channelList: this.state.channelList.concat(channellist.roomIds),
                 })
-                for (var i = 0; i < this.state.channelList.length; i++) {
-                    var output = {
-                        command: 'join',
-                        roomId: this.state.channelList[i].text,
-                        id: this.props.currentUser,
-                        userEmail: this.props.currentEmail,
-                        oneonone: false
-                    }
-                    console.log('채널', output.roomId)
-
-                    socket.emit('room', output)
-                }
+                // for (var i = 0; i < this.state.channelList.length; i++) {
+                //     var output = {
+                //         command: 'join',
+                //         roomId: this.state.channelList[i].text,
+                //         id: this.props.currentUser,
+                //         userEmail: this.props.currentEmail,
+                //         oneonone: false
+                //     }
+                //     console.log('채널', output.roomId)
+                //
+                //     socket.emit('room', output)
+                // }
 
             })
         }
@@ -952,7 +961,7 @@ class ChatContainer extends React.Component {
                         <Popup
                             trigger={<Button circular
                                              icon="users"/>}
-                            header='UserList'
+                            header='대화상대'
                             content={ChannelUser}
                             position='bottom'
                             on={['hover', 'click']}
@@ -1438,8 +1447,6 @@ class ChatContainer extends React.Component {
 
                                         {chatView}
                                         {inputView}
-
-
                                 </div>
 
 
