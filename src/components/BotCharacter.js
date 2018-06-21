@@ -30,9 +30,6 @@ class BotCharacter extends React.Component {
         }
     }
 
-    componentWillMount() {
-    }
-
     render() {
 
         return (
@@ -57,7 +54,7 @@ class BotCharacter extends React.Component {
                     <circle fill="#FCEFED" stroke="#FEEBE6" strokeMiterlimit={10} cx="24.739" cy="93.551" r="2.667"/>
                     <circle fill="#FCEFED" stroke="#FEEBE6" strokeMiterlimit={10} cx="101.489" cy="33.051" r="2.666"/>
                     <circle fill="#FCEFED" stroke="#FEEBE6" strokeMiterlimit={10} cx="18.738" cy="87.717" r="2.833"/>
-                    <path fill="#1279c6" stroke="#FEEBE6" strokeMiterlimit={10} d="M116.279,55.814c-0.021-0.286-2.323-28.744-30.221-41.012
+                    <path fill="#FCEFED" stroke="#FEEBE6" strokeMiterlimit={10} d="M116.279,55.814c-0.021-0.286-2.323-28.744-30.221-41.012
 	c-7.806-3.433-15.777-5.173-23.691-5.173c-16.889,0-30.283,7.783-37.187,15.067c-9.229,9.736-13.84,26.712-14.191,30.259
 	l-0.748,62.332c0.149,2.133,1.389,6.167,5.019,6.167c1.891,0,4.074-1.083,6.672-3.311c4.96-4.251,7.424-6.295,9.226-6.295
 	c1.339,0,2.712,1.213,5.102,3.762c4.121,4.396,7.461,6.355,10.833,6.355c2.713,0,5.311-1.296,7.942-3.962

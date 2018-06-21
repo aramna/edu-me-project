@@ -77,33 +77,6 @@ router.post('/adduser', (req, res) => {
             return console.log("roomlist가 생성되었습니다.\n" + list);
         });
 
-        var file = '../edu-me-project/config/name.txt'
-        var data = user.username+','+user.username+'\n';
-
-        fs.open(file, 'a+', function(err, fd){
-            if (err) throw err;
-            if(fd == '9')
-            {
-                console.log('file create.');
-                fs.writeFile(file, data, 'utf8', function(err){
-                    if(err) throw err
-                })
-            } else
-            {
-                fs.appendFile(file, data, function(err){
-                    if (err) throw err
-                })
-            }
-        })
-
-
-
-
-
-
-        var data2 = user.username + '이';
-
-
         return res.json({success: true});
     })
 })

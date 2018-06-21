@@ -20,6 +20,7 @@ import {
     Responsive,
     Dropdown,
     Search,
+    Checkbox,
 } from 'semantic-ui-react'
 import {
     Message,
@@ -29,10 +30,14 @@ import '../index.css'
 import avartarImage from '../images/avatar.jpg'
 import {socketConnect} from 'socket.io-react'
 import {getStatusRequest, logoutRequest} from "../actions/authentication";
-import _ from 'underscore'
+
+import {BotCharacter} from 'components'
+import './styles2'
+import './slide.less'
+import _ from 'lodash'
 
 
-var audio = new Audio('audio_file.mp3');
+// var audio = new Audio('audio_file.mp3');
 
 function dynamicSort(property) {
     var sortOrder = 1
@@ -78,6 +83,7 @@ class ChatContainer extends React.Component {
             show: false,
             listening: false,
             text: '말씀하세요',
+            livetext: '',
             modalOpen: false,
             sidebarOpened: false,
             oneOnOneList: [],
@@ -89,10 +95,13 @@ class ChatContainer extends React.Component {
             results: [],
             value: '',
             givetextcount: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,],
-            givemessage: ["None","None","None","None","None","None","None","None","None","None",],
+            givemessage: ["None", "None", "None", "None", "None", "None", "None", "None", "None", "None",],
             activeChannelIndex: 0,
             recentMsg: [],
-            recentLoading: true
+            recentLoading: true,
+            liveSTT: false,
+            live: false,
+            main: true
         }
 
 
@@ -110,7 +119,8 @@ class ChatContainer extends React.Component {
         this.personalTalk = this.personalTalk.bind(this)
         this.start = this.start.bind(this)
         this.end = this.end.bind(this)
-        this.speechstart = this.speechstart.bind(this)
+        this.livestart = this.livestart.bind(this)
+        this.liveend = this.liveend.bind(this)
         this.handleClose = this.handleClose.bind(this)
         this.handleModalOpen = this.handleModalOpen.bind(this)
         this.handleModalClose = this.handleModalClose.bind(this)
@@ -153,6 +163,7 @@ class ChatContainer extends React.Component {
     //     audio.play()
     //     console.log("dsfjkhfkjsdalhf");
     // }
+
 
     handleMobile() {
         this.setState({mobileView: !this.state.mobileView})
@@ -293,6 +304,7 @@ class ChatContainer extends React.Component {
 
     //Menu.Item에서 item을 클릭했을 때 그 채널을 활성화해주는 함수
     handleItemClick(e, {name}) {
+        this.setState({main: false})
         const {socket} = this.props
         const givetextcount = this.state.givetextcount
         givetextcount[this.state.channelList2.indexOf(name)] = "0"
@@ -313,6 +325,8 @@ class ChatContainer extends React.Component {
     }
 
     handleItemClick2(e, {name}) {
+        this.setState({main: false})
+
         const {socket} = this.props
 
         this.setState({oneonone: true, showSearchUser: false})
@@ -429,6 +443,7 @@ class ChatContainer extends React.Component {
 
 
     componentWillMount() {
+        this.setState({main: true})
         this.resetComponent()
 
         const {socket} = this.props
@@ -437,7 +452,7 @@ class ChatContainer extends React.Component {
             obj.key = 'key_' + (this.state.logs.length + 1)
             logs2.push(obj) // 로그에 추가
             this.setState({logs: logs2})
-            console.log('message',obj)
+            console.log('message', obj)
             // const TextToSpeech = window.speechSynthesis
             //
             // let sayThis = new SpeechSynthesisUtterance(obj.message)
@@ -471,7 +486,7 @@ class ChatContainer extends React.Component {
                     oneOnOneList: oneononelist.oneonones,
                 })
                 console.log('일대일리스트', this.state.oneOnOneList)
-                for(var i = 0; i< this.state.oneOnOneList.length; i++){
+                for (var i = 0; i < this.state.oneOnOneList.length; i++) {
                     var output = {
                         command: 'join',
                         roomId: this.state.oneOnOneList[i].text,
@@ -480,7 +495,10 @@ class ChatContainer extends React.Component {
                         oneonone: true
                     }
                     socket.emit('room', output)
+
                 }
+
+
             })
         }
 
@@ -491,7 +509,7 @@ class ChatContainer extends React.Component {
                 this.setState({
                     channelList: this.state.channelList.concat(channellist.roomIds),
                 })
-                for(var i = 0; i< this.state.channelList.length; i++){
+                for (var i = 0; i < this.state.channelList.length; i++) {
                     var output = {
                         command: 'join',
                         roomId: this.state.channelList[i].text,
@@ -506,6 +524,8 @@ class ChatContainer extends React.Component {
 
             })
         }
+
+
 
         socket.on('memberlist', (memberlist) => {
             this.setState({memberList: []})
@@ -541,10 +561,11 @@ class ChatContainer extends React.Component {
             this.setState({recentMsg: recentmsg, recentLoading: false})
             console.log('recentmsg', recentmsg)
         })
-     }
+    }
 
 
     componentDidMount() {
+
         const {socket} = this.props
         const {container} = this.refs
 
@@ -558,13 +579,8 @@ class ChatContainer extends React.Component {
         const Recognition =
             window.SpeechRecognition || window.webkitSpeechRecognition;
 
-        // const TextToSpeech =
-        //     window.speechSynthesis
-        //
-        // let sayThis = new SpeechSynthesisUtterance(text)
-        //
-        // TextToSpeech.speak(sayThis)
-
+        const TextToSpeech =
+            window.speechSynthesis
 
         if (!Recognition) {
             alert(
@@ -578,6 +594,12 @@ class ChatContainer extends React.Component {
         this.recognition.continuous = true;
         this.recognition.interimResults = false;
         this.recognition.maxAlternatives = 1;
+
+        this.liverecognition = new Recognition();
+        this.liverecognition.lang = process.env.REACT_APP_LANGUAGE || 'ko-KR';
+        this.liverecognition.continuous = true;
+        this.liverecognition.interimResults = false;
+        this.liverecognition.maxAlternatives = 1;
 
         this.recognition.onresult = event => {
             const text = event.results[0][0].transcript;
@@ -625,6 +647,55 @@ class ChatContainer extends React.Component {
             }.bind(this), 1200)
         };
 
+        // 라이브챗팅
+
+        this.liverecognition.onresult = event => {
+            const text = event.results[0][0].transcript;
+
+            console.log('livetranscript', text);
+            this.setState({livetext: text});
+
+            var output = {
+                command: 'call',
+                email: this.props.currentEmail,
+                id: this.props.currentUser,
+                transcript: this.state.livetext,
+                roomId: this.state.activeOneOnOne,
+                possibility: this.state.liveSTT
+            }
+            socket.emit('room', output)
+            this.liverecognition.onend()
+        };
+
+        this.liverecognition.onend = () => {
+            if (this.state.liveSTT === false) {
+                console.log('liveSTT상태', this.state.liveSTT)
+                this.liverecognition.stop();
+                console.log('live end1')
+            } else {
+                this.liverecognition.stop();
+                console.log('live end2')
+                this.liverecognition.start();
+                console.log('live 재시작')
+            }
+        }
+
+
+        this.liverecognition.onspeechstart = () => {
+            console.log('소리 감지')
+            this.setState({
+                listening: true,
+            })
+        };
+
+        // this.liverecognition.onerror = event => {
+        //     console.log('liveerror', event);
+        //
+        //     setTimeout(function () {
+        //         this.setState({liveSTT: false})
+        //     }.bind(this), 1200)
+        // };
+
         socket.on('request', (obj) => {
             console.log("obj", obj)
             if (obj.modal === true) {
@@ -653,6 +724,19 @@ class ChatContainer extends React.Component {
             }
         })
 
+        socket.on('recall', (obj) => {
+            let sayThis = new SpeechSynthesisUtterance(obj.message)
+            TextToSpeech.speak(sayThis)
+        })
+
+        socket.on('reject', (obj) => {
+            this.setState({liveSTT: obj.possibility})
+            this.liverecognition.stop();
+        })
+
+        socket.on('transcript-end', (obj) => {
+            this.handleModalClose()
+        })
     }
 
     start() {
@@ -664,14 +748,27 @@ class ChatContainer extends React.Component {
         this.recognition.stop();
     }
 
+    livestart() {
+        this.setState({liveSTT: !this.state.liveSTT})
+
+        setTimeout(function () {
+            if (this.state.liveSTT === true) {
+                this.liverecognition.start();
+            } else {
+                this.liverecognition.stop();
+            }
+        }.bind(this), 100)
+
+        console.log('라이브챗')
+    }
+
+    liveend() {
+        this.liverecognition.stop();
+    }
+
     handleClose() {
         this.setState({show: false})
     }
-
-    speechstart() {
-        this.recognition.onspeechstart()
-    }
-
 
     componentDidUpdate(prevProps, prevState) {
         const {socket} = this.props
@@ -708,66 +805,65 @@ class ChatContainer extends React.Component {
         const {isLoading, value, results} = this.state
         const {activeChannel} = this.state
         const {activeOneOnOne} = this.state
-        const logoutButton1 = (
-            <Dropdown icon='bars' pointing='top right' style={{color: 'white', fontFamily: "Jeju Gothic"}}>
-                <Dropdown.Menu>
-                    <Dropdown.Item active='false' text={this.props.currentEmail}/>
-                    <Dropdown.Divider/>
-                    <Dropdown.Item icon='sign out' text='로그아웃' onClick={this.handleLogout}/>
-                </Dropdown.Menu>
-            </Dropdown>
-
-        )
-        const logoutButton2 = (
-            <Dropdown icon='bars' pointing='top right' style={{marginLeft: 5, fontFamily: "Jeju Gothic"}}>
-                <Dropdown.Menu>
-                    <Dropdown.Item active='false' text={this.props.currentEmail}/>
-                    <Dropdown.Divider/>
-                    <Dropdown.Item icon='sign out' text='로그아웃' onClick={this.handleLogout}/>
-                </Dropdown.Menu>
-            </Dropdown>
-        )
 
         const channel = this.state.channelList.map(
             ({text}) => (
+
                 <div>
                     {this.state.visibleList ?
                         <Menu.Menu>
                             {activeChannel === text ?
                                 <div>
-                                <Menu.Item
-                                    name={text}
-                                    active={activeChannel === text}
-                                    onClick={this.handleItemClick}
-                                    style={{float: 'left', width: '155', fontFamily: "Jeju Gothic", fontStyle: 'normal'}}
-                                />
-                                <Icon name='circle' size='small' color='green'
-                                style={{float: 'right', marginTop: 5}}/>
+                                    <Menu.Item
+                                        name={text}
+                                        active={activeChannel === text}
+                                        onClick={this.handleItemClick}
+                                        style={{
+                                            float: 'left',
+                                            width: '155',
+                                            fontFamily: "Jeju Gothic",
+                                            fontStyle: 'normal'
+                                        }}
+                                    />
+                                    <Icon name='circle' size='small' color='green'
+                                          style={{float: 'right', marginTop: 5}}/>
                                 </div>
                                 :
                                 <Menu.Item
                                     name={text}
                                     active={activeChannel === text}
                                     onClick={this.handleItemClick}
-                                    style={{float: 'left', width: '155', fontFamily: "Jeju Gothic", fontStyle: 'normal'}}
+                                    style={{
+                                        float: 'left',
+                                        width: '155',
+                                        fontFamily: "Jeju Gothic",
+                                        fontStyle: 'normal'
+                                    }}
                                 />
                             }
                         </Menu.Menu> : ""}
-                </div>)
+                </div>
+
+            )
         )
 
 
         const ChannelUser = []
         for (var i = 0; i < this.state.memberList.length; i++) {
-            ChannelUser.push(
-                <Menu.Item
-                    name={this.state.memberList[i]}
-                />
-            )
+            if (this.props.currentUser !== this.state.memberList[i]) {
+                ChannelUser.push(
+                    <Menu.Item
+                        name={this.state.memberList[i]}
+                        style={{fontFamily: "Jeju Gothic", fontSize: 13}}
+                    />
+                )
+            }
         }
+
 
         const mobileChannel = this.state.channelList.map(
             ({text}) => (
+                // text !== 'main' ?
                 <div>
                     <Item as='a'>
                         <Item.Content>
@@ -785,7 +881,8 @@ class ChatContainer extends React.Component {
                                 {this.state.recentMsg.map((e) => (
 
                                     e.roomId === text ?
-                                        <div style={{fontFamily: "Jeju Gothic", color: '#4f596b'}}>{e.message}</div> : ''
+                                        <div
+                                            style={{fontFamily: "Jeju Gothic", color: '#4f596b'}}>{e.message}</div> : ''
 
 
                                 ))}
@@ -794,6 +891,9 @@ class ChatContainer extends React.Component {
                     </Item>
                     <Divider fitted style={{marginTop: 5, marginBottom: 5}}/>
                 </div>
+                    // :
+                    // <div>
+                    // </div>
             )
         )
 
@@ -816,7 +916,8 @@ class ChatContainer extends React.Component {
                                 {this.state.recentMsg.map((e) => (
 
                                     e.roomId.match(text) ?
-                                        <div style={{fontFamily: "Jeju Gothic", color: '#4f596b'}}>{e.message}</div> : ''
+                                        <div
+                                            style={{fontFamily: "Jeju Gothic", color: '#4f596b'}}>{e.message}</div> : ''
 
 
                                 ))}
@@ -872,6 +973,54 @@ class ChatContainer extends React.Component {
             </div>
         )
 
+        const logoutButton1 = (
+            <Dropdown icon='bars' pointing='top right' style={{color: 'white', fontFamily: "Jeju Gothic"}}>
+                <Dropdown.Menu>
+                    <Dropdown.Item active='false' text={this.props.currentEmail}/>
+                    <Dropdown.Divider/>
+                    <Dropdown.Item icon='sign out' text='로그아웃' onClick={this.handleLogout}/>
+                </Dropdown.Menu>
+            </Dropdown>
+
+        )
+        const logoutButton2 = (
+            <Dropdown icon='bars' pointing='top right' style={{marginLeft: 5, fontFamily: "Jeju Gothic"}}>
+                <Dropdown.Menu>
+                    <Dropdown.Item active='false' text={this.props.currentEmail}/>
+                    <Dropdown.Divider/>
+                    <Dropdown.Item icon='users' text='대화상대'/>
+                    <Dropdown.Divider/>
+                    {this.state.activeOneOnOne === '' ?
+                        <div className={this.state.activeChannel}>
+                            <Item>
+                                <Item.Content>
+                                    <Item.Header>
+                                        <Header size='small'>
+                                            {ChannelUser}
+                                        </Header>
+                                    </Item.Header>
+                                </Item.Content>
+                            </Item>
+                        </div>
+                        :
+                        <div className={this.state.activeOneOnOne}>
+                            <Item>
+                                <Item.Content>
+                                    <Item.Header>
+                                        <Header size='small'>
+                                            {ChannelUser}
+                                        </Header>
+                                    </Item.Header>
+                                </Item.Content>
+                            </Item>
+                        </div>
+                    }
+                    <Dropdown.Divider/>
+                    <Dropdown.Item icon='sign out' text='로그아웃' onClick={this.handleLogout}/>
+                </Dropdown.Menu>
+            </Dropdown>
+        )
+
         const chatView = (
 
             <div style={{height: 'calc(100% - 70px)'}}>
@@ -879,10 +1028,20 @@ class ChatContainer extends React.Component {
                 <div ref='container' style={{height: '100%', overflowY: 'scroll', backgroundColor: '#D6D6D6'}}>
 
                     {this.state.activeChannel === '' ?
-                        <Divider horizontal style={{color: '#455A64', fontSize: 11, opacity: 0.8, fontFamily: "Jeju Gothic"}}>{this.state.activeOneOnOne}님과 대화를
+                        <Divider horizontal style={{
+                            color: '#455A64',
+                            fontSize: 11,
+                            opacity: 0.8,
+                            fontFamily: "Jeju Gothic"
+                        }}>{this.state.activeOneOnOne}님과 대화를
                             시작합니다.</Divider>
                         :
-                        <Divider horizontal style={{color: '#455A64', fontSize: 11, opacity: 0.8, fontFamily: "Jeju Gothic"}}>{this.state.activeChannel}방에
+                        <Divider horizontal style={{
+                            color: '#455A64',
+                            fontSize: 11,
+                            opacity: 0.8,
+                            fontFamily: "Jeju Gothic"
+                        }}>{this.state.activeChannel}방에
                             입장하셨습니다.</Divider>}
 
 
@@ -893,12 +1052,14 @@ class ChatContainer extends React.Component {
                                     e.name !== this.props.currentUser ?
                                         // sender가 상대방일 때
                                         <Message
-                                            authorName={e.name} date={e.time} style={{fontFamily: "Jeju Gothic", fontSize: 14}}>
+                                            authorName={e.name} date={e.time}
+                                            style={{fontFamily: "Jeju Gothic", fontSize: 12}}>
                                             <MessageText>{e.message}</MessageText>
                                         </Message>
                                         :
                                         // sender가 본인일 때
-                                        <Message isOwn deliveryStatus={e.time} style={{fontFamily: "Jeju Gothic", fontSize: 14}}>
+                                        <Message isOwn deliveryStatus={e.time}
+                                                 style={{fontFamily: "Jeju Gothic", fontSize: 12}}>
                                             <MessageText>{e.message}</MessageText>
                                         </Message>
                                 }
@@ -966,7 +1127,10 @@ class ChatContainer extends React.Component {
                             <Grid.Column style={{width: '100%', height: '100%', padding: 0}}>
                                 <div>
                                     <Image avatar src={avartarImage} style={{width: 75, height: 75}}/>
-                                    <span style={{marginLeft: 20, fontFamily: "Jeju Gothic"}}>{this.props.currentUser}</span>
+                                    <span style={{
+                                        marginLeft: 20,
+                                        fontFamily: "Jeju Gothic"
+                                    }}>{this.props.currentUser}</span>
                                 </div>
                             </Grid.Column>
 
@@ -1045,216 +1209,84 @@ class ChatContainer extends React.Component {
             </div>
         )
 
+        const LiveSTT = (
+            <div>
+                <Button toggle circular icon='power off'
+                        active={this.state.liveSTT}
+                        onClick={this.livestart}
+               />
+            </div>
+        )
+
+        const mobileLiveSTT = (
+            <div style={{marginRight: 10}}>
+                <Button toggle circular
+                        active={this.state.liveSTT}
+                        onClick={this.livestart}
+                >
+                    live
+                </Button>
+            </div>
+        )
+
+        const bot = (
+            <BotCharacter/>
+        )
+
+        const bubble = (
+            <div className="bubble" style={{textAlign: 'center', fontFamily: "Jeju Gothic"}}>
+                {this.state.text}
+            </div>
+        )
 
         const STT = (
             <div>
-                <Modal
-                    trigger={<Button circular
-                                     icon="unmute"
-                                     onClick={this.start}
-                    />}
-                    size='huge'
-                    basic
-                    // onClose={this.end}
-                    open={this.state.modalOpen}
-                    style={{height: '100%'}}
-                >
-                    <Modal.Header>음성인식</Modal.Header>
-                    <Modal.Content style={{textAlign: 'center'}}>
-                        <h1 style={{fontSize: 70, marginTop: 200, color: 'white' }}>
-                            {
-                                this.state.text
-                            }
-                        </h1>
-                        <Modal.Description>
-                            <Icon circular
-                                  inverted
-                                  color='red'
-                                  name="unmute"
-                                  onClick={this.handleModalClose}
-                                  size='huge'
-                                  link
-                                  style={{marginTop: 40}}
-                            />
-                        </Modal.Description>
-
-                    </Modal.Content>
-                </Modal>
-
+                {this.state.modalOpen === false ?
+                    <Button circular
+                            icon="microphone"
+                            onClick={this.start}
+                    />
+                    :
+                    <div>
+                        <Button circular
+                                icon="microphone"
+                                onClick={this.start}
+                        />
+                        <a>
+                        <div onClick={this.handleModalClose} style={{position: 'absolute', bottom: '3.5%', right: '5%'}}>
+                            {bot}
+                        </div>
+                        </a>
+                        <div style={{position: 'absolute', bottom: '25%', right: '10%'}}>
+                            {bubble}
+                        </div>
+                    </div>
+                }
             </div>
         )
 
         const WidgetSTT = (
             <div>
-                <Modal
-                    trigger={<Button circular
-                                     icon="unmute"
-                                     size='massive'
-                                     color='blue'
-                                     onClick={this.start}
-                    />}
-                    size='huge'
-                    basic
-                    // onClose={this.end}
-                    open={this.state.modalOpen}
-                    style={{height: '100%'}}
-                >
-                    <Modal.Header>음성인식</Modal.Header>
-                    <Modal.Content style={{textAlign: 'center'}}>
-                        <h1 style={{fontSize: 70, marginTop: 200, color: 'white'}}>
-                            {
-                                this.state.text
-                            }
-                        </h1>
-                        <Modal.Description>
-                            <Icon circular
-                                  inverted
-                                  color='red'
-                                  name="unmute"
-                                  onClick={this.handleModalClose}
-                                  size='huge'
-                                  link
-                                  style={{marginTop: 40}}
-                            />
-                        </Modal.Description>
-                    </Modal.Content>
-                </Modal>
-            </div>
-        )
-
-        const bot = (
-            <div>
-                <svg className="ghost" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg"
-                     xmlnshref="http://www.w3.org/1999/xlink" x="0px" y="0px" width="127.433px" height="132.743px"
-                     viewBox="0 0 127.433 132.743" enableBackground="new 0 0 127.433 132.743" xmlSpace="preserve">
-                    <path fill="#FFF6F4" d="M116.223,125.064c1.032-1.183,1.323-2.73,1.391-3.747V54.76c0,0-4.625-34.875-36.125-44.375
-	s-66,6.625-72.125,44l-0.781,63.219c0.062,4.197,1.105,6.177,1.808,7.006c1.94,1.811,5.408,3.465,10.099-0.6
-	c7.5-6.5,8.375-10,12.75-6.875s5.875,9.75,13.625,9.25s12.75-9,13.75-9.625s4.375-1.875,7,1.25s5.375,8.25,12.875,7.875
-	s12.625-8.375,12.625-8.375s2.25-3.875,7.25,0.375s7.625,9.75,14.375,8.125C114.739,126.01,115.412,125.902,116.223,125.064z"/>
-                    <circle fill="#013E51" cx="86.238" cy="57.885" r="6.667"/>
-                    <circle fill="#013E51" cx="40.072" cy="57.885" r="6.667"/>
-                    <path fill="#013E51" d="M71.916,62.782c0.05-1.108-0.809-2.046-1.917-2.095c-0.673-0.03-1.28,0.279-1.667,0.771
-	c-0.758,0.766-2.483,2.235-4.696,2.358c-1.696,0.094-3.438-0.625-5.191-2.137c-0.003-0.003-0.007-0.006-0.011-0.009l0.002,0.005
-	c-0.332-0.294-0.757-0.488-1.235-0.509c-1.108-0.049-2.046,0.809-2.095,1.917c-0.032,0.724,0.327,1.37,0.887,1.749
-	c-0.001,0-0.002-0.001-0.003-0.001c2.221,1.871,4.536,2.88,6.912,2.986c0.333,0.014,0.67,0.012,1.007-0.01
-	c3.163-0.191,5.572-1.942,6.888-3.166l0.452-0.453c0.021-0.019,0.04-0.041,0.06-0.061l0.034-0.034
-	c-0.007,0.007-0.015,0.014-0.021,0.02C71.666,63.771,71.892,63.307,71.916,62.782z"/>
-                    <circle fill="#FCEFED" stroke="#FEEBE6" strokeMiterlimit={10} cx="18.614" cy="99.426" r="3.292"/>
-                    <circle fill="#FCEFED" stroke="#FEEBE6" strokeMiterlimit={10} cx="95.364" cy="28.676" r="3.291"/>
-                    <circle fill="#FCEFED" stroke="#FEEBE6" strokeMiterlimit={10} cx="24.739" cy="93.551" r="2.667"/>
-                    <circle fill="#FCEFED" stroke="#FEEBE6" strokeMiterlimit={10} cx="101.489" cy="33.051" r="2.666"/>
-                    <circle fill="#FCEFED" stroke="#FEEBE6" strokeMiterlimit={10} cx="18.738" cy="87.717" r="2.833"/>
-                    <path fill="#FCEFED" stroke="#FEEBE6" strokeMiterlimit={10} d="M116.279,55.814c-0.021-0.286-2.323-28.744-30.221-41.012
-	c-7.806-3.433-15.777-5.173-23.691-5.173c-16.889,0-30.283,7.783-37.187,15.067c-9.229,9.736-13.84,26.712-14.191,30.259
-	l-0.748,62.332c0.149,2.133,1.389,6.167,5.019,6.167c1.891,0,4.074-1.083,6.672-3.311c4.96-4.251,7.424-6.295,9.226-6.295
-	c1.339,0,2.712,1.213,5.102,3.762c4.121,4.396,7.461,6.355,10.833,6.355c2.713,0,5.311-1.296,7.942-3.962
-	c3.104-3.145,5.701-5.239,8.285-5.239c2.116,0,4.441,1.421,7.317,4.473c2.638,2.8,5.674,4.219,9.022,4.219
-	c4.835,0,8.991-2.959,11.27-5.728l0.086-0.104c1.809-2.2,3.237-3.938,5.312-3.938c2.208,0,5.271,1.942,9.359,5.936
-	c0.54,0.743,3.552,4.674,6.86,4.674c1.37,0,2.559-0.65,3.531-1.932l0.203-0.268L116.279,55.814z M114.281,121.405
-	c-0.526,0.599-1.096,0.891-1.734,0.891c-2.053,0-4.51-2.82-5.283-3.907l-0.116-0.136c-4.638-4.541-7.975-6.566-10.82-6.566
-	c-3.021,0-4.884,2.267-6.857,4.667l-0.086,0.104c-1.896,2.307-5.582,4.999-9.725,4.999c-2.775,0-5.322-1.208-7.567-3.59
-	c-3.325-3.528-6.03-5.102-8.772-5.102c-3.278,0-6.251,2.332-9.708,5.835c-2.236,2.265-4.368,3.366-6.518,3.366
-	c-2.772,0-5.664-1.765-9.374-5.723c-2.488-2.654-4.29-4.395-6.561-4.395c-2.515,0-5.045,2.077-10.527,6.777
-	c-2.727,2.337-4.426,2.828-5.37,2.828c-2.662,0-3.017-4.225-3.021-4.225l0.745-62.163c0.332-3.321,4.767-19.625,13.647-28.995
-	c3.893-4.106,10.387-8.632,18.602-11.504c-0.458,0.503-0.744,1.165-0.744,1.898c0,1.565,1.269,2.833,2.833,2.833
-	c1.564,0,2.833-1.269,2.833-2.833c0-1.355-0.954-2.485-2.226-2.764c4.419-1.285,9.269-2.074,14.437-2.074
-	c7.636,0,15.336,1.684,22.887,5.004c26.766,11.771,29.011,39.047,29.027,39.251V121.405z"/>
-                </svg>
-                <p className="shadowFrame">
-                    <svg version="1.1" className="shadow" id="Layer_1" xmlns="http://www.w3.org/2000/svg"
-                         xmlnsXlink="http://www.w3.org/1999/xlink" x="61px" y="20px" width="122.436px" height="39.744px"
-                         viewBox="0 0 122.436 39.744" enableBackground="new 0 0 122.436 39.744" xmlSpace="preserve">
-                        <ellipse fill="#666564" cx="61.128" cy="19.872" rx="49.25" ry="8.916"/>
-                    </svg>
-                </p>
-            </div>
-        )
-
-        const jerry = (
-
-            <div className="jerry">
-                <div className="lights">
-                    <span className="white_light" />
-                    <span className="dark_light" />
-                </div>
-                <div className="jerry_hair">
-                    <ul>
-                        <li className="h1" />
-                        <li className="h2" />
-                        <li className="h3" />
-                        <li className="h4" />
-                        <li className="h5" />
-                        <li className="h6" />
-                        <li className="h7" />
-                        <li className="h8" />
-                        <li className="h9" />
-                        <li className="h10" />
-                        <li className="h11" />
-                        <li className="h12" />
-                    </ul>
-                </div>
-                <div className="eyes1">
-                    <div className="eye_animate" />
-                    <div className="glasses" />
-                    <div className="white_part">
-                        <div className="brown_eye">
-                            <span className="black_part" />
+                {this.state.modalOpen === false ?
+                    <Button circular
+                            icon="microphone"
+                            size='massive'
+                            color='blue'
+                            onClick={this.start}
+                    />
+                    :
+                    <div>
+                        <a>
+                        <div onClick={this.handleModalClose} style={{position: 'absolute', bottom: '3.5%', right: '5%'}}>
+                            {bot}
+                        </div>
+                        </a>
+                        <div style={{position: 'absolute', bottom: '25%', right: '10%'}}>
+                            {bubble}
                         </div>
                     </div>
-                </div>
-                <div className="eyes2">
-                    <div className="eye_animate" />
-                    <div className="glasses" />
-                    <div className="white_part">
-                        <div className="brown_eye">
-                            <span className="black_part" />
-                        </div>
-                    </div>
-                </div>
-                <div className="jerry_hand">
-                    <div className="jerry_lh" />
-                    <div className="animated_lh">
-                        <span className="gloves_lh" />
-                        <span className="gloves_lh2" />
-                    </div>
-                    <div className="jerry_rh" />
-                    <span className="gloves_rh" />
-                </div>
-                <div className="black_tie">
-          <span className="right_tie">
-            <div className="top_tie" />
-            <div className="down_tie" />
-          </span>
-                    <span className="left_tie">
-            <div className="top_tie" />
-            <div className="down_tie" />
-          </span>
-                </div>
-                <div className="jerry_smile">
-                    <span className="teeth1" />
-                    <span className="teeth2" />
-                </div>
-                <div className="curves">
-                    <span className="jerry_curve1" />
-                    <span className="jerry_curve1 jerry_left_curve" />
-                    <span className="jerry_curve2" />
-                </div>
-                <div className="clothes">
-                    <div className="main_jerry" />
-                    <div className="right_shirt jerry_right_shirt" />
-                    <div className="right_shirt jerry_left_shirt" />
-                    <div className="jerry_bottom" />
-                </div>
-                <div className="pocket">
-                    <div className="logo" />
-                    <span className="lines" />
-                </div>
-                <div className="legs">
-                    <div className="jerry_shoes"><span className="jerry_small_shoes" /></div>
-                    <div className="jerry_shoes jerry_left_shoes"><span className="jerry_small_shoes" /></div>
-                </div>
+                }
             </div>
-
         )
 
 
@@ -1271,13 +1303,17 @@ class ChatContainer extends React.Component {
                 }}>
                     {this.state.channelORoneOnOne === false ?
                         <Button.Group widths={2} style={{width: 200, marginBottom: 10}}>
-                            <Button color='blue' onClick={this.handleChannel} style={{fontFamily: "Jeju Gothic"}}>채널</Button>
-                            <Button basic color='blue' onClick={this.handleOneOnOne} style={{fontFamily: "Jeju Gothic"}}>일대일</Button>
+                            <Button color='blue' onClick={this.handleChannel}
+                                    style={{fontFamily: "Jeju Gothic"}}>채널</Button>
+                            <Button basic color='blue' onClick={this.handleOneOnOne}
+                                    style={{fontFamily: "Jeju Gothic"}}>일대일</Button>
                         </Button.Group>
                         :
                         <Button.Group widths={2} style={{width: 200, marginBottom: 10}}>
-                            <Button basic color='blue' onClick={this.handleChannel} style={{fontFamily: "Jeju Gothic"}}>채널</Button>
-                            <Button color='blue' onClick={this.handleOneOnOne} style={{fontFamily: "Jeju Gothic"}}>일대일</Button>
+                            <Button basic color='blue' onClick={this.handleChannel}
+                                    style={{fontFamily: "Jeju Gothic"}}>채널</Button>
+                            <Button color='blue' onClick={this.handleOneOnOne}
+                                    style={{fontFamily: "Jeju Gothic"}}>일대일</Button>
                         </Button.Group>}
                     {this.state.channelORoneOnOne === false ?
                         <Input as='search'
@@ -1326,52 +1362,121 @@ class ChatContainer extends React.Component {
 
         )
 
+        const mainView = (
+            <div className="container">
+                <section className="slide">
+                    <div className="inner" style={{}}>
+                        <h1 style={{fontFamily: 'Quicksand', fontSize: 90, color: 'white'}}>Talky</h1>
+                        <p style={{fontFamily: "Jeju Gothic"}}>토키에 오신 것을 환영합니다. 옆으로 넘기세요.</p>
+                    </div>
+                </section>
+                <section className="slide">
+                    <div className="inner">
+                        <p>Just a really simple way to layout and animate a gallery.</p>
+                    </div>
+                </section>
+                <section className="slide">
+                    <div className="inner">
+                        <p>The active slide is positioned in the viewport.</p>
+                        <pre><code>{"\n"}.slide.active {"{"}{"\n"}{"  "}transform: translatex(0);{"\n"}{"}"}</code></pre>
+                    </div>
+                </section>
+                <section className="slide">
+                    <div className="inner">
+                        <p>Siblings after the active slide are positioned off the screen to the right.</p>
+                        <pre><code>{"\n"}.slide.active ~ .slide {"{"}{"\n"}{"  "}transform: translatex(100%);{"\n"}{"}"}</code></pre>
+                    </div>
+                </section>
+                <section className="slide">
+                    <div className="inner">
+                        <p>Siblings before the active slide are positioned off the screen to the left.</p>
+                        <pre><code>{"\n"}.slide {"{"}{"\n"}{"  "}transform: translatex(-100%);{"\n"}{"}"}</code></pre>
+                    </div>
+                </section>
+                <section className="slide">
+                    <div className="inner">
+                        <p>The movement between slides is handled by a transition.</p>
+                        <pre><code>{"\n"}.slide {"{"}{"\n"}{"  "}transition: transform 0.4s ease;{"\n"}{"}"}</code></pre>
+                    </div>
+                </section>
+
+            </div>
+        )
+
         return (
-            <Segment.Group>
+            <div>
                 <Responsive
                     maxWidth={Responsive.onlyComputer.maxWidth}
                     minWidth={Responsive.onlyTablet.minWidth}
                 >
 
-                    <Grid stretched celled style={{
+                    <Grid stretched style={{
                         padding: 0,
                         marginTop: 0,
                         marginBottom: 0,
+                        marginRight: 0,
+                        marginLeft: 0,
                         width: '100%',
-                        height: 'calc(100vh - 60px)'
+                        height: 'calc(100vh - 56px)'
                     }}>
                         <Dimmer active={this.state.loading}>
                             <Loader active={this.state.loading}>채팅 불러오는중</Loader>
                         </Dimmer>
-                        <Grid.Column stretched style={{width: 250, padding: 0, height: '100%'}}>
-                            <div style={{height: '100%'}}>
+                        <Grid.Column stretched style={{width: 250, padding: 0, height: '100%', zIndex: 3}}>
+                            <div style={{width: '100%', height: '100%'}}>
                                 {SideView}
                                 {OneOnOneView}
                             </div>
-                        </Grid.Column>
-                        <Grid.Column style={{width: 'calc(100% - 310px)', padding: 0}}>
-                            <div style={{height: '100%', textAlign: 'center'}}>
+                            <div style={{width:0, height:0, opacity: 0}}>
                                 {chatView}
-                                {inputView}
                             </div>
                         </Grid.Column>
-                        <Grid.Column floated='right' style={{width: 60, backgroundColor: '#455A64'}}>
-                            <List>
-                                <List.Item>
-                                    {STT}
-                                </List.Item>
-                                <List.Item style={{marginTop: 10}}>
-                                    {userList}
-                                </List.Item>
-                            </List>
+                        <Grid.Column stretched style={{width: 'calc(100% - 310px)', padding: 0, zIndex: 1}}>
+
+                                <div style={{height: '100%', textAlign: 'center'}}>
+
+
+                                        {chatView}
+                                        {inputView}
+
+
+                                </div>
+
+
+
+                        </Grid.Column>
+                        <Grid.Column stretched floated='right' style={{width: 60, backgroundColor: '#455A64', zIndex: 2}}>
+                            {this.state.activeChannel !== '' ?
+                                <List style={{width: '100%', textAlign: 'center'}}>
+                                    <List.Item>
+                                        {STT}
+                                    </List.Item>
+                                    <List.Item style={{marginTop: 10}}>
+                                        {userList}
+                                    </List.Item>
+                                </List>
+                                :
+                                <List style={{width: '100%', textAlign: 'center'}}>
+                                    <List.Item>
+                                        {STT}
+                                    </List.Item>
+                                    <List.Item style={{marginTop: 10}}>
+                                        {LiveSTT}
+                                    </List.Item>
+                                    <List.Item style={{marginTop: 10}}>
+                                        {userList}
+                                    </List.Item>
+                                </List>
+                            }
+
                         </Grid.Column>
                     </Grid>
                 </Responsive>
 
-
                 <Responsive {...Responsive.onlyMobile}>
                     <div>
                         {this.state.mobileView ?
+                            this.state.activeChannel !== '' ?
                             <Menu compact secondary icon attached='top' style={{
                                 width: '100vh',
                                 height: 55,
@@ -1382,24 +1487,52 @@ class ChatContainer extends React.Component {
                             }}>
                                 <Menu.Item
                                     onClick={this.handleMobile}
-                                    style={{width: 50}}
+                                    style={{width: 50, marginRight: 55}}
                                 >
                                     <Icon name='angle left' size='big'/>
                                 </Menu.Item>
-                                <Menu.Item style={{width: 'calc(100% - 200px)'}}>
+                                <Menu.Item style={{width: 'calc(100% - 240px)'}}>
                                     <Header style={{width: '100%'}}>
                                         {this.state.channelORoneOnOne ? this.state.activeOneOnOne : this.state.activeChannel}
                                     </Header>
                                 </Menu.Item>
                                 <Menu.Item
                                     position='right'
-                                    style={{width: 130}}
+                                    style={{width: 90}}
                                 >
-                                    {userList}
                                     {STT}
                                     {logoutButton2}
                                 </Menu.Item>
                             </Menu>
+                                :
+                                <Menu compact secondary icon attached='top' style={{
+                                    width: '100vh',
+                                    height: 55,
+                                    backgroundColor: '#c4c4c4',
+                                    opacity: 0.8,
+                                    position: 'absolute',
+                                    zIndex: 3
+                                }}>
+                                    <Menu.Item
+                                        onClick={this.handleMobile}
+                                        style={{width: 50, marginRight: 85}}
+                                    >
+                                        <Icon name='angle left' size='big'/>
+                                    </Menu.Item>
+                                    <Menu.Item style={{width: 'calc(100% - 320px)'}}>
+                                        <Header style={{width: '100%'}}>
+                                            {this.state.channelORoneOnOne ? this.state.activeOneOnOne : this.state.activeChannel}
+                                        </Header>
+                                    </Menu.Item>
+                                    <Menu.Item
+                                        position='right'
+                                        style={{width: 180}}
+                                    >
+                                        {mobileLiveSTT}
+                                        {STT}
+                                        {logoutButton2}
+                                    </Menu.Item>
+                                </Menu>
                             :
                             <Menu compact secondary icon attached='top' style={{
                                 width: '100vh',
@@ -1449,9 +1582,15 @@ class ChatContainer extends React.Component {
                                     <Loader active={this.state.recentLoading}>목록 불러오는중</Loader>
                                 </Dimmer>
                                 {MobileListView}
-                                <div style={{position: 'absolute', bottom: '3.5%', right: '5%'}}>
-                                    {WidgetSTT}
-                                </div>
+                                {this.state.modalOpen === false ?
+                                    <div style={{position: 'absolute', bottom: '3.5%', right: '5%'}}>
+                                        {WidgetSTT}
+                                    </div>
+                                :
+                                    <div>
+                                        {WidgetSTT}
+                                    </div>
+                                }
 
                                 <div style={{height: 0}}>
                                     {chatView}
@@ -1460,7 +1599,7 @@ class ChatContainer extends React.Component {
                         }
                     </div>
                 </Responsive>
-            </Segment.Group>
+            </div>
         )
     }
 }

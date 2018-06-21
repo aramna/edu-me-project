@@ -110,7 +110,7 @@ class FixedHeader extends React.Component {
                 >
                     <div
 
-                        style={{ textAlign: 'center', minHeight: 55, padding: 0, borderRadius: 0, backgroundColor: '#2196F3' }}>
+                        style={{ textAlign: 'center', minHeight: 55, padding: 0, borderRadius: 0, backgroundColor: '#404347' }}>
                         <Menu
                             fixed='top'
                             secondary
