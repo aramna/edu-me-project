@@ -77,7 +77,7 @@ router.post('/adduser', (req, res) => {
             return console.log("roomlist가 생성되었습니다.\n" + list);
         });
 
-        var file = '../edu-me-project-Aram/config/name.txt'
+        var file = '../edu-me-project/config/name.txt'
         var data = user.username+','+user.username+'\n';
 
         fs.open(file, 'a+', function(err, fd){
