@@ -454,7 +454,7 @@ module.exports = function(socket) {
 
                     //베이지안 알고리즘으로 텍스트분석
                     var ch = ""//"ㅇㅇ한테"를 가져올 변수
-                    const article = fs.readFileSync("../edu-me-project-Aram/config/test.txt");
+                    const article = fs.readFileSync("../edu-me-project/config/test.txt");
                     var lineArray = article.toString();
                     var line = lineArray.split('\n');
                     console.log('line : ' + line)
@@ -532,7 +532,7 @@ module.exports = function(socket) {
                                         return text.split('')}
                                 })
 
-                                const article2 = fs.readFileSync("../edu-me-project-Aram/config/name.txt");
+                                const article2 = fs.readFileSync("../edu-me-project/config/name.txt");
                                 var lineArray2 = article2.toString();
                                 var line2 = lineArray2.split('\n');
                                 for(var i in line2){
@@ -615,7 +615,7 @@ module.exports = function(socket) {
                                 return text.split('')}
                         })
 
-                        const article2 = fs.readFileSync("../edu-me-project-Aram/config/name.txt");
+                        const article2 = fs.readFileSync("../edu-me-project/config/name.txt");
                         var lineArray2 = article2.toString();
                         var line2 = lineArray2.split('\n');
                         for(var i in line2){
@@ -674,7 +674,7 @@ module.exports = function(socket) {
                             return text.split('')}
                     })
 
-                    const article3 = fs.readFileSync("../edu-me-project-Aram/config/yesNo.txt");
+                    const article3 = fs.readFileSync("../edu-me-project/config/yesNo.txt");
                     var lineArray3 = article3.toString();
                     var line3 = lineArray3.split('\n');
                     for(var i in line3){
@@ -695,9 +695,9 @@ module.exports = function(socket) {
                         contents.push(content1)
                         contents.push(content2)
 
-                        var file = '../edu-me-project-Aram/config/name.txt'
+                        var file = '../edu-me-project/config/name.txt'
                         //파일에 내용 쓰려고함
-                        const article2 = fs.readFileSync("../edu-me-project-Aram/config/name.txt");
+                        const article2 = fs.readFileSync("../edu-me-project/config/name.txt");
                         var lineArray2 = article2.toString();
                         var line2 = lineArray2.split('\n');
                         var check = true
