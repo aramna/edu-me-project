@@ -4,7 +4,7 @@
   "description": "use 'yarn' (yarn 사용 권장!)\r =\r 'yarn' 설치 \r - npm install -g yarn",
   "main": "webpack.config.js",
   "dependencies": {
-    "@livechat/ui-kit": "^0.2.2",
+    "@livechat/ui-kit": "^0.1.0",
     "abab": "^1.0.4",
     "abbrev": "^1.1.1",
     "accepts": "^1.3.4",
