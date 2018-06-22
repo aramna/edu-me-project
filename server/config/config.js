@@ -1,5 +1,5 @@
 module.exports = {
-    server_port: 3000,
+    server_port: process.env.PORT || 3000,
     devServer_port: 4000,
     db_url: 'mongodb://dydcks5:c1w1s1c1!!@ds018168.mlab.com:18168/oz',
     db_schemas: [
