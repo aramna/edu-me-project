@@ -15,7 +15,7 @@ module.exports = {
     },
 
 
-    devServer_port: 3000,
+    devServer_port: 4000,
 
     devServer: {
         hot: true,
