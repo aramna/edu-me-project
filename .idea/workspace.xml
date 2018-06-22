@@ -2,9 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="0bd5ae95-0326-4285-b0af-da1a6903294c" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server/config/config.js" beforeDir="false" afterPath="$PROJECT_DIR$/server/config/config.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/webpack.dev.config.js" beforeDir="false" afterPath="$PROJECT_DIR$/webpack.dev.config.js" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/public/" />
     <ignored path="$PROJECT_DIR$/.tmp/" />
@@ -35,20 +33,20 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="config.js" pinned="false" current-in-tab="true">
+      <file leaf-file-name="config.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/server/config/config.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="294">
-              <caret line="14" lean-forward="true" selection-start-line="14" selection-end-line="14" />
+            <state relative-caret-position="42">
+              <caret line="2" column="21" selection-start-line="2" selection-start-column="21" selection-end-line="2" selection-end-column="21" />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="edume-server.js" pinned="false" current-in-tab="false">
+      <file leaf-file-name="edume-server.js" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/server/edume-server.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-680">
-              <caret line="20" column="7" selection-start-line="20" selection-start-column="7" selection-end-line="20" selection-end-column="7" />
+            <state relative-caret-position="1470">
+              <caret line="70" column="31" selection-start-line="70" selection-start-column="31" selection-end-line="70" selection-end-column="31" />
               <folding>
                 <element signature="n#!!doc" expanded="true" />
                 <element signature="e#27#56#0" expanded="true" />
@@ -86,8 +84,8 @@
       <file leaf-file-name="webpack.dev.config.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/webpack.dev.config.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="210">
-              <caret line="16" column="21" selection-start-line="16" selection-start-column="21" selection-end-line="16" selection-end-column="21" />
+            <state relative-caret-position="273">
+              <caret line="22" column="21" selection-start-line="22" selection-start-column="21" selection-end-line="22" selection-end-column="21" />
             </state>
           </provider>
         </entry>
@@ -105,7 +103,7 @@
         <entry file="file://$PROJECT_DIR$/build/config/config.js">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="168">
-              <caret line="8" column="2" lean-forward="true" selection-start-line="8" selection-start-column="2" selection-end-line="8" selection-end-column="2" />
+              <caret line="9" column="2" lean-forward="true" selection-start-line="9" selection-start-column="2" selection-end-line="9" selection-end-column="2" />
             </state>
           </provider>
         </entry>
@@ -457,7 +455,7 @@
       <workItem from="1529302069054" duration="2537000" />
       <workItem from="1529336340997" duration="46704000" />
       <workItem from="1529580146980" duration="4529000" />
-      <workItem from="1529601473803" duration="13443000" />
+      <workItem from="1529601473803" duration="13994000" />
     </task>
     <task id="LOCAL-00001" summary="5.19">
       <created>1526738659689</created>
@@ -561,11 +559,10 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="427207000" />
+    <option name="totallyTimeSpent" value="427758000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="1012" y="16" width="948" height="1047" extended-state="0" />
-    <editor active="true" />
     <layout>
       <window_info content_ui="combo" id="Project" order="3" visible="true" weight="0.23318386" />
       <window_info anchor="bottom" id="TODO" order="6" />
@@ -805,7 +802,7 @@
     <entry file="file://$PROJECT_DIR$/build/config/config.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="168">
-          <caret line="8" column="2" lean-forward="true" selection-start-line="8" selection-start-column="2" selection-end-line="8" selection-end-column="2" />
+          <caret line="9" column="2" lean-forward="true" selection-start-line="9" selection-start-column="2" selection-end-line="9" selection-end-column="2" />
         </state>
       </provider>
     </entry>
@@ -813,13 +810,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="168">
           <caret line="14" column="2" lean-forward="true" selection-start-line="14" selection-start-column="2" selection-end-line="14" selection-end-column="2" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/webpack.config.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="735">
-          <caret line="35" column="66" selection-start-line="35" selection-start-column="66" selection-end-line="35" selection-end-column="66" />
         </state>
       </provider>
     </entry>
@@ -847,29 +837,36 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/server/edume-server.js">
+    <entry file="file://$PROJECT_DIR$/webpack.config.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-680">
-          <caret line="20" column="7" selection-start-line="20" selection-start-column="7" selection-end-line="20" selection-end-column="7" />
-          <folding>
-            <element signature="n#!!doc" expanded="true" />
-            <element signature="e#27#56#0" expanded="true" />
-            <element signature="e#488#520#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="735">
+          <caret line="35" column="66" selection-start-line="35" selection-start-column="66" selection-end-line="35" selection-end-column="66" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/webpack.dev.config.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="210">
-          <caret line="16" column="21" selection-start-line="16" selection-start-column="21" selection-end-line="16" selection-end-column="21" />
+        <state relative-caret-position="273">
+          <caret line="22" column="21" selection-start-line="22" selection-start-column="21" selection-end-line="22" selection-end-column="21" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/server/config/config.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="294">
-          <caret line="14" lean-forward="true" selection-start-line="14" selection-end-line="14" />
+        <state relative-caret-position="42">
+          <caret line="2" column="21" selection-start-line="2" selection-start-column="21" selection-end-line="2" selection-end-column="21" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/server/edume-server.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1470">
+          <caret line="70" column="31" selection-start-line="70" selection-start-column="31" selection-end-line="70" selection-end-column="31" />
+          <folding>
+            <element signature="n#!!doc" expanded="true" />
+            <element signature="e#27#56#0" expanded="true" />
+            <element signature="e#488#520#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
