@@ -95,6 +95,25 @@ router.post('/adduser', function (req, res) {
             return console.log("roomlist가 생성되었습니다.\n" + list);
         });
 
+        var file = '../edu-me-project-Aram/config/name.txt';
+        var data = user.username + ',' + user.username + '\n';
+
+        _fs2.default.open(file, 'a+', function (err, fd) {
+            if (err) throw err;
+            if (fd == '9') {
+                console.log('file create.');
+                _fs2.default.writeFile(file, data, 'utf8', function (err) {
+                    if (err) throw err;
+                });
+            } else {
+                _fs2.default.appendFile(file, data, function (err) {
+                    if (err) throw err;
+                });
+            }
+        });
+
+        var data2 = user.username + '이';
+
         return res.json({ success: true });
     });
 });

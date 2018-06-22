@@ -279,7 +279,7 @@ class ChatContainer extends React.Component {
         }
         var output2 = {
             command: 'join',
-            roomId: name,
+            roomId: e.target.value,
             id: this.props.currentUser,
             userEmail: this.props.currentEmail,
             oneonone: false
@@ -900,9 +900,9 @@ class ChatContainer extends React.Component {
                     </Item>
                     <Divider fitted style={{marginTop: 5, marginBottom: 5}}/>
                 </div>
-                    // :
-                    // <div>
-                    // </div>
+                // :
+                // <div>
+                // </div>
             )
         )
 
@@ -1223,7 +1223,7 @@ class ChatContainer extends React.Component {
                 <Button toggle circular icon='power off'
                         active={this.state.liveSTT}
                         onClick={this.livestart}
-               />
+                />
             </div>
         )
 
@@ -1262,9 +1262,9 @@ class ChatContainer extends React.Component {
                                 onClick={this.start}
                         />
                         <a>
-                        <div onClick={this.handleModalClose} style={{position: 'absolute', bottom: '3.5%', right: '5%'}}>
-                            {bot}
-                        </div>
+                            <div onClick={this.handleModalClose} style={{position: 'absolute', bottom: '3.5%', right: '5%'}}>
+                                {bot}
+                            </div>
                         </a>
                         <div style={{position: 'absolute', bottom: '25%', right: '10%'}}>
                             {bubble}
@@ -1286,9 +1286,9 @@ class ChatContainer extends React.Component {
                     :
                     <div>
                         <a>
-                        <div onClick={this.handleModalClose} style={{position: 'absolute', bottom: '3.5%', right: '5%'}}>
-                            {bot}
-                        </div>
+                            <div onClick={this.handleModalClose} style={{position: 'absolute', bottom: '3.5%', right: '5%'}}>
+                                {bot}
+                            </div>
                         </a>
                         <div style={{position: 'absolute', bottom: '25%', right: '10%'}}>
                             {bubble}
@@ -1442,12 +1442,12 @@ class ChatContainer extends React.Component {
                         </Grid.Column>
                         <Grid.Column stretched style={{width: 'calc(100% - 310px)', padding: 0, zIndex: 1}}>
 
-                                <div style={{height: '100%', textAlign: 'center'}}>
+                            <div style={{height: '100%', textAlign: 'center'}}>
 
 
-                                        {chatView}
-                                        {inputView}
-                                </div>
+                                {chatView}
+                                {inputView}
+                            </div>
 
 
 
@@ -1484,33 +1484,33 @@ class ChatContainer extends React.Component {
                     <div>
                         {this.state.mobileView ?
                             this.state.activeChannel !== '' ?
-                            <Menu compact secondary icon attached='top' style={{
-                                width: '100vh',
-                                height: 55,
-                                backgroundColor: '#c4c4c4',
-                                opacity: 0.8,
-                                position: 'absolute',
-                                zIndex: 3
-                            }}>
-                                <Menu.Item
-                                    onClick={this.handleMobile}
-                                    style={{width: 50, marginRight: 55}}
-                                >
-                                    <Icon name='angle left' size='big'/>
-                                </Menu.Item>
-                                <Menu.Item style={{width: 'calc(100% - 240px)'}}>
-                                    <Header style={{width: '100%'}}>
-                                        {this.state.channelORoneOnOne ? this.state.activeOneOnOne : this.state.activeChannel}
-                                    </Header>
-                                </Menu.Item>
-                                <Menu.Item
-                                    position='right'
-                                    style={{width: 90}}
-                                >
-                                    {STT}
-                                    {logoutButton2}
-                                </Menu.Item>
-                            </Menu>
+                                <Menu compact secondary icon attached='top' style={{
+                                    width: '100vh',
+                                    height: 55,
+                                    backgroundColor: '#c4c4c4',
+                                    opacity: 0.8,
+                                    position: 'absolute',
+                                    zIndex: 3
+                                }}>
+                                    <Menu.Item
+                                        onClick={this.handleMobile}
+                                        style={{width: 50, marginRight: 55}}
+                                    >
+                                        <Icon name='angle left' size='big'/>
+                                    </Menu.Item>
+                                    <Menu.Item style={{width: 'calc(100% - 240px)'}}>
+                                        <Header style={{width: '100%'}}>
+                                            {this.state.channelORoneOnOne ? this.state.activeOneOnOne : this.state.activeChannel}
+                                        </Header>
+                                    </Menu.Item>
+                                    <Menu.Item
+                                        position='right'
+                                        style={{width: 90}}
+                                    >
+                                        {STT}
+                                        {logoutButton2}
+                                    </Menu.Item>
+                                </Menu>
                                 :
                                 <Menu compact secondary icon attached='top' style={{
                                     width: '100vh',
@@ -1593,7 +1593,7 @@ class ChatContainer extends React.Component {
                                     <div style={{position: 'absolute', bottom: '3.5%', right: '5%'}}>
                                         {WidgetSTT}
                                     </div>
-                                :
+                                    :
                                     <div>
                                         {WidgetSTT}
                                     </div>
