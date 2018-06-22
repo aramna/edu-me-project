@@ -1214,7 +1214,7 @@ module.exports = function (socket) {
                         //object
                         console.log('recentMsg시방', recentMsg);
                         io.sockets.in(chat.roomId).emit('message', chat);
-                        io.sockets.in(chat.roomId).emit('message', chat);
+                        io.sockets.in(chat.roomId).emit('recall', chat);
                         io.sockets.in(chat.roomId).emit('recentmsg', recentMsg);
                     }
                 });
@@ -1266,7 +1266,7 @@ module.exports = function (socket) {
                         });
                         console.log(chat);
                         io.sockets.in(chat.roomId).emit('message', chat);
-                        io.sockets.in(chat.roomId).emit('message', chat);
+                        io.sockets.in(chat.roomId).emit('recall', chat);
                     }
                 });
             } else {
@@ -1603,7 +1603,7 @@ module.exports = function (socket) {
                         console.log(chat);
                         io.sockets.in(chat.roomId).emit('message', chat);
 
-                        io.sockets.in(chat.roomId).emit('message', chat);
+                        io.sockets.in(chat.roomId).emit('recall', chat);
                     } else {
                         var data = { possibility: false,
                             contents: '상대방이 접속하지 않았어요' };
@@ -1649,7 +1649,7 @@ module.exports = function (socket) {
                             });
                             console.log(_chat2);
                             io.sockets.in(_chat2.roomId).emit('message', _chat2);
-                            io.sockets.in(_chat2.roomId).emit('message', _chat2);
+                            io.sockets.in(_chat2.roomId).emit('recall', _chat2);
                         } else {
                             var data = { possibility: false,
                                 contents: '상대방이 접속하지 않았어요' };

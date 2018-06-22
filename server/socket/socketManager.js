@@ -1246,7 +1246,7 @@ module.exports = function(socket) {
                         //object
                         console.log('recentMsg시방',recentMsg)
                         io.sockets.in(chat.roomId).emit('message', chat);
-                        io.sockets.in(chat.roomId).emit('message', chat)
+                        io.sockets.in(chat.roomId).emit('recall', chat)
                         io.sockets.in(chat.roomId).emit('recentmsg', recentMsg)
                     }
                 })
@@ -1301,7 +1301,7 @@ module.exports = function(socket) {
                         })
                         console.log(chat);
                         io.sockets.in(chat.roomId).emit('message', chat)
-                        io.sockets.in(chat.roomId).emit('message', chat);
+                        io.sockets.in(chat.roomId).emit('recall', chat);
                     }
                 })
             } else
@@ -1659,7 +1659,7 @@ module.exports = function(socket) {
                         console.log(chat);
                         io.sockets.in(chat.roomId).emit('message', chat);
 
-                        io.sockets.in(chat.roomId).emit('message', chat)
+                        io.sockets.in(chat.roomId).emit('recall', chat)
                     } else
                     {
                         var data = {possibility: false,
@@ -1710,7 +1710,7 @@ module.exports = function(socket) {
                             })
                             console.log(chat);
                             io.sockets.in(chat.roomId).emit('message', chat);
-                            io.sockets.in(chat.roomId).emit('message', chat)
+                            io.sockets.in(chat.roomId).emit('recall', chat)
                         } else
                         {
                             var data = {possibility: false,
