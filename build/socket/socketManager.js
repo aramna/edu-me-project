@@ -1183,10 +1183,6 @@ module.exports = function (socket) {
                             if (err) throw err;
                         });
 
-                        var receiverSocket = login_ids.find(function (you) {
-                            return you.email === jroom.receiverEmail;
-                        });
-
                         console.log(socket.request.sessionID);
                         if (socket.request.sessionID) {
                             console.log('로그인되어 있음.');
@@ -1218,20 +1214,14 @@ module.exports = function (socket) {
                         //object
                         console.log('recentMsg시방', recentMsg);
                         io.sockets.in(chat.roomId).emit('message', chat);
-                        if (receiverSocket != null) {
-                            console.log("리콜해여");
-                            console.dir(receiverSocket);
-                            io.sockets.to(receiverSocket.socketId).emit('recall', chat);
-                        }
+                        io.sockets.in(chat.roomId).emit('message', chat);
                         io.sockets.in(chat.roomId).emit('recentmsg', recentMsg);
                     }
                 });
                 _database2.default.RoomModel.findOne({ creater: room.name, receiver: room.roomId }, function (err, jroom) {
                     if (err) throw err;
                     if (jroom) {
-                        var receiverSocket = login_ids.find(function (you) {
-                            return you.email === jroom.receiverEmail;
-                        });
+
                         if (jroom.chatCount == 0) {
                             _database2.default.ListModel.findOne({ email: jroom.receiverEmail }, function (err, oneononelist) {
                                 var croom = new _database2.default.RoomModel({
@@ -1275,11 +1265,7 @@ module.exports = function (socket) {
                             if (err) throw err;
                         });
                         console.log(chat);
-                        if (receiverSocket != null) {
-                            console.log("리콜해여");
-                            console.dir(receiverSocket);
-                            io.sockets.to(receiverSocket.socketId).emit('recall', chat);
-                        }
+                        io.sockets.in(chat.roomId).emit('message', chat);
                         io.sockets.in(chat.roomId).emit('message', chat);
                     }
                 });
@@ -1600,9 +1586,7 @@ module.exports = function (socket) {
                         } else {
                             console.log('로그인 안되어 있음');
                         }
-                        var receiverSocket = login_ids.find(function (you) {
-                            return you.email === jroom.receiverEmail;
-                        });
+
                         var chat = new _database2.default.ChatModel({
                             name: room.id,
                             message: message,
@@ -1618,11 +1602,8 @@ module.exports = function (socket) {
                         });
                         console.log(chat);
                         io.sockets.in(chat.roomId).emit('message', chat);
-                        if (receiverSocket != null) {
-                            console.log("리콜해여");
-                            console.dir(receiverSocket);
-                            io.sockets.to(receiverSocket.socketId).emit('recall', chat);
-                        }
+
+                        io.sockets.in(chat.roomId).emit('message', chat);
                     } else {
                         var data = { possibility: false,
                             contents: '상대방이 접속하지 않았어요' };
@@ -1653,10 +1634,6 @@ module.exports = function (socket) {
                             }
                             console.log('채팅을 전송합니다');
 
-                            var receiverSocket = login_ids.find(function (you) {
-                                return you.email === jroom.receiverEmail;
-                            });
-
                             var _chat2 = new _database2.default.ChatModel({
                                 name: room.id,
                                 message: message,
@@ -1672,11 +1649,7 @@ module.exports = function (socket) {
                             });
                             console.log(_chat2);
                             io.sockets.in(_chat2.roomId).emit('message', _chat2);
-                            if (receiverSocket != null) {
-                                console.log("리콜해여");
-                                console.dir(receiverSocket);
-                                io.sockets.to(receiverSocket.socketId).emit('recall', _chat2);
-                            }
+                            io.sockets.in(_chat2.roomId).emit('message', _chat2);
                         } else {
                             var data = { possibility: false,
                                 contents: '상대방이 접속하지 않았어요' };

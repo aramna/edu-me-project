@@ -1214,9 +1214,6 @@ module.exports = function(socket) {
                             if (err) throw err
                         });
 
-                        var receiverSocket = login_ids.find(function(you){
-                            return you.email === jroom.receiverEmail
-                        })
 
                         console.log(socket.request.sessionID);
                         if (socket.request.sessionID) {
@@ -1249,21 +1246,14 @@ module.exports = function(socket) {
                         //object
                         console.log('recentMsg시방',recentMsg)
                         io.sockets.in(chat.roomId).emit('message', chat);
-                        if(receiverSocket != null)
-                        {
-                            console.log("리콜해여")
-                            console.dir(receiverSocket)
-                            io.sockets.to(receiverSocket.socketId).emit('recall', chat)
-                        }
+                        io.sockets.in(chat.roomId).emit('message', chat)
                         io.sockets.in(chat.roomId).emit('recentmsg', recentMsg)
                     }
                 })
                 database.RoomModel.findOne({creater:room.name, receiver: room.roomId}, function(err, jroom){
                     if (err) throw err;
                     if (jroom) {
-                        var receiverSocket = login_ids.find(function(you){
-                            return you.email === jroom.receiverEmail
-                        })
+
                         if(jroom.chatCount == 0)
                         {
                             database.ListModel.findOne({email: jroom.receiverEmail}, function(err, oneononelist){
@@ -1310,12 +1300,7 @@ module.exports = function(socket) {
                             if (err) throw err
                         })
                         console.log(chat);
-                        if(receiverSocket != null)
-                        {
-                            console.log("리콜해여")
-                            console.dir(receiverSocket)
-                            io.sockets.to(receiverSocket.socketId).emit('recall', chat)
-                        }
+                        io.sockets.in(chat.roomId).emit('message', chat)
                         io.sockets.in(chat.roomId).emit('message', chat);
                     }
                 })
@@ -1654,9 +1639,10 @@ module.exports = function(socket) {
                         } else {
                             console.log('로그인 안되어 있음');
                         }
-                        var receiverSocket = login_ids.find(function(you){
-                            return you.email === jroom.receiverEmail
-                        })
+
+
+
+
                         let chat = new database.ChatModel({
                             name: room.id,
                             message: message,
@@ -1672,12 +1658,8 @@ module.exports = function(socket) {
                         })
                         console.log(chat);
                         io.sockets.in(chat.roomId).emit('message', chat);
-                        if(receiverSocket != null)
-                        {
-                            console.log("리콜해여")
-                            console.dir(receiverSocket)
-                            io.sockets.to(receiverSocket.socketId).emit('recall', chat)
-                        }
+
+                        io.sockets.in(chat.roomId).emit('message', chat)
                     } else
                     {
                         var data = {possibility: false,
@@ -1711,9 +1693,7 @@ module.exports = function(socket) {
                             }
                             console.log('채팅을 전송합니다')
 
-                            var receiverSocket = login_ids.find(function(you){
-                                return you.email === jroom.receiverEmail
-                            })
+
 
                             let chat = new database.ChatModel({
                                 name: room.id,
@@ -1730,12 +1710,7 @@ module.exports = function(socket) {
                             })
                             console.log(chat);
                             io.sockets.in(chat.roomId).emit('message', chat);
-                            if(receiverSocket != null)
-                            {
-                                console.log("리콜해여")
-                                console.dir(receiverSocket)
-                                io.sockets.to(receiverSocket.socketId).emit('recall', chat)
-                            }
+                            io.sockets.in(chat.roomId).emit('message', chat)
                         } else
                         {
                             var data = {possibility: false,

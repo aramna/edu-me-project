@@ -2,7 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="0bd5ae95-0326-4285-b0af-da1a6903294c" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/socket/socketManager.js" beforeDir="false" afterPath="$PROJECT_DIR$/server/socket/socketManager.js" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/public/" />
     <ignored path="$PROJECT_DIR$/.tmp/" />
@@ -29,7 +30,7 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="package.json" pinned="false" current-in-tab="true">
+      <file leaf-file-name="package.json" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/package.json">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="126">
@@ -77,11 +78,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="socketManager.js" pinned="false" current-in-tab="false">
+      <file leaf-file-name="socketManager.js" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/server/socket/socketManager.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="147">
-              <caret line="617" column="94" selection-start-line="617" selection-start-column="31" selection-end-line="617" selection-end-column="94" />
+            <state relative-caret-position="129">
+              <caret line="1253" column="39" lean-forward="true" selection-start-line="1253" selection-start-column="39" selection-end-line="1253" selection-end-column="39" />
               <folding>
                 <element signature="e#0#43#0" expanded="true" />
               </folding>
@@ -135,7 +136,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>speechstart</find>
       <find>STT</find>
       <find>toggle</find>
       <find>livechat</find>
@@ -165,6 +165,7 @@
       <find>txt</find>
       <find>classname=&quot;mess</find>
       <find>chatview</find>
+      <find>'recall',</find>
     </findStrings>
     <replaceStrings>
       <replace />
@@ -242,9 +243,9 @@
         <option value="$PROJECT_DIR$/server/edume-server.js" />
         <option value="$PROJECT_DIR$/server/config/config.js" />
         <option value="$PROJECT_DIR$/src/containers/ChatContainer.js" />
-        <option value="$PROJECT_DIR$/server/socket/socketManager.js" />
         <option value="$PROJECT_DIR$/server/routes/user.js" />
         <option value="$PROJECT_DIR$/package.json" />
+        <option value="$PROJECT_DIR$/server/socket/socketManager.js" />
       </list>
     </option>
   </component>
@@ -274,9 +275,8 @@
     <dismissed value="$PROJECT_DIR$/package.json" />
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="930" />
-    <option name="y" value="12" />
-    <option name="width" value="948" />
+    <option name="x" value="953" />
+    <option name="width" value="974" />
     <option name="height" value="1047" />
   </component>
   <component name="ProjectView">
@@ -427,7 +427,7 @@
       <workItem from="1529302069054" duration="2537000" />
       <workItem from="1529336340997" duration="46704000" />
       <workItem from="1529580146980" duration="4529000" />
-      <workItem from="1529601473803" duration="22336000" />
+      <workItem from="1529601473803" duration="23659000" />
     </task>
     <task id="LOCAL-00001" summary="5.19">
       <created>1526738659689</created>
@@ -531,13 +531,13 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="436100000" />
+    <option name="totallyTimeSpent" value="437423000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="930" y="12" width="948" height="1047" extended-state="0" />
+    <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="3" visible="true" weight="0.28923768" />
+      <window_info active="true" content_ui="combo" id="Project" order="3" visible="true" weight="0.13723405" />
       <window_info anchor="bottom" id="TODO" order="6" />
       <window_info anchor="bottom" id="Docker" order="7" show_stripe_button="false" />
       <window_info anchor="bottom" id="Event Log" order="8" side_tool="true" />
@@ -546,7 +546,7 @@
       <window_info id="npm" order="1" side_tool="true" />
       <window_info id="Structure" order="0" side_tool="true" weight="0.25" />
       <window_info anchor="right" id="Mongo Explorer" order="3" weight="0.3224401" />
-      <window_info anchor="bottom" id="Terminal" order="10" visible="true" weight="0.40268457" />
+      <window_info anchor="bottom" id="Terminal" order="10" visible="true" weight="0.3986711" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="TypeScript" order="11" />
@@ -808,16 +808,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/server/socket/socketManager.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="147">
-          <caret line="617" column="94" selection-start-line="617" selection-start-column="31" selection-end-line="617" selection-end-column="94" />
-          <folding>
-            <element signature="e#0#43#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/server/routes/user.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="273">
@@ -849,6 +839,16 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="126">
           <caret line="6" column="31" selection-start-line="6" selection-start-column="31" selection-end-line="6" selection-end-column="31" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/server/socket/socketManager.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="129">
+          <caret line="1253" column="39" lean-forward="true" selection-start-line="1253" selection-start-column="39" selection-end-line="1253" selection-end-column="39" />
+          <folding>
+            <element signature="e#0#43#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
