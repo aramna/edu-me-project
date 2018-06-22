@@ -56,7 +56,7 @@ app.use(function(err, req, res, next) {
 
 // app.use('/', router);//라우터 객체 등록
 
-var server = app.listen(config.server_port, () => {
+var server = app.listen(config.server_port,'0.0.0.0', () => {
     console.log('서버 실행 완료:', `http://localhost:` + config.server_port)
     database.init(app,config);
 })

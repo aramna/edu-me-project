@@ -102,7 +102,7 @@ app.use(function (err, req, res, next) {
 
 // app.use('/', router);//라우터 객체 등록
 
-var server = app.listen(_config2.default.server_port, function () {
+var server = app.listen(_config2.default.server_port, '0.0.0.0', function () {
     console.log('서버 실행 완료:', 'http://localhost:' + _config2.default.server_port);
     _database2.default.init(app, _config2.default);
 });
