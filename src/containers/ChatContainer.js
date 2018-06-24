@@ -20,7 +20,6 @@ import {
     Responsive,
     Dropdown,
     Search,
-    Checkbox,
 } from 'semantic-ui-react'
 import {
     Message,
@@ -30,14 +29,10 @@ import '../index.css'
 import avartarImage from '../images/avatar.jpg'
 import {socketConnect} from 'socket.io-react'
 import {getStatusRequest, logoutRequest} from "../actions/authentication";
-
 import {BotCharacter} from 'components'
 import './styles2'
 import './slide.less'
 import _ from 'lodash'
-
-
-// var audio = new Audio('audio_file.mp3');
 
 function dynamicSort(property) {
     var sortOrder = 1
@@ -94,9 +89,6 @@ class ChatContainer extends React.Component {
             isLoading: false,
             results: [],
             value: '',
-            givetextcount: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,],
-            givemessage: ["None", "None", "None", "None", "None", "None", "None", "None", "None", "None",],
-            activeChannelIndex: 0,
             recentMsg: [],
             recentLoading: true,
             liveSTT: false,
@@ -105,10 +97,10 @@ class ChatContainer extends React.Component {
         }
 
 
-        this.handleChannelShow = this.handleChannelShow.bind(this)    //sidebar
-        this.handleOneOnOneShow = this.handleOneOnOneShow.bind(this)    //sidebar
-        this.handleChannelAdd = this.handleChannelAdd.bind(this)    //sidebar
-        this.handleOneOnOneAdd = this.handleOneOnOneAdd.bind(this)    //sidebar
+        this.handleChannelShow = this.handleChannelShow.bind(this)
+        this.handleOneOnOneShow = this.handleOneOnOneShow.bind(this)
+        this.handleChannelAdd = this.handleChannelAdd.bind(this)
+        this.handleOneOnOneAdd = this.handleOneOnOneAdd.bind(this)
         this.handleItemClick = this.handleItemClick.bind(this)
         this.handleItemClick2 = this.handleItemClick2.bind(this)
         this.handleRoomCreate = this.handleRoomCreate.bind(this)
@@ -131,7 +123,6 @@ class ChatContainer extends React.Component {
         this.resetComponent = this.resetComponent.bind(this)
         this.handleResultSelect = this.handleResultSelect.bind(this)
         this.handleSearchChange = this.handleSearchChange.bind(this)
-        // this.audioQ = this.audioQ.bind(this)
         this.handleLogout = this.handleLogout.bind(this)
     }
 
@@ -158,12 +149,6 @@ class ChatContainer extends React.Component {
             }
         );
     }
-
-    // audioQ() {
-    //     audio.play()
-    //     console.log("dsfjkhfkjsdalhf");
-    // }
-
 
     handleMobile() {
         this.setState({mobileView: !this.state.mobileView})
@@ -462,16 +447,6 @@ class ChatContainer extends React.Component {
             logs2.push(obj) // 로그에 추가
             this.setState({logs: logs2})
             console.log('message', obj)
-            // const TextToSpeech = window.speechSynthesis
-            //
-            // let sayThis = new SpeechSynthesisUtterance(obj.message)
-            //
-            // TextToSpeech.speak(sayThis)
-
-
-            // if(obj.email!==this.props.currentEmail){
-            //     this.audioQ()
-            // }
         })
 
         var defaultRoom = 'main'    //채팅방에 입장시 기본 채팅방을 main으로 설정
@@ -494,46 +469,18 @@ class ChatContainer extends React.Component {
                 this.setState({
                     oneOnOneList: oneononelist.oneonones,
                 })
-                console.log('일대일리스트', this.state.oneOnOneList)
-                // for (var i = 0; i < this.state.oneOnOneList.length; i++) {
-                //     var output = {
-                //         command: 'join',
-                //         roomId: this.state.oneOnOneList[i].text,
-                //         id: this.props.currentUser,
-                //         userEmail: this.props.currentEmail,
-                //         oneonone: true
-                //     }
-                //     socket.emit('room', output)
-                //
-                // }
-
 
             })
         }
 
         if (this.state.channelList !== null) {
             socket.on('channellist', (channellist) => {
-                console.log('채널리스트', channellist)
                 this.setState({channelList: []})
                 this.setState({
                     channelList: this.state.channelList.concat(channellist.roomIds),
                 })
-                // for (var i = 0; i < this.state.channelList.length; i++) {
-                //     var output = {
-                //         command: 'join',
-                //         roomId: this.state.channelList[i].text,
-                //         id: this.props.currentUser,
-                //         userEmail: this.props.currentEmail,
-                //         oneonone: false
-                //     }
-                //     console.log('채널', output.roomId)
-                //
-                //     socket.emit('room', output)
-                // }
-
             })
         }
-
 
 
         socket.on('memberlist', (memberlist) => {
@@ -648,14 +595,6 @@ class ChatContainer extends React.Component {
             })
         };
 
-        this.recognition.onerror = event => {
-            console.log('error', event);
-
-            setTimeout(function () {
-                this.setState({modalOpen: false})
-            }.bind(this), 1200)
-        };
-
         // 라이브챗팅
 
         this.liverecognition.onresult = event => {
@@ -696,14 +635,6 @@ class ChatContainer extends React.Component {
                 listening: true,
             })
         };
-
-        // this.liverecognition.onerror = event => {
-        //     console.log('liveerror', event);
-        //
-        //     setTimeout(function () {
-        //         this.setState({liveSTT: false})
-        //     }.bind(this), 1200)
-        // };
 
         socket.on('request', (obj) => {
             console.log("obj", obj)
@@ -872,7 +803,6 @@ class ChatContainer extends React.Component {
 
         const mobileChannel = this.state.channelList.map(
             ({text}) => (
-                // text !== 'main' ?
                 <div>
                     <Item as='a'>
                         <Item.Content>
@@ -900,9 +830,7 @@ class ChatContainer extends React.Component {
                     </Item>
                     <Divider fitted style={{marginTop: 5, marginBottom: 5}}/>
                 </div>
-                // :
-                // <div>
-                // </div>
+
             )
         )
 
@@ -1369,47 +1297,6 @@ class ChatContainer extends React.Component {
                     }}>{mobileOneOnOne}</div>}
             </div>
 
-        )
-
-        const mainView = (
-            <div className="container">
-                <section className="slide">
-                    <div className="inner" style={{}}>
-                        <h1 style={{fontFamily: 'Quicksand', fontSize: 90, color: 'white'}}>Talky</h1>
-                        <p style={{fontFamily: "Jeju Gothic"}}>토키에 오신 것을 환영합니다. 옆으로 넘기세요.</p>
-                    </div>
-                </section>
-                <section className="slide">
-                    <div className="inner">
-                        <p>Just a really simple way to layout and animate a gallery.</p>
-                    </div>
-                </section>
-                <section className="slide">
-                    <div className="inner">
-                        <p>The active slide is positioned in the viewport.</p>
-                        <pre><code>{"\n"}.slide.active {"{"}{"\n"}{"  "}transform: translatex(0);{"\n"}{"}"}</code></pre>
-                    </div>
-                </section>
-                <section className="slide">
-                    <div className="inner">
-                        <p>Siblings after the active slide are positioned off the screen to the right.</p>
-                        <pre><code>{"\n"}.slide.active ~ .slide {"{"}{"\n"}{"  "}transform: translatex(100%);{"\n"}{"}"}</code></pre>
-                    </div>
-                </section>
-                <section className="slide">
-                    <div className="inner">
-                        <p>Siblings before the active slide are positioned off the screen to the left.</p>
-                        <pre><code>{"\n"}.slide {"{"}{"\n"}{"  "}transform: translatex(-100%);{"\n"}{"}"}</code></pre>
-                    </div>
-                </section>
-                <section className="slide">
-                    <div className="inner">
-                        <p>The movement between slides is handled by a transition.</p>
-                        <pre><code>{"\n"}.slide {"{"}{"\n"}{"  "}transition: transform 0.4s ease;{"\n"}{"}"}</code></pre>
-                    </div>
-                </section>
-
-            </div>
         )
 
         return (

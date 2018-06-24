@@ -34,7 +34,6 @@ class FixedHeader extends React.Component {
                 browserHistory.push('/')
                 message.success("로그아웃이 완료되었습니다.")
 
-                // EMPTIES THE SESSION
                 let loginData = {
                     isLoggedIn: false,
                     email: ''

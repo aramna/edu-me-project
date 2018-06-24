@@ -30,23 +30,18 @@ class App extends Component {
         // 쿠키로부터 로그인 데이터를 얻음
         let loginData = getCookie('key');
 
-        // if loginData is undefined, do nothing
         if (typeof loginData === "undefined") return;
 
-        // decode base64 & parse json
         loginData = JSON.parse(atob(loginData));
 
-        // if not logged in, do nothing
+
         if (!loginData.isLoggedIn) return;
 
-        // page refreshed & has a session in cookie,
-        // check whether this cookie is valid or not
+
         this.props.getStatusRequest().then(
             () => {
                 console.log(this.props.status);
-                // if session is not valid
                 if (!this.props.status.valid) {
-                    // logout the session
                     loginData = {
                         isLoggedIn: false,
                         email: ''

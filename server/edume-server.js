@@ -14,7 +14,6 @@ import WebpackDevServer from 'webpack-dev-server';
 import config from './config/config';
 import webConfig from '../webpack.dev.config';
 import path from 'path';
-import http from 'http';
 
 
 // import socketio from 'socket.io';
